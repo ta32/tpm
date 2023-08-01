@@ -186,3 +186,24 @@ it('get tag tile', () => {
   notTitle = getTagTitle(INITIAL_TAGS, 'status');
   expect(notTitle).toEqual('');
 });
+
+it('add tag after error', () => {
+  const addTag: AddTag = {
+    type: "ADD_TAG",
+    title: 'Bitcoin',
+    icon: 'Bitcoin',
+  }
+
+  const syncedTags = {...INITIAL_TAGS, status: TagsStatus.ERROR};
+  const actualTags = tagsReducer(syncedTags, addTag);
+  expect(actualTags.status).toEqual(TagsStatus.ERROR);
+
+  const addTag2: AddTag = {
+    type: "ADD_TAG",
+    title: 'Bitcoin2',
+    icon: 'Bitcoin',
+  }
+
+  const actualTags2 = tagsReducer(actualTags, addTag2);
+  expect(actualTags2.status).toEqual(TagsStatus.SAVE_REQUIRED);
+});

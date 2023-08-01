@@ -1,7 +1,7 @@
 import Styles from './tag_modal.module.scss'
 import Image from 'next/image'
 import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react'
-import { useTagEntries } from '../../../contexts/tag_entries'
+import { useTagEntries, useTagEntriesDispatch } from '../../../contexts/tag_entries'
 import { getTagTitle, TagsStatus } from '../../../contexts/reducers/tag_entries'
 import { getTagIconPath, TAG_ICONS } from '../../../lib/icons'
 
@@ -20,6 +20,7 @@ interface TagModalProps {
 
 export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: TagModalProps) {
   const tagEntries = useTagEntries();
+  const tagEntriesDispatch = useTagEntriesDispatch();
   const [error, setError] = useState("");
   const [tagIconIndex, setTagIconIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
@@ -46,6 +47,7 @@ export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: T
 
   const handleClose = () => {
     setError("");
+    tagEntriesDispatch({type: "CLEAR_ERROR"});
     setShowControls(false);
     onClosed();
   }
@@ -57,6 +59,7 @@ export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: T
 
   const handleDiscard = () => {
     setError("");
+    tagEntriesDispatch({type: "CLEAR_ERROR"});
     setShowControls(false);
     onDiscard();
   }

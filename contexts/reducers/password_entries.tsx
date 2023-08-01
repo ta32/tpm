@@ -1,6 +1,6 @@
 
 // MODEL
-import { uniqueId } from '../../lib/utils'
+import { uniqueId } from 'lib/utils'
 
 export interface SafePasswordEntry {
   key: string;

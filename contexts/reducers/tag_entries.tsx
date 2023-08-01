@@ -1,6 +1,6 @@
 // MODEL
 
-import { uniqueId } from '../../lib/utils'
+import { uniqueId } from 'lib/utils'
 
 export interface TagEntries {
   [key: string]: TagEntry | string | number;
@@ -46,7 +46,11 @@ export interface SyncTags {
   tags?: TagEntry[];
 }
 
-export type TagsAction = AddTag | RemoveTag | UpdateTag | UploadedTags | SyncTags;
+export interface ClearError {
+  type: "CLEAR_ERROR"
+}
+
+export type TagsAction = AddTag | RemoveTag | UpdateTag | UploadedTags | SyncTags | ClearError;
 
 export function tagsReducer(state: TagEntries, action: TagsAction) : TagEntries {
   switch (action.type) {
@@ -113,6 +117,9 @@ export function tagsReducer(state: TagEntries, action: TagsAction) : TagEntries 
         newTagEntries[tagId] = tag;
       }
       return newTagEntries;
+    }
+    case "CLEAR_ERROR": {
+      return { ...state, status: TagsStatus.SYNCED, lastError: "" };
     }
     default:
       return state;
