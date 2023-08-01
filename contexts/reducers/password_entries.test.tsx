@@ -1,6 +1,3 @@
-import {
-
-} from '../password_entries'
 import { describe } from '@jest/globals'
 import {
   AddEntry, getSafePasswordEntries,
@@ -12,6 +9,11 @@ import {
   UpdateEntry,
   UploadEntries
 } from './password_entries'
+import { uniqueId } from '../../lib/utils'
+
+jest.mock('../../lib/utils');
+const mUniqueId = jest.mocked(uniqueId);
+
 
 function initialEntries(): PasswordEntries {
   return {
@@ -92,8 +94,9 @@ test('Adding new entry to loaded database', () => {
   let initialState: PasswordEntries = {...initialEntries(), version: 1, status: PasswordEntriesStatus.SYNCED};
   initialState.key1 = entry(1);
 
-  let entry2 = {...entry(2), key: "key set by reducer"};
+  let entry2 = {...entry(2), key: "value set by reducer when added"};
   const action: AddEntry = {type: "ADD_ENTRY", entry: entry2};
+  mUniqueId.mockReturnValue("key2");
 
   // noinspection DuplicatedCode
   const actual = passwordEntriesReducer(initialState, action);
@@ -106,6 +109,7 @@ test('Adding new entry to loaded database', () => {
     key2: entry(2),
     lastError: ""
   };
+
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
   expect(actual.key1).toEqual(expectedState.key1);

@@ -1,5 +1,7 @@
 
 // MODEL
+import { uniqueId } from '../../lib/utils'
+
 export interface SafePasswordEntry {
   key: string;
   item: string;
@@ -92,7 +94,7 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
         return { ...state, status: PasswordEntriesStatus.ERROR, lastError: "Cannot add entry to un-synced state" };
       }
       let new_entries: PasswordEntries = {...state};
-      let nextKey = nextEntryKey(state);
+      let nextKey = uniqueId();
       new_entries[nextKey] = { ...action.entry, key: nextKey };
       return { ...new_entries, status: PasswordEntriesStatus.NEW_ENTRY };
     }
@@ -121,13 +123,4 @@ export function getSafePasswordEntries(state: PasswordEntries) : SafePasswordEnt
     }
   }
   return entries;
-}
-
-function nextEntryKey(state: PasswordEntries): string {
-  const entries = getSafePasswordEntries(state);
-  if (entries.length === 0) {
-    return 'key1';
-  }
-  const next = entries.length + 1;
-  return 'key' + next;
 }

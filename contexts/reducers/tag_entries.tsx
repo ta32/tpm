@@ -1,5 +1,7 @@
 // MODEL
 
+import { uniqueId } from '../../lib/utils'
+
 export interface TagEntries {
   [key: string]: TagEntry | string | number;
   status: TagsStatus;
@@ -51,7 +53,7 @@ export function tagsReducer(state: TagEntries, action: TagsAction) : TagEntries 
         return { ...state, status: TagsStatus.ERROR, lastError: "Cannot add until new tag is saved" };
       }
       const newEntries = {...state};
-      const tagId = nextTagKey();
+      const tagId = uniqueId();
       if (titleExists(state, action.title)) {
         return { ...state, status: TagsStatus.ERROR, lastError: "Cannot add duplicate tag" };
       }
@@ -141,10 +143,4 @@ function tagTitleIsDuplicated(state: TagEntries, tagId: string, title: string): 
   const tags = getTags(state);
   const existingTag = tags.find((tag) => tag.title === title && tag.id !== tagId);
   return existingTag != undefined;
-}
-
-function nextTagKey(): string {
-  const rnd = Math.random().toString(36).substring(2);
-  const time = Date.now().toString(36);
-  return rnd + time;
 }

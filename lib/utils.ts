@@ -4,3 +4,9 @@ export async function readBlob(blobParts: Uint8Array): Promise<ArrayBuffer> {
   const fileBlob = new Blob([blobParts], { type: 'application/octet-stream' });
   return await fileBlob.arrayBuffer();
 }
+
+export function uniqueId(): string {
+  const rnd = Math.random().toString(36).substring(2);
+  const time = Date.now().toString(36);
+  return rnd + time;
+}
