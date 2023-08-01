@@ -25,7 +25,7 @@ export default function PasswordTable() {
   useEffect(() => {
     if (user.dbc != null && user.device?.encryptionKey != null) {
       const encryptionKey = user.device.encryptionKey;
-      if (passwordEntries.status == PasswordEntriesStatus.UNINITIALIZED || passwordEntries.status == PasswordEntriesStatus.UNSYNCED) {
+      if (passwordEntries.status == PasswordEntriesStatus.UNINITIALIZED || passwordEntries.status == PasswordEntriesStatus.SAVED) {
         readAppFile(user, user.dbc).then((result) => {
           if (result.initialized) {
             if (result.data === undefined) {
@@ -63,7 +63,7 @@ export default function PasswordTable() {
     let dbc = user.dbc;
     const masterKey = user.device.masterKey;
     const appDataEncryptionKey = user.device.encryptionKey;
-    if (passwordEntries.status === PasswordEntriesStatus.NEW_ENTRY || tagEntries.status === TagsStatus.SAVE_REQUIRED) {
+    if (passwordEntries.status === PasswordEntriesStatus.SAVE_REQUIRED || tagEntries.status === TagsStatus.SAVE_REQUIRED) {
       const latestVersion = passwordEntries.version + 1;
       const appData = fromState(passwordEntries, tagEntries, latestVersion);
       appFileName(masterKey).then((appFileName) => {
@@ -74,7 +74,8 @@ export default function PasswordTable() {
           }
           saveAppFile(dbc, appDataEnc, appFileName, rev).then((rev) => {
             setRev(rev);
-            passwordEntriesDispatch({ type: 'UPLOAD_ENTRIES', version_uploaded: appData.version });
+            passwordEntriesDispatch({ type: 'UPLOADED_ENTRIES', version_uploaded: appData.version });
+            tagEntriesDispatch({ type: 'UPLOADED_TAGS' });
             setNewEntry(false);
           });
         })
@@ -119,9 +120,6 @@ export default function PasswordTable() {
           return <TableEntry entry={entry} key={entry.key} />
         })}
       </div>
-      {passwordEntries.status != PasswordEntriesStatus.SYNCED &&
-        <div className={styles.notification_info}>loading password entries</div>
-      }
       {passwordEntries.status == PasswordEntriesStatus.ERROR &&
         <div className={styles.notification_error}>Error loading password entries</div>
       }

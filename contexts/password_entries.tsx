@@ -12,6 +12,7 @@ const initialEntries: PasswordEntries = {
   lastError: ""
 }
 
+
 const PasswordEntriesContext = createContext<PasswordEntries|undefined>(undefined);
 const PasswordEntriesDispatchContext = createContext<Dispatch<PasswordEntriesAction>|undefined>(undefined);
 

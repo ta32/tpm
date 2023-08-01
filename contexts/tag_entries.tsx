@@ -18,7 +18,7 @@ const initialTageEntries: TagEntries = {
     title: 'Social Media',
     icon: SOCIAL_ICON,
   },
-  status: TagsStatus.SYNCED,
+  status: TagsStatus.UNINITIALIZED,
   lastError: ""
 }
 

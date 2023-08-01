@@ -15,8 +15,8 @@ export interface SafePasswordEntry {
 export enum PasswordEntriesStatus {
   UNINITIALIZED,
   SYNCED,
-  UNSYNCED,
-  NEW_ENTRY,
+  SAVED,
+  SAVE_REQUIRED,
   ERROR,
 }
 export interface PasswordEntries {
@@ -43,7 +43,7 @@ export interface UpdateEntry {
 }
 
 export interface UploadEntries {
-  type: "UPLOAD_ENTRIES"
+  type: "UPLOADED_ENTRIES"
   version_uploaded: number;
 }
 
@@ -63,7 +63,7 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
         }
         return { ...new_entries };
       }
-      if (state.status === PasswordEntriesStatus.UNSYNCED) {
+      if (state.status === PasswordEntriesStatus.SAVED) {
         if (action.version === state.version) {
           // check items
           for (const entry of action.entries) {
@@ -96,7 +96,7 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
       let new_entries: PasswordEntries = {...state};
       let nextKey = uniqueId();
       new_entries[nextKey] = { ...action.entry, key: nextKey };
-      return { ...new_entries, status: PasswordEntriesStatus.NEW_ENTRY };
+      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case "UPDATE_ENTRY": {
       if (state.status !== PasswordEntriesStatus.SYNCED) {
@@ -106,10 +106,10 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
       const updatedEntry = action.entry;
       updatedEntry.key = action.key;
       new_entries[action.key] = updatedEntry;
-      return { ...new_entries, status: PasswordEntriesStatus.NEW_ENTRY };
+      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
-    case "UPLOAD_ENTRIES": {
-      return { ...state, version: action.version_uploaded, status: PasswordEntriesStatus.UNSYNCED };
+    case "UPLOADED_ENTRIES": {
+      return { ...state, version: action.version_uploaded, status: PasswordEntriesStatus.SAVED };
     }
   }
 }

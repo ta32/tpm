@@ -28,6 +28,13 @@ export function getTagIconPath(icon: string): string {
   return `/images/tags/${icon}`
 }
 
+export function getUiIconPath(icon: string): string {
+  return `/icons/ui/${icon}`
+}
+
+export const UI_DONE = "done_FILL1_wght700_GRAD200_opsz48.svg";
+export const UI_MORE = "more_horiz_FILL1_wght700_GRAD200_opsz48.svg";
+
 export const ALL_ICON = "apps_FILL1_wght700_GRAD200_opsz48.svg";
 export const BITCOIN_ICON = "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg";
 export const SOCIAL_ICON =  "group_FILL1_wght700_GRAD200_opsz48.svg";

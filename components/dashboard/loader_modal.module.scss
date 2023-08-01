@@ -1,0 +1,50 @@
+@use "styles/colors";
+@use "styles/animations";
+
+.hidden {
+  visibility: hidden;
+}
+
+.data_loader {
+  position: fixed;
+  top: 100px;
+  right: -200px;
+  background: colors.$blue;
+  color: #fff;
+  padding: 15px 30px;
+  font-size: 16px;
+  z-index: 9;
+  transition: right 250ms ease-in-out 750ms;
+  border-radius: 3px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  &.active {
+    right: 30px;
+    transition: right 500ms ease-in-out;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+  }
+
+  .spinner {
+    height: 16px;
+    width: 16px;
+    animation: rotate 0.8s infinite linear;
+    border: 3px solid colors.$white;
+    border-right-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
+    margin-right: 10px;
+  }
+
+  .icon {
+    margin-right: 10px;
+    float: left;
+    filter: colors.$white_filter
+  }
+}
+

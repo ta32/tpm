@@ -12,6 +12,7 @@ export enum TagsStatus {
   UNINITIALIZED,
   SYNCED,
   SAVE_REQUIRED,
+  SAVED,
   ERROR,
 }
 
@@ -27,24 +28,25 @@ export interface AddTag {
   title: string;
   icon: string;
 }
-
 export interface RemoveTag {
   type: "REMOVE_TAG"
   tagId: string;
 }
-
 export interface UpdateTag {
   type: "UPDATE_TAG"
   tagId: string;
   title: string;
   icon: string;
 }
+export interface UploadedTags {
+  type: "UPLOADED_TAGS"
+}
 export interface SyncTags {
   type: "SYNC_TAGS"
   tags?: TagEntry[];
 }
 
-export type TagsAction = AddTag | RemoveTag | UpdateTag | SyncTags;
+export type TagsAction = AddTag | RemoveTag | UpdateTag | UploadedTags | SyncTags;
 
 export function tagsReducer(state: TagEntries, action: TagsAction) : TagEntries {
   switch (action.type) {
@@ -96,6 +98,9 @@ export function tagsReducer(state: TagEntries, action: TagsAction) : TagEntries 
       newEntries.status = TagsStatus.SAVE_REQUIRED;
       newEntries[action.tagId] = { ...newEntries[oldTagId] as TagEntry, title: action.title, icon: action.icon };
       return newEntries;
+    }
+    case "UPLOADED_TAGS": {
+      return { ...state, status: TagsStatus.SAVED };
     }
     case "SYNC_TAGS": {
       const tags = action.tags;

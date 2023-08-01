@@ -53,14 +53,14 @@ describe('Uploading and Synchronization', () => {
     let initialState: PasswordEntries = initialEntries();
     initialState.key1 = entry(1);
     initialState.version = 2;
-    initialState.status = PasswordEntriesStatus.NEW_ENTRY
+    initialState.status = PasswordEntriesStatus.SAVE_REQUIRED
 
-    const action: UploadEntries = {type: "UPLOAD_ENTRIES", version_uploaded: 3};
+    const action: UploadEntries = {type: "UPLOADED_ENTRIES", version_uploaded: 3};
     const actualEntriesUpload = passwordEntriesReducer(initialState, action);
 
     const expectedUploadState: PasswordEntries = {
       version: 3,
-      status: PasswordEntriesStatus.UNSYNCED,
+      status: PasswordEntriesStatus.SAVED,
       key1: entry(1),
       lastError: ""
     }
@@ -74,7 +74,7 @@ describe('Uploading and Synchronization', () => {
     let initialState: PasswordEntries = initialEntries();
     initialState.key1 = entry(1);
     initialState.version = UPLOADED_VERSION;
-    initialState.status = PasswordEntriesStatus.UNSYNCED;
+    initialState.status = PasswordEntriesStatus.SAVED;
 
     const action: Sync = {type: "SYNC", entries: [entry(1)], version: UPLOADED_VERSION};
     const actual = passwordEntriesReducer(initialState, action);
@@ -104,7 +104,7 @@ test('Adding new entry to loaded database', () => {
   // noinspection DuplicatedCode
   const expectedState: PasswordEntries = {
     version: 1,
-    status: PasswordEntriesStatus.NEW_ENTRY,
+    status: PasswordEntriesStatus.SAVE_REQUIRED,
     key1: entry(1),
     key2: entry(2),
     lastError: ""
@@ -134,7 +134,7 @@ test('Should not add entry if database is not loaded', () => {
 
 test('Do not override entries if version is lower', () => {
   let initialState: PasswordEntries = {...initialEntries(), version: 1};
-  initialState.status = PasswordEntriesStatus.UNSYNCED;
+  initialState.status = PasswordEntriesStatus.SAVED;
   initialState.item1 = entry(1);
   initialState.item2 = entry(2);
 
@@ -185,7 +185,7 @@ test( 'Update entry test', () => {
 
   const expectedState: PasswordEntries = {
     ...initialState,
-    status: PasswordEntriesStatus.NEW_ENTRY,
+    status: PasswordEntriesStatus.SAVE_REQUIRED,
     key1: {...entry1, title: "new title"},
     key2: entry2
   }

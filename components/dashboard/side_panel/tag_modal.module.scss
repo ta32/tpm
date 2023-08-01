@@ -135,10 +135,9 @@
   height: 100px;
 }
 
-// from black to #2c3e50 $blue_dark // TODO make a calculation for this
 .filter_icon {
   padding: 0 10px;
-  filter: drop-shadow(2px 2px 2px black) invert(21%) sepia(11%) saturate(1787%) hue-rotate(169deg) brightness(91%) contrast(89%);
+  filter: colors.$filter_dark_blue_shadow;
 }
 
 .chevron_left {
