@@ -1,5 +1,6 @@
 export const TAG_ICONS = [
-  "apps_FILL1_wght700_GRAD200_opsz48.svg",
+  "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg",
+  "currency_exchange_FILL1_wght700_GRAD200_opsz48.svg",
   "account_balance_FILL1_wght700_GRAD200_opsz48.svg",
   "account_circle_FILL1_wght700_GRAD200_opsz48.svg",
   "alternate_email_FILL1_wght700_GRAD200_opsz48.svg",
@@ -7,8 +8,6 @@ export const TAG_ICONS = [
   "build_circle_FILL1_wght700_GRAD200_opsz48.svg",
   "cloud_FILL1_wght700_GRAD200_opsz48.svg",
   "credit_card_FILL1_wght700_GRAD200_opsz48.svg",
-  "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg",
-  "currency_exchange_FILL1_wght700_GRAD200_opsz48.svg",
   "error_FILL1_wght700_GRAD200_opsz48.svg",
   "favorite_FILL1_wght700_GRAD200_opsz48.svg",
   "grade_FILL1_wght700_GRAD200_opsz48.svg",
@@ -29,10 +28,9 @@ export function getTagIconPath(icon: string): string {
   return `/images/tags/${icon}`
 }
 
-export const ALL_ICON = TAG_ICONS[0];
-export const BITCOIN_ICON = TAG_ICONS[8];
-
-export const SOCIAL_ICON =  TAG_ICONS[13];
+export const ALL_ICON = "apps_FILL1_wght700_GRAD200_opsz48.svg";
+export const BITCOIN_ICON = "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg";
+export const SOCIAL_ICON =  "group_FILL1_wght700_GRAD200_opsz48.svg";
 
 
 
