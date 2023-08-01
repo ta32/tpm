@@ -1,0 +1,166 @@
+@use "animations";
+@use "colors";
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  max-width: 800px;
+  margin-top: 3rem;
+}
+
+.main {
+  @include flex-center;
+  flex: 1;
+  flex-direction: column;
+  h1 {
+    color: colors.$white;
+    margin-bottom: 25px;
+  }
+}
+
+.dropbox {
+  background: {
+    color: colors.$white;
+    image: url('/images/dropbox-blue.svg');
+    size: 30px 30px;
+    repeat: no-repeat;
+    position: 15px center;
+  }
+  border: 2px solid colors.$white;
+  padding: 12px 25px 12px 55px;
+  color: colors.$blue;
+  word-spacing: 2px;
+  letter-spacing: -.1px;
+  line-height: 1.3em;
+  font-size: 1.2em;
+  font-weight: 400;
+  margin: 15px;
+  white-space: nowrap;
+  border-radius: 4px;
+  &:hover {
+    box-shadow: 0 0 10px -1px rgba(0, 0, 0, 0.65);
+  }
+}
+
+.dropbox_user {
+  text-align: center;
+  color: colors.$white;
+  span {
+    max-width: 350px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1em;
+    font-weight: 400;
+  }
+  h3 {
+    font-size: 1.5em;
+    margin-top: 5px;
+    b {
+      font-weight: 900;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    /* arrow pseudo element after text for dropbox_user */
+    &:after {
+      content: "ᐯ";
+      font-size: 15px;
+      margin-left: 5px;
+      text-decoration: none;
+    }
+  }
+}
+
+.connect_trezor {
+  display: block;
+  margin: 0 auto 5px;
+  height: 60px;
+  line-height: 60px;
+  color: colors.$white;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+  animation-name: pulsate;
+}
+
+.connect_trezor img {
+  margin: 0 10px;
+  vertical-align: middle;
+}
+
+.connect_trezor span {
+  max-width: 350px;
+  font-size: 1.1em;
+  font-weight: 400;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    width: 100%;
+    flex-direction: column;
+  }
+}
+
+.spinner {
+    margin: 0 auto;
+    width: 50px;
+    height: 50px;
+    border: 5px solid colors.$white;
+    border-right-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    animation: rotate 1s infinite linear;
+}
+
+.dev_list {
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  width: 350px;
+  margin-top: 20px;
+  border-radius: 5px;
+  padding: 0;
+  list-style: none;
+  li a {
+    display: block;
+    position: relative;
+    padding: 20px 0 20px 50px;
+    width: 100%;
+  }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.trezor {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 24px;
+  height: 40px;
+  z-index: 2;
+  left: 15px;
+  top: 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: auto 30px;
+}
+
+.t1:after {
+  @extend .trezor;
+  background-image: url("/images/t1.png");
+}
+
+.t2:after {
+  @extend .trezor;
+  background-image: url("/images/t2.png");
+}

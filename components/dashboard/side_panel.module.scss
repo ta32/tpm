@@ -1,0 +1,230 @@
+@use "styles/colors";
+@use "styles/animations";
+
+.left_panel_wrapper {
+  .backdrop {
+    display: none;
+  }
+}
+
+aside.left_panel {
+  color: colors.$grey_content_font;
+  outline: none;
+  width: 250px;
+  position: fixed;
+  min-height: 100%;
+  height: 100%;
+  overflow: auto;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-size: 100% 100%;
+  background: url("/images/tmp_background.png") no-repeat center top fixed;
+  box-shadow: 0 2px 50px rgba(0, 0, 0, 0.4);
+}
+
+.logo {
+  padding: 24px 28px;
+  line-height: 51px;
+  height: 81px;
+  border-bottom: 1px solid rgba(255, 255, 255, .10);
+}
+
+.list_unstyled {
+  padding-left: 0;
+  list-style: none;
+}
+
+.navigation {
+  margin: 0;
+
+  ul {
+    margin: 0;
+
+    li.fadeIn {
+      opacity: 0;
+      animation: fadeIn 0.8s ease 0s;
+      animation-fill-mode: forwards;
+    }
+  }
+
+  @for $i from 1 through 50 {
+    ul li.delayed:nth-child(#{$i}) {
+      animation-delay: (#{$i*0.1s});
+    }
+  }
+
+  ul.list_unstyled > li:first-child {
+    &:after {
+      content: 'TAGS';
+      display: block;
+      padding: 20px 0 10px 28px;
+      font-size: 12px;
+      color: rgba(colors.$white, .7);
+    }
+  }
+
+  ul > li {
+    position: relative;
+    cursor: pointer;
+    float: left;
+    clear: both;
+    width: 100%;
+    user-select: none;
+
+    &.active:hover > a, &.active > a {
+      color: colors.$white;
+      background: rgba(0,0,0,.20);
+    }
+
+    & > a {
+      display: flex;
+      align-items: center;
+      padding: 14px 24px;
+      color: colors.$white;
+      font-size: 15px;
+      text-decoration: none;
+      font-weight: 400;
+      outline: none !important;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      transition: all 0.3s;
+
+      &:hover {
+        color: colors.$white;
+        background: rgba(colors.$white,.1);
+      }
+
+      i {
+        margin-right: 6px;
+        margin-top: 1px;
+        font-size: 24px;
+        width: 25px;
+        float: left;
+      }
+
+      span {
+        color: colors.$white;
+        display: inline;
+        width: 160px;
+        line-height: 24px;
+      }
+    }
+
+    &.active:hover > .dropdown, &.active > .dropdown {
+      display: block;
+    }
+
+    .dropdown {
+      display: none;
+      position: relative;
+      float: right;
+      margin-top: -52px;
+      width: 45px;
+      height: 52px;
+      transition: all 300ms;
+
+      &.open {
+        transition: all 300ms;
+        margin-bottom: 74px;
+
+        & > .dropdown-toggle {
+          background: transparent;
+
+          &:after {
+            color: colors.$white !important;
+          }
+        }
+
+        & > .dropdown-menu {
+          width: 250px;
+          background: rgba(0,0,0,.20);
+          padding: 0;
+          border-radius: 0;
+
+          & > li > a {
+            font-size: .9em;
+            padding-left: 30px !important;
+
+            &:hover {
+              background: rgba(colors.$white,.1);
+            }
+
+            & > i {
+              margin-top: -3px;
+            }
+          }
+        }
+
+      }
+
+      button.dropdown {
+        display: block;
+        width: 45px;
+        text-align: right;
+        height: 52px;
+        margin-top: 0;
+        line-height: 52px;
+        font-size: 1.2em;
+        padding: 0;
+        color: colors.$white;
+        background-color: transparent;
+        border: 0;
+        outline: 0;
+        box-shadow: none;
+        border-radius: 0;
+
+        &:active, &:focus, .btn-group.open .dropdown-toggle {
+          box-shadow: none;
+        }
+
+        &.edit:after {
+          display: block;
+          color: colors.$white;
+          width: 45px;
+          height: 52px;
+          line-height: 52px;
+          text-align: center;
+          content: "\f20b";
+          font-size: 1em;
+        }
+      }
+    }
+
+    &.add_tag_btn {
+      vertical-align: middle;
+      padding-left: 15px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+
+      a {
+        padding: 0 0 0 40px;
+        background: rgba(255,255,255,.10);
+        width: 220px;
+        height: 40px;
+        line-height: 31px;
+        border-radius: 20px;
+
+        &:hover:not(.disabled) {
+          background: rgba(255,255,255,.20);
+        }
+
+        &.disabled {
+          opacity: 0.5;
+          cursor: default;
+        }
+
+        i {
+          color: colors.$white;
+          font-size: 40px;
+          position: absolute;
+          top: 0;
+          left: 16px;
+        }
+
+      }
+    }
+  }
+}
+

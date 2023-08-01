@@ -1,0 +1,222 @@
+@use "styles/colors";
+@use "styles/mixins";
+
+$avatar_size: 50px;
+
+$account_info_controls_margin: 2rem;
+
+.card {
+  display: block;
+  width: 100%;
+  background-color: colors.$white;
+  overflow: visible;
+  transition: all 150ms ease-in-out;
+
+  &:hover {
+    background: rgba(colors.$grey_bg, .9);
+  }
+
+  .entry {
+    display: flex;
+    position: relative;
+    flex-wrap: nowrap;
+    width: 100%;
+    border-bottom: 1px solid #fff;
+
+    &:hover {
+      .password_shadow {
+        visibility: visible !important;
+      }
+      .edit_btn {
+        visibility: visible !important;
+      }
+    }
+    .account_info {
+      margin: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .account_info_controls {
+      margin-left: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .avatar_mini {
+      display: flex;
+      position: relative;
+      margin: 15px 15px 10px 20px;
+      background-color: rgba(colors.$grey_content_font, .4);
+      border-radius: 4px;
+      height: $avatar_size;
+      width: $avatar_size;
+      img {
+        position: absolute;
+      }
+    }
+
+    .avatar_expanded {
+      display: flex;
+      position: relative;
+      margin: 15px 15px 10px 20px;
+      background-color: rgba(colors.$grey_content_font, .4);
+      border-radius: 4px;
+
+      height: calc($avatar_size * 2);
+      width: calc($avatar_size * 2);
+
+      img {
+        position: absolute;
+      }
+    }
+
+
+    .title {
+      padding-left: 1rem;
+      display: inline;
+      font-size: 1rem;
+      color: colors.$black_font;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .credentials {
+      padding-left: 1rem;
+      display: flex;
+      flex-direction: row;
+      @include mixins.text_sm;
+      color: colors.$grey_font;
+      text-overflow: ellipsis;
+
+      input {
+        width: 75px;
+        border: none;
+        background-color: transparent;
+        letter-spacing: 0.1rem;
+      }
+
+      .label {
+        margin-bottom: 0.25rem;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      .password_shadow {
+        visibility: hidden;
+        margin-left: 0.5rem;
+        transition: all 30ms ease-in-out;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+    }
+  }
+}
+
+.tooltip {
+  position: relative;
+}
+.tooltip .tooltip_text {
+  width: 110px;
+  visibility: hidden;
+  background-color: colors.$black;
+  color: colors.$white;
+  border-radius: 0.3rem;
+  // tool tip position
+  position: absolute;
+  margin-top : 0.25rem;
+  // shift relative to parent element
+  top: 100%;
+  left: 50%;
+  transform: translateX(-55px);
+  z-index: 99999;
+  padding: 0.25rem;
+  opacity: 0;
+  transition: opacity 1s;
+}
+.tooltip .tooltip_text::after {
+  content: "";
+  position: absolute;
+  // arrow position
+  bottom: 100%;
+  right: 50%;
+  border-color:  transparent  transparent colors.$black transparent;
+  //
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+}
+
+.tooltip:hover .tooltip_text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.icon {
+  color: colors.$white;
+  margin: auto;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.save_btn {
+  margin-top: $account_info_controls_margin;
+  margin-right: 1rem;
+  border: none;
+  background-color: rgb(colors.$green,1);
+  color: colors.$white;
+  border-radius: 3px;
+  width: 6rem;
+  height: 2.5rem;
+  padding: 0.5rem 0;
+
+    &:hover {
+      background-color: rgb(colors.$green,0.8);
+      cursor: pointer;
+    }
+}
+
+.discard_btn {
+  margin-top: $account_info_controls_margin;
+  margin-right: 1rem;
+  background-color: rgb(colors.$white,1);
+  border: 1px solid colors.$grey_font;
+  color: colors.$grey_font;
+  border-radius: 3px;
+  width: 6rem;
+  height: 2.5rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    color: colors.$black;
+    border-color: colors.$black;
+    cursor: pointer;
+  }
+}
+
+.edit_btn {
+  margin-left: auto;
+  align-self: center;
+  margin-right: 1rem;
+  border: none;
+  visibility: hidden;
+  background-color: rgb(colors.$white,0);
+  color: colors.$grey_font;
+  border-radius: 3px;
+  width: 6rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    background-color: colors.$white;
+  }
+}
+

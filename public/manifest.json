@@ -1,0 +1,23 @@
+{
+  "name": "Temporary Password Manager",
+  "short_name": "TMP",
+  "theme_color": "#ffffff",
+  "background_color": "#004740",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icons/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/logo-512x512.png",
+      "sizes": "512x512"
+    }
+  ],
+  "splash_pages": null
+}

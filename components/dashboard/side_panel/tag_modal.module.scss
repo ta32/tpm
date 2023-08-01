@@ -1,0 +1,215 @@
+@use "styles/colors";
+@use "styles/animations";
+
+.modal_backdrop {
+  position: fixed;
+  inset: 0 0 0 0;
+  opacity: 0.5;
+  background-color: #000;
+  z-index: 1040;
+}
+
+.modal_backdrop_inactive {
+  position: fixed;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal_fade_in {
+  position: fixed;
+  width: 100%;
+  opacity: 1;
+  z-index: 1050;
+  transition: opacity 0.15s linear;
+}
+
+.modal_fade_out {
+  pointer-events: none;
+  position: fixed;
+  width: 100%;
+  height: 0;
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+
+.modal_dialog {
+  margin: 5rem auto;
+  width: 600px;
+  transition: margin 0.1s linear;
+}
+
+.modal_dialog_inactive {
+  pointer-events: none;
+  margin: 2.5rem auto;
+  width: 600px;
+  transition: margin 0.1s linear;
+}
+
+.modal_body {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  background-color: rgba(237, 241, 242, 0.9);
+  height: 100px;
+}
+
+.modal_content {
+  position: relative;
+  width: 100%;
+  background-color: colors.$white;
+  opacity: 1;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  outline: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+.error {
+  animation: shake 1s ease both;
+}
+
+
+.hidden {
+  visibility: hidden !important;
+}
+
+.none {
+  display: none !important;
+}
+
+.notification_popup {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 50px;
+    background-color: colors.$red;
+    border-radius: 0 0 2px 2px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    .notification_text {
+        font-size: 1.2rem;
+        color: colors.$white;
+    }
+}
+
+
+.tag_controls {
+  position: absolute;
+  bottom: -40px;
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  width: 200px;
+  button {
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #fff;
+    margin-left: 10px;
+  }
+  .green {
+    background-color: colors.$green;
+    border-color: colors.$green;
+  }
+  .red {
+    background-color: colors.$red;
+    border-color: colors.$red;
+  }
+  .blank {
+    color: colors.$grey_content_font;
+  }
+}
+
+.avatar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+// from black to #2c3e50 $blue_dark // TODO make a calculation for this
+.filter_icon {
+  padding: 0 10px;
+  filter: drop-shadow(2px 2px 2px black) invert(21%) sepia(11%) saturate(1787%) hue-rotate(169deg) brightness(91%) contrast(89%);
+}
+
+.chevron_left {
+  &:after {
+    display: inline-block;
+    width: 10px;
+    content: '';
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid colors.$blue_dark;
+  }
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.chevron_right {
+  &:after {
+    display: inline-block;
+    width: 10px;
+    content: '';
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid colors.$blue_dark;
+  }
+  &:hover {
+      cursor: pointer;
+  }
+}
+
+// TODO replace with icon
+.close_icon {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 15px;
+  height: 15px;
+  opacity: 0.3;
+  border: none;
+}
+.close_icon:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.close_icon:before, .close_icon:after {
+  position: absolute;
+  left: 5px;
+  content: ' ';
+  height: 20px; // length of the cross
+  width: 2px;
+  background-color: #333;
+}
+.close_icon:before {
+  transform: rotate(45deg);
+}
+.close_icon:after {
+  transform: rotate(-45deg);
+}
+
+.title {
+  input, span {
+    display: inline-block;
+    padding: 0 0 0 5px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    max-width: 450px;
+    font-size: 3rem;
+    line-height: 100px;
+    color: colors.$grey_content_font;
+  }
+}

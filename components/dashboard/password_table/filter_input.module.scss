@@ -1,0 +1,32 @@
+@use "styles/colors";
+@use "styles/mixins";
+
+.filter {
+  width: 100%;
+
+  input {
+    @include mixins.text_sm;
+    font-size: 1rem;
+    box-shadow: none;
+    outline: none;
+    border-radius: 0.25rem;
+    height: 2.5rem;
+    border: 1px solid colors.$grey_border;
+
+    padding-left: calc(2.25rem/3);
+    padding-right: calc(2.25rem/3);
+
+    transition: 100ms ease-out;
+
+    &:focus {
+      outline: transparent none;
+      border: 1px solid colors.$blue;
+    }
+
+    &::placeholder {
+        color: colors.$grey_font;
+    }
+  }
+}
+
+

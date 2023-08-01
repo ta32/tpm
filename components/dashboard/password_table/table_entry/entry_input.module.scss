@@ -1,0 +1,50 @@
+@use "styles/colors";
+
+.container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+}
+
+.container_row_no_wrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 7rem;
+}
+
+.label {
+  color: colors.$grey_content_font;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  margin-bottom: 0.25rem;
+  margin-right: 1rem;
+}
+
+.input {
+  overflow: visible;
+  border-radius: 0.25rem;
+  border: 1px solid colors.$black;
+  width: 15rem;
+}
+
+.control_btn {
+  background-color: rgb(colors.$white,1);
+  border: 1px solid colors.$grey_font;
+  color: colors.$grey_font;
+  border-radius: 3px;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: 0.25rem;
+
+  &:hover {
+    color: colors.$black;
+    border-color: colors.$black;
+  }
+}

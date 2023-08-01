@@ -1,0 +1,38 @@
+@use "styles/colors";
+@use "styles/breakpoints";
+
+.content {
+  margin-left: 250px;
+  height: 100%;
+}
+
+.dashboard_layout {
+  min-height: 100vh;
+  position: relative;
+
+  & > div {
+    height: 100vh;
+  }
+
+  @media screen and (min-width: breakpoints.$break-large) {
+    margin: 0 auto;
+    border-right: 1px solid colors.$grey_border;
+    box-shadow: 0 0 4px 1px rgba(colors.$grey_font_header_links, 0.5);
+  }
+  .loading_dialog{
+    height: 100vh;
+    text-align: center;
+    padding-top: 20vh;
+
+    .spinner {
+      height: 50px;
+      width: 50px;
+      animation: rotate 0.8s infinite linear;
+      border: 5px solid colors.$white;
+      border-right-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+}

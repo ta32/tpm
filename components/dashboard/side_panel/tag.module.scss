@@ -1,0 +1,47 @@
+@use "styles/colors";
+@use "styles/animations";
+
+.nav_label {
+  vertical-align: middle;
+}
+
+// from black to #2c3e50 $blue_dark // TODO make a calculation for this
+.tag_icon {
+  margin-right: 10px;
+  height: 34px;
+}
+
+.ui_icon_white {
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(317deg) brightness(107%) contrast(101%);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.active {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.tag_controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: expandIn 0.8s ease 0s;
+}
+
+.tag_control {
+  color: colors.$white;
+  font-size: 0.9rem;
+  width: 100%;
+  padding: 8px 24px;
+  cursor: pointer;
+  &:hover {
+    background: rgba(colors.$white, .1);
+  }
+  :first-child {
+    padding-top: 0;
+  }
+}
+
+
