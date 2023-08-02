@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import styles from './side_panel.module.scss'
 import { useTagEntries, useTagEntriesDispatch } from '../../contexts/tag_entries'
@@ -31,15 +31,13 @@ export default function SidePanel() {
   const [tagModalAction, setTagModalAction] = useState<TagModalAction>({
     type: "CLOSED"
   });
-  const tags = useTagEntries();
-  const tagsDispatch = useTagEntriesDispatch();
+  const tagEntries = useTagEntries();
+  const tagEntriesDispatch = useTagEntriesDispatch();
 
-  useEffect(() => {
-    console.log("status: ", tags.status);
-    if (tags.status !== TagsStatus.ERROR) {
-      setTagModalAction({type: "CLOSED"});
-    }
-  }, [tags, tagsDispatch])
+  let mode = tagModalAction.type;
+  if (tagEntries.status === TagsStatus.SYNCED && tagModalAction.type === "CLOSED") {
+    mode = "CLOSED";
+  }
 
   function handleSelect(e: React.MouseEvent<HTMLLIElement>) {
     const tagId = e.currentTarget.id;
@@ -51,19 +49,21 @@ export default function SidePanel() {
   }
 
   const handleCloseTag = () => {
+    tagEntriesDispatch({type: "CLEAR_ERROR"});
     setTagModalAction({type: "CLOSED"});
   }
 
   const handleSubmitNewTag = (tag: {title: string, icon: string}) => {
     if (tagModalAction.type === "ADD") {
-      tagsDispatch({type: 'ADD_TAG', title: tag.title, icon: tag.icon});
+      tagEntriesDispatch({type: 'ADD_TAG', title: tag.title, icon: tag.icon});
     }
     if (tagModalAction.type === "EDIT") {
-      tagsDispatch({type: 'UPDATE_TAG', tagId: tagModalAction.tagId, title: tag.title, icon: tag.icon});
+      tagEntriesDispatch({type: 'UPDATE_TAG', tagId: tagModalAction.tagId, title: tag.title, icon: tag.icon});
     }
     if (tagModalAction.type === "REMOVE") {
-      tagsDispatch({type: 'REMOVE_TAG', tagId: tagModalAction.tagId});
+      tagEntriesDispatch({type: 'REMOVE_TAG', tagId: tagModalAction.tagId});
     }
+    setTagModalAction({type: "CLOSED"});
   }
 
   const handleRemoveTag = (id: string) => {
@@ -75,15 +75,16 @@ export default function SidePanel() {
   }
 
   const tagId = (() => {
-    if (tagModalAction.type === "ADD" || tagModalAction.type === "CLOSED") {
-      return undefined;
-    } else {
+    if (tagModalAction.type === "EDIT" || tagModalAction.type === "REMOVE") {
       return tagModalAction.tagId;
+    } else {
+      return undefined;
     }
   })();
+
   return (
     <div className={styles.left_panel_wrapper}>
-      <TagModal onClosed={handleCloseTag} onDiscard={handleCloseTag} onSubmit={handleSubmitNewTag} mode={tagModalAction.type} tagId={tagId}/>
+      <TagModal onClosed={handleCloseTag} onSubmit={handleSubmitNewTag} mode={mode} tagId={tagId}/>
       <div className="backdrop" /*onClick={onSelectTag} TODO */ />
       <aside className={styles.left_panel}>
         <div className={styles.logo}>
@@ -96,7 +97,7 @@ export default function SidePanel() {
           <ul className={styles.list_unstyled}>
             {tagList({
               selectedId: selectedTag,
-              tags: getTags(tags),
+              tags: getTags(tagEntries),
               onRemove: handleRemoveTag,
               onEdit: handleEditTag,
               onSelect: handleSelect}

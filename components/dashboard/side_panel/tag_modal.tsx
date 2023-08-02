@@ -15,12 +15,10 @@ interface TagModalProps {
   tagId?: string;
   onClosed: () => void;
   onSubmit: (tag: Tag) => void;
-  onDiscard: () => void;
 }
 
-export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: TagModalProps) {
+export default function TagModal({onClosed, onSubmit, mode, tagId}: TagModalProps) {
   const tagEntries = useTagEntries();
-  const tagEntriesDispatch = useTagEntriesDispatch();
   const [tagIconIndex, setTagIconIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
 
@@ -44,19 +42,17 @@ export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: T
   }
 
   const handleClose = () => {
-    tagEntriesDispatch({type: "CLEAR_ERROR"});
+    setShowControls(false);
+    onClosed();
+  }
+
+  const handleDiscard = () => {
     setShowControls(false);
     onClosed();
   }
 
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     setShowControls(true);
-  }
-
-  const handleDiscard = () => {
-    tagEntriesDispatch({type: "CLEAR_ERROR"});
-    setShowControls(false);
-    onDiscard();
   }
 
   const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
