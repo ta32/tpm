@@ -21,44 +21,39 @@ interface TagModalProps {
 export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: TagModalProps) {
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
-  const [error, setError] = useState("");
   const [tagIconIndex, setTagIconIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
-  const [submitForm, setSubmitForm] = useState<HTMLFormElement | null>(null);
 
-  useEffect(() => {
-    if (submitForm) {
-      if(tagEntries.status === TagsStatus.ERROR) {
-        setError("tag already exists");
-      } else {
-        submitForm.reset();
-        setSubmitForm(null);
-      }
-    }
-  }, [submitForm, tagEntries.status]);
+  let error = "";
+  if(tagEntries.status === TagsStatus.ERROR) {
+    error = "tag already exists";
+  }
 
   const handleLeftClick = () => {
+    if(!showControls) {
+      setShowControls(true);
+    }
     setTagIconIndex((tagIconIndex + TAG_ICONS.length - 1) % TAG_ICONS.length);
   }
 
   const handleRightClick = () => {
+    if(!showControls) {
+      setShowControls(true);
+    }
     setTagIconIndex((tagIconIndex + 1) % TAG_ICONS.length);
   }
 
   const handleClose = () => {
-    setError("");
     tagEntriesDispatch({type: "CLEAR_ERROR"});
     setShowControls(false);
     onClosed();
   }
 
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setError("");
     setShowControls(true);
   }
 
   const handleDiscard = () => {
-    setError("");
     tagEntriesDispatch({type: "CLEAR_ERROR"});
     setShowControls(false);
     onDiscard();
@@ -72,7 +67,6 @@ export default function TagModal({onClosed, onSubmit, onDiscard, mode, tagId}: T
     const tagTitle = formData.get("title") as string;
     const newTag: Tag = {title: tagTitle, icon: tagIcon};
     onSubmit(newTag);
-    setSubmitForm(form);
   }, [onSubmit, tagIconIndex]);
 
   const tagIcon = TAG_ICONS[tagIconIndex];
