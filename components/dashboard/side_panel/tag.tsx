@@ -16,11 +16,9 @@ interface TagProps {
 export default function Tag({title, icon, selected, permanent, onEdit, onRemove, id}: TagProps) {
   const [showControls, setShowControls] = React.useState(false);
 
-  useEffect(() => {
-    if(!selected) {
-      setShowControls(false);
-    }
-  },[showControls, selected])
+  if(!selected && showControls) {
+    setShowControls(false);
+  }
 
   const handleClickedMore = (e: React.MouseEvent<HTMLImageElement>) => {
     setShowControls(!showControls);
