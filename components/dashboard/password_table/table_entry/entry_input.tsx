@@ -33,7 +33,7 @@ export default function EntryInput({label, name, placeholder, defaultValue, type
           <MultiSelect name={name} className={styles.input} selectedValues={selectedValues} items={tags}/>
         }
         { type != 'tags' &&
-          <input name={name} className={styles.input} type={type == 'text' ? 'text': passwordInputType} placeholder={placeholder} defaultValue={defaultValue != null ? defaultValue : ''} />
+          <input autoComplete="off" autoCorrect="off" name={name} className={styles.input} type={type == 'text' ? 'text': passwordInputType} placeholder={placeholder} defaultValue={defaultValue != null ? defaultValue : ''} />
         }
       </div>
       {type === 'password' &&

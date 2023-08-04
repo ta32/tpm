@@ -5,7 +5,8 @@ import { PasswordEntriesStatus } from '../../contexts/reducers/password_entries'
 import { TagsStatus } from '../../contexts/reducers/tag_entries'
 import styles from './loader_modal.module.scss'
 import Image from 'next/image'
-import { getUiIconPath, UI_DONE } from '../../lib/icons'
+import ProgressModal from '../ui/progress_modal'
+
 
 export default function LoaderModal() {
   const tagEntries = useTagEntries();
@@ -20,19 +21,6 @@ export default function LoaderModal() {
   const active = saveRequired || saved;
 
   return (
-    <div className={`${styles.data_loader} ${ active ? styles.active : styles.hidden}`}>
-      {saveRequired && (
-        <div className={styles.label}>
-          <span className={styles.spinner} />
-          Saving
-        </div>
-      )}
-      {saved && (
-        <div className={styles.label}>
-          <Image className={`${styles.icon} ${styles.ui_icon_white}`} src={getUiIconPath(UI_DONE)} alt={"done"} height={24} width={24} />
-          Saved
-        </div>
-      )}
-    </div>
+    <ProgressModal active={active} progress={saveRequired} />
   )
 }

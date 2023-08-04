@@ -1,16 +1,32 @@
 import React, { FormEvent, useEffect, useState } from 'react'
-import styles from './table_entry.module.scss';
-import Image from 'next/image';
-import { IoAddCircleOutline } from 'react-icons/io5';
+import styles from './table_entry.module.scss'
+import Image from 'next/image'
+import { IoAddCircleOutline } from 'react-icons/io5'
 import EntryInput from './table_entry/entry_input'
-import { useUser, useUserDispatch } from '../../../contexts/user'
-import { encryptFullEntry, ClearPasswordEntry, decryptFullEntry } from '../../../lib/trezor'
-import {
-  usePasswordEntries,
-  usePasswordEntriesDispatch
-} from '../../../contexts/password_entries'
+import { useUser } from '../../../contexts/user'
+import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry } from '../../../lib/trezor'
+import { usePasswordEntries, usePasswordEntriesDispatch } from '../../../contexts/password_entries'
 import { PasswordEntriesStatus, SafePasswordEntry } from '../../../contexts/reducers/password_entries'
 
+interface Init {
+  type: 'INIT';
+}
+interface Decrypting {
+  type: 'DECRYPTING';
+}
+interface Decrypted {
+  type: 'DECRYPTED';
+  clearEntry: ClearPasswordEntry;
+}
+interface FormSubmitted {
+  type: 'FORM_SUBMITTED';
+  formData: FormData;
+}
+interface Error {
+  type: 'ERROR';
+  error: string;
+}
+type EntryState = Init | Decrypting | Decrypted | FormSubmitted  | Error
 
 interface FormData {
   item: string;
@@ -21,20 +37,9 @@ interface FormData {
   tags: string;
 }
 
-enum EntryStatus {
-  INIT,
-  DECRYPTING
-}
-
 interface NewEntry {
   type: 'NEW_ENTRY';
 }
-
-interface EditEntry {
-  type: 'EDIT_ENTRY';
-  entry: ClearPasswordEntry;
-}
-
 interface ViewEntry {
   type: 'VIEW_ENTRY';
   entry: SafePasswordEntry;
@@ -52,36 +57,25 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }:
   const user = useUser();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
-  const [entryStatus, setEntryStatus] = useState<EntryStatus>(EntryStatus.INIT);
-  const [clearEntry, setClearEntry] = useState<ClearPasswordEntry|null>(null);
-  const [formData, setFormData] = useState<FormData|null>(null);
+  const [entryState, setEntryState] = useState<EntryState>({type: 'INIT'});
 
-  // decrypting entry and setting the clearEntry (triggered by editing entry)
   useEffect(() => {
-    if (user.device == null) {
-      return;
-    }
-    let device = user.device;
-    const masterKey = user.device.masterKey;
-    if (entryStatus === EntryStatus.DECRYPTING && mode.type === 'VIEW_ENTRY' && entryStatus === EntryStatus.DECRYPTING) {
+    if (entryState.type === 'DECRYPTING' && mode.type === 'VIEW_ENTRY') {
       const safeEntry = mode.entry;
       decryptFullEntry(safeEntry).then((clearEntry) => {
         if (clearEntry != null) {
-          setClearEntry(clearEntry);
+          setEntryState({type: 'DECRYPTED', clearEntry: clearEntry});
         }
       }).catch((err) => {
-        console.log(err);
+        setEntryState({type: 'ERROR', error: err});
       });
     }
-    setEntryStatus(EntryStatus.INIT);
-  }, [user, entryStatus, clearEntry]);
+  }, [entryState, mode]);
 
   // encrypting entry (triggered by saving entry)
   useEffect(() => {
-    if (user.device == null) {
-      return;
-    }
-    if (formData && passwordEntries.status == PasswordEntriesStatus.SYNCED) {
+    if (entryState.type === 'FORM_SUBMITTED' && passwordEntries.status == PasswordEntriesStatus.SYNCED) {
+      const formData = entryState.formData;
       const clearEntry: ClearPasswordEntry = {
         key: '', // key is determined by the reducer for new entries
         item: formData.item,
@@ -101,12 +95,11 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }:
           }
         }
       }).catch((err) => {
-        console.log(err);
+        setEntryState({type: 'ERROR', error: err});
       });
-      setFormData(null);
-      setClearEntry(null);
+      setEntryState({type: 'INIT'});
     }
-  }, [formData, passwordEntries, user, passwordEntriesDispatch]);
+  }, [passwordEntries.status === PasswordEntriesStatus.SYNCED, user, passwordEntriesDispatch, entryState, mode]);
 
   const handleSubmitEntry = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -121,25 +114,26 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }:
       secretNote: formData.get("secretNote") as string,
       tags: formData.get("tags") as string,
     };
-    setFormData(newEntry);
+    setEntryState({type: 'FORM_SUBMITTED', formData: newEntry})
     if(onSavedCallback) {
       onSavedCallback();
     }
 
   }
   const handleDiscardEntry = () => {
-    setClearEntry(null);
-    setFormData(null);
+    setEntryState({type: 'INIT'})
     if(onDiscardCallback) {
       onDiscardCallback();
     }
   }
 
   const handleEditEntry = () => {
-    setEntryStatus(EntryStatus.DECRYPTING);
+    setEntryState({type: 'DECRYPTING'})
   }
 
-  const expanded = mode.type === 'NEW_ENTRY' || mode.type === 'VIEW_ENTRY' && clearEntry != null;
+  const expanded = mode.type === 'NEW_ENTRY' ||
+                            mode.type === 'VIEW_ENTRY' && entryState.type === 'DECRYPTED'
+  const clearEntry = entryState.type === 'DECRYPTED' ? entryState.clearEntry : null;
 
   return (
     <div className={styles.card} key={mode.type === 'VIEW_ENTRY' ? mode.entry.key : 'newEntry'}>
