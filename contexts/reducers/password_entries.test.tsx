@@ -9,9 +9,9 @@ import {
   UpdateEntry,
   UploadEntries
 } from './password_entries'
-import { uniqueId } from '../../lib/utils'
+import { uniqueId } from 'lib/utils'
 
-jest.mock('../../lib/utils');
+jest.mock('lib/utils');
 const mUniqueId = jest.mocked(uniqueId);
 
 

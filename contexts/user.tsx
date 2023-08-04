@@ -1,5 +1,6 @@
 import React, { createContext, Dispatch, useContext, useReducer } from 'react'
 import { User, UserAction, userReducer, UserStatus } from './reducers/users'
+import { Dropbox } from 'dropbox'
 export { type User } from './reducers/users';
 
 const initialUser = {
@@ -9,6 +10,20 @@ const initialUser = {
   dbc: null,
   errorMsg: ''
 };
+
+// const initialUser: User = {
+//   status: UserStatus.TPM_READY_TO_LOAD,
+//   device: {
+//     label: "test",
+//     model: "test",
+//     deviceId: "test",
+//     path: "test",
+//     masterKey: "test",
+//     encryptionKey: new Uint8Array()
+//   },
+//   dropboxAccountName: 'test',
+//   dbc: new Dropbox()
+// }
 
 const UserContext = createContext<User | undefined>(undefined);
 const UserDispatchContext = createContext<Dispatch<UserAction> | undefined>(undefined);

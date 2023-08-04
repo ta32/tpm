@@ -81,7 +81,7 @@ export default function PasswordTable() {
         })
       });
     }
-  }, [passwordEntries, passwordEntriesDispatch, user, setNewEntry, rev, tagEntries]);
+  }, [passwordEntries, passwordEntriesDispatch, user, setNewEntry, rev, tagEntries, tagEntriesDispatch]);
 
   const handleAddEntry = useCallback(() => {
     setNewEntry(true);
@@ -99,7 +99,7 @@ export default function PasswordTable() {
   for (const entry of entries) {
     entry.key
   }
-  const hideNewEntry = newEntry ? '' : 'None';
+
   return (
     <div className={styles.container}>
       <div className={styles.start_bar}>
@@ -115,9 +115,9 @@ export default function PasswordTable() {
         </div>
       </div>
       <div className={styles.dashboard}>
-        {<TableEntry style={{display: hideNewEntry}} key={"newEntry"} onDiscardCallback={handleDiscardEntry} onSavedCallback={handleSaveNewEntry} entry={null} />}
+        {<TableEntry mode={newEntry? {type:'NEW_ENTRY'}: {type:'HIDDEN'}} key={"newEntry"} onDiscardCallback={handleDiscardEntry} onSavedCallback={handleSaveNewEntry} />}
         {entries.map((entry) => {
-          return <TableEntry entry={entry} key={entry.key} />
+          return <TableEntry mode={{type: 'VIEW_ENTRY', entry: entry}} key={entry.key} />
         })}
       </div>
       {passwordEntries.status == PasswordEntriesStatus.ERROR &&

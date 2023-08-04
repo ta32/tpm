@@ -10,6 +10,7 @@ import {
 import { TextDecoder, TextEncoder} from 'util';
 import { CipheredValue } from '@trezor/connect/lib/types/api/cipherKeyValue'
 import { AppData } from './storage'
+import { SafePasswordEntry } from '../contexts/reducers/password_entries'
 
 // nodeJs polyfills for WebAPIs
 Object.assign(global, { TextDecoder, TextEncoder });
@@ -68,23 +69,32 @@ afterEach(() => {
 });
 
 it('can generate valid key derived from trezor that can encrypt and decrypt the app data', async () => {
-  // The old trezor extension used the trezor to encrypt a constant value ( DEFAULT_NONCE )
+  // The old trezor extension used the trezor to encrypt (AES-256-CBC) a constant value ( DEFAULT_NONCE )
   // The returned CipherText is deterministic to the account used on the trezor.
   // This is used to generate a key which will encrypt and decrypt the app data using AES-256-GCM
 
   // TrezorConnect.cipherKeyValue implementation defined by slip-0011 (AES-256-CBC)
   mTrezorConnectCipherKeyValueOfDefaultNonceReturnsCipherText(mTrezorConnectCipherKeyValue)
-
+  // the key is used to encrypt and decrypt the app data
   const appDataKey = await getEncryptionKey("path");
   expect(appDataKey).toBeDefined();
   expect(appDataKey?.encryptionKey).toBeDefined();
   if (appDataKey === undefined || appDataKey?.encryptionKey === undefined) {
     return;
   }
-  // the key is used to encrypt and decrypt the app data
+  const safeEntry: SafePasswordEntry = {
+    key: 'test',
+    title: 'test',
+    item: 'test',
+    username: 'username',
+    passwordEnc: new Uint8Array([1,2,3,4,5,6,7,8,9,10]),
+    secretNoteEnc: new Uint8Array([1,2,3,4,5,6,7,8,9,10]),
+    tags: 'tags',
+    safeKey: 'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted'
+  }
     const appData: AppData = {
     tags: [],
-    entries: [],
+    entries: [safeEntry],
     version: 1
   };
 
@@ -145,5 +155,4 @@ it('encrypt then decrypt result in the same value', async () => {
   expect(decrypted?.password).toBe(clearPasswordEntry.password);
   expect(decrypted?.safeNote).toBe(clearPasswordEntry.safeNote);
 });
-
 
