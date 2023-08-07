@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
-import styles from '../styles/home.module.scss';
-import Router , {useRouter}  from 'next/router';
-import Image from 'next/image'
+import { useEffect } from "react";
+import styles from "../styles/home.module.scss";
+import Router, { useRouter } from "next/router";
+import Image from "next/image";
 export default function OAuthReceiver() {
   const router = useRouter();
-  useEffect(  () => {
-    router.push('/').catch((err) => console.log(err));
+  useEffect(() => {
+    router.push("/").catch((err) => console.log(err));
   }, [router]);
   return (
     <div className={styles.container}>
@@ -17,7 +17,7 @@ export default function OAuthReceiver() {
           fill
           sizes="100vw"
           style={{
-            objectFit: 'cover',
+            objectFit: "cover",
           }}
         />
       </div>

@@ -1,9 +1,9 @@
-import Head from 'next/head';
-import '../styles/globals.css';
-import { AppProps } from 'next/app';
-import { UserProvider } from '../contexts/user'
-import { PasswordEntriesProvider} from '../contexts/password_entries'
-import { TagEntriesProvider } from '../contexts/tag_entries'
+import Head from "next/head";
+import "../styles/globals.css";
+import { AppProps } from "next/app";
+import { UserProvider } from "../contexts/user";
+import { PasswordEntriesProvider } from "../contexts/password_entries";
+import { TagEntriesProvider } from "../contexts/tag_entries";
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
@@ -29,5 +29,5 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         </TagEntriesProvider>
       </UserProvider>
     </>
-  )
+  );
 }

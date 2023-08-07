@@ -1,25 +1,20 @@
-import { describe } from '@jest/globals'
-import { TextDecoder, TextEncoder} from 'util';
-import { deserializeObject, serializeObject } from './storage'
+import { describe } from "@jest/globals";
+import { TextDecoder, TextEncoder } from "util";
+import { deserializeObject, serializeObject } from "./storage";
 
 // Node.Js polyfills for WebAPIs
 Object.assign(global, { TextDecoder, TextEncoder });
 
-describe('serialization tests', () => {
-
-
-  it('should not lose typed arrays when serializing', () => {
+describe("serialization tests", () => {
+  it("should not lose typed arrays when serializing", () => {
     interface Item {
       key: string;
     }
-    const items: Item[] = [
-      { key: "key1" },
-      { key: "key2" }
-    ];
+    const items: Item[] = [{ key: "key1" }, { key: "key2" }];
     const obj = {
       key: "key",
       items: items,
-      values: new Uint8Array([1, 2, 3])
+      values: new Uint8Array([1, 2, 3]),
     };
 
     const serialized = serializeObject(obj);
@@ -29,5 +24,4 @@ describe('serialization tests', () => {
     expect(objActual.values).toEqual(obj.values);
     expect(ArrayBuffer.isView(objActual.values)).toEqual(true);
   });
-
 });

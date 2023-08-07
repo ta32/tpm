@@ -1,8 +1,8 @@
-import React, {useCallback} from 'react';
-import styles from './pin_dialog.module.scss';
+import React, { useCallback } from "react";
+import styles from "./pin_dialog.module.scss";
 
 function highlightKeyPress(id: string) {
-  let highlightTimeMs = parseInt(styles.keyHighlightTimeMs.replace('ms', ''));
+  let highlightTimeMs = parseInt(styles.keyHighlightTimeMs.replace("ms", ""));
   let element = document.getElementById(id);
   element?.classList.add(styles.active);
   setTimeout(() => {
@@ -11,9 +11,9 @@ function highlightKeyPress(id: string) {
 }
 
 function hideText(text: string) {
-  let hiddenText = text.replace(/./g, '•');
+  let hiddenText = text.replace(/./g, "•");
   let maxPinDisplayLength = parseInt(styles.maxPinDisplayLength);
-  if(hiddenText.length > maxPinDisplayLength ) {
+  if (hiddenText.length > maxPinDisplayLength) {
     hiddenText = hiddenText.slice(0, 9);
   }
   return hiddenText;
@@ -30,56 +30,71 @@ interface PinDialogProps {
 
 export default function PinDialog({ submitCallback }: PinDialogProps) {
   let [pinDialogState, setPinDialogState] = React.useState<PinDialogState>({
-    pin: '',
-    pinDialogText: 'Please enter your PIN',
+    pin: "",
+    pinDialogText: "Please enter your PIN",
   });
 
-  const pinAdd = useCallback((id: string) => {
-    highlightKeyPress(id)
-    let pin = pinDialogState.pin;
-    pin = pin + id;
-    setPinDialogState({ ...pinDialogState, pin: pin });
-  },[pinDialogState]);
+  const pinAdd = useCallback(
+    (id: string) => {
+      highlightKeyPress(id);
+      let pin = pinDialogState.pin;
+      pin = pin + id;
+      setPinDialogState({ ...pinDialogState, pin: pin });
+    },
+    [pinDialogState]
+  );
 
   const pinBackspace = useCallback(() => {
-    highlightKeyPress(styles.backspace)
+    highlightKeyPress(styles.backspace);
     let pin = pinDialogState.pin;
     pin = pin.slice(0, -1);
     setPinDialogState({ ...pinDialogState, pin: pin });
   }, [pinDialogState]);
 
   const pinEnter = useCallback(() => {
-    highlightKeyPress(styles.enter)
+    highlightKeyPress(styles.enter);
     submitCallback(pinDialogState.pin);
   }, [pinDialogState, submitCallback]);
 
-  const pinKeyDownHandler = useCallback((event: KeyboardEvent) => {
-    let keyCode = event.code;
-    // if digit
-    if (keyCode >= 'Digit0' && keyCode <= 'Digit9' || keyCode >= 'Numpad0' && keyCode <= 'Numpad9') {
-      pinAdd(event.key);
-    }
-    if (keyCode === 'Enter') {
-      pinEnter();
-    }
-    if (keyCode === 'Backspace') {
-      pinBackspace();
-    }
-  }, [pinAdd, pinEnter, pinBackspace]);
+  const pinKeyDownHandler = useCallback(
+    (event: KeyboardEvent) => {
+      let keyCode = event.code;
+      // if digit
+      if (
+        (keyCode >= "Digit0" && keyCode <= "Digit9") ||
+        (keyCode >= "Numpad0" && keyCode <= "Numpad9")
+      ) {
+        pinAdd(event.key);
+      }
+      if (keyCode === "Enter") {
+        pinEnter();
+      }
+      if (keyCode === "Backspace") {
+        pinBackspace();
+      }
+    },
+    [pinAdd, pinEnter, pinBackspace]
+  );
 
   React.useEffect(() => {
-    window.addEventListener('keydown', pinKeyDownHandler);
+    window.addEventListener("keydown", pinKeyDownHandler);
     return () => {
-      window.removeEventListener('keydown', pinKeyDownHandler);
-    }
+      window.removeEventListener("keydown", pinKeyDownHandler);
+    };
   }, [pinDialogState, pinKeyDownHandler]);
 
   return (
     <div className={styles.pin_dialog}>
-      <div className={styles.pin_table_header}>{pinDialogState.pinDialogText}</div>
-      <div className={styles.pin_table_subheader}>{"Look at the device for number positions."}</div>
+      <div className={styles.pin_table_header}>
+        {pinDialogState.pinDialogText}
+      </div>
+      <div className={styles.pin_table_subheader}>
+        {"Look at the device for number positions."}
+      </div>
       <div className={styles.pin_password}>
-        <span className={styles.password_text}>{hideText(pinDialogState.pin)}</span>
+        <span className={styles.password_text}>
+          {hideText(pinDialogState.pin)}
+        </span>
         <span className={styles.blinking_cursor} />
       </div>
       <div className={styles.pin_table}>
@@ -126,5 +141,5 @@ export default function PinDialog({ submitCallback }: PinDialogProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

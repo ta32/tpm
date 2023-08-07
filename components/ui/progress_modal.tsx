@@ -1,7 +1,7 @@
-import React from 'react';
-import styles from './progress_modal.module.scss'
-import Image from 'next/image'
-import { getUiIconPath, UI_DONE } from 'lib/icons'
+import React from "react";
+import styles from "./progress_modal.module.scss";
+import Image from "next/image";
+import { getUiIconPath, UI_DONE } from "lib/icons";
 
 interface ProgressModalProps {
   progress: boolean;
@@ -9,23 +9,38 @@ interface ProgressModalProps {
   progressText?: string;
   completedText?: string;
 }
-export default function ProgressModal({ active, progress, progressText, completedText }: ProgressModalProps) {
+export default function ProgressModal({
+  active,
+  progress,
+  progressText,
+  completedText,
+}: ProgressModalProps) {
   const progressLabel = progressText || "Uploading";
   const completedLabel = completedText || "Saved";
   return (
-    <div className={`${styles.progress_modal} ${ active ? styles.active : styles.hidden}`}>
-      {(progress && active) && (
+    <div
+      className={`${styles.progress_modal} ${
+        active ? styles.active : styles.hidden
+      }`}
+    >
+      {progress && active && (
         <div className={styles.label}>
           <span className={styles.spinner} />
           {progressLabel}
         </div>
       )}
-      {(!progress && active) && (
+      {!progress && active && (
         <div className={styles.label}>
-          <Image className={`${styles.icon} ${styles.ui_icon_white}`} src={getUiIconPath(UI_DONE)} alt={"done"} height={24} width={24} />
+          <Image
+            className={`${styles.icon} ${styles.ui_icon_white}`}
+            src={getUiIconPath(UI_DONE)}
+            alt={"done"}
+            height={24}
+            width={24}
+          />
           {completedLabel}
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,6 +1,5 @@
-
 // MODEL
-import { uniqueId } from 'lib/utils'
+import { uniqueId } from "lib/utils";
 
 export interface SafePasswordEntry {
   key: string;
@@ -27,37 +26,44 @@ export interface PasswordEntries {
 }
 // ACTIONS
 export interface Sync {
-  type: "SYNC"
+  type: "SYNC";
   entries: SafePasswordEntry[];
   version: number;
 }
 export interface AddEntry {
-  type: "ADD_ENTRY"
+  type: "ADD_ENTRY";
   entry: SafePasswordEntry;
 }
 
 export interface UpdateEntry {
-  type: "UPDATE_ENTRY"
+  type: "UPDATE_ENTRY";
   key: string;
   entry: SafePasswordEntry;
 }
 
 export interface UploadEntries {
-  type: "UPLOADED_ENTRIES"
+  type: "UPLOADED_ENTRIES";
   version_uploaded: number;
 }
 
-export type PasswordEntriesAction =  Sync | AddEntry | UpdateEntry | UploadEntries;
+export type PasswordEntriesAction =
+  | Sync
+  | AddEntry
+  | UpdateEntry
+  | UploadEntries;
 
-export function passwordEntriesReducer(state: PasswordEntries, action: PasswordEntriesAction) : PasswordEntries {
+export function passwordEntriesReducer(
+  state: PasswordEntries,
+  action: PasswordEntriesAction
+): PasswordEntries {
   switch (action.type) {
     case "SYNC": {
       if (state.status === PasswordEntriesStatus.UNINITIALIZED) {
         let new_entries: PasswordEntries = {
           status: PasswordEntriesStatus.SYNCED,
           version: action.version,
-          lastError: ""
-        }
+          lastError: "",
+        };
         for (const entry of action.entries) {
           new_entries[entry.key] = entry;
         }
@@ -68,53 +74,83 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
           // check items
           for (const entry of action.entries) {
             if (state[entry.key] === undefined) {
-              return { ...state, status: PasswordEntriesStatus.ERROR, lastError: "new entries do not match current entries" };
+              return {
+                ...state,
+                status: PasswordEntriesStatus.ERROR,
+                lastError: "new entries do not match current entries",
+              };
             }
           }
           return { ...state, status: PasswordEntriesStatus.SYNCED };
         }
         if (action.version < state.version) {
-          return { ...state, status: PasswordEntriesStatus.ERROR, lastError: "new version is older than current version" };
+          return {
+            ...state,
+            status: PasswordEntriesStatus.ERROR,
+            lastError: "new version is older than current version",
+          };
         }
         let new_entries: PasswordEntries = {
           status: PasswordEntriesStatus.SYNCED,
           version: action.version,
-          lastError: ""
-        }
+          lastError: "",
+        };
         for (const entry of action.entries) {
           new_entries[entry.key] = entry;
         }
         return { ...new_entries };
       }
       // internal error - e.g. neighbor trying to dispatch sync action at the same time as another component
-      return { ...state, status: PasswordEntriesStatus.ERROR, lastError: "Synced called in state: " + state.status + " action version is: " + action.version };
+      return {
+        ...state,
+        status: PasswordEntriesStatus.ERROR,
+        lastError:
+          "Synced called in state: " +
+          state.status +
+          " action version is: " +
+          action.version,
+      };
     }
     case "ADD_ENTRY": {
       if (state.status !== PasswordEntriesStatus.SYNCED) {
-        return { ...state, status: PasswordEntriesStatus.ERROR, lastError: "Cannot add entry to un-synced state" };
+        return {
+          ...state,
+          status: PasswordEntriesStatus.ERROR,
+          lastError: "Cannot add entry to un-synced state",
+        };
       }
-      let new_entries: PasswordEntries = {...state};
+      let new_entries: PasswordEntries = { ...state };
       let nextKey = uniqueId();
       new_entries[nextKey] = { ...action.entry, key: nextKey };
       return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case "UPDATE_ENTRY": {
       if (state.status !== PasswordEntriesStatus.SYNCED) {
-        return { ...state, status: PasswordEntriesStatus.ERROR, lastError: "Cannot update entry in un-synced state" };
+        return {
+          ...state,
+          status: PasswordEntriesStatus.ERROR,
+          lastError: "Cannot update entry in un-synced state",
+        };
       }
-      let new_entries: PasswordEntries = {...state};
+      let new_entries: PasswordEntries = { ...state };
       const updatedEntry = action.entry;
       updatedEntry.key = action.key;
       new_entries[action.key] = updatedEntry;
       return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case "UPLOADED_ENTRIES": {
-      return { ...state, version: action.version_uploaded, status: PasswordEntriesStatus.SAVED };
+      return {
+        ...state,
+        version: action.version_uploaded,
+        status: PasswordEntriesStatus.SAVED,
+      };
     }
   }
 }
 
-export function getSafePasswordEntries(state: PasswordEntries) : SafePasswordEntry[] {
+export function getSafePasswordEntries(
+  state: PasswordEntries
+): SafePasswordEntry[] {
   const entries: SafePasswordEntry[] = [];
   for (const [key, value] of Object.entries(state)) {
     let entry = value as SafePasswordEntry;

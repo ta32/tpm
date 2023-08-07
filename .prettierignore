@@ -1,0 +1,29 @@
+# Ignore all HTML files:
+**/*.html
+
+# Public folder
+public
+
+# Ignore all CSS and SCSS files
+**/*.css
+**/*.scss
+
+# Ignore all .JSON files
+**/*.json
+
+# Markdown files:
+**/*.md
+
+# Next.js build output:
+.next
+
+# all files starting with dot
+.*
+
+# other files
+tsconfig.json
+jest.config.mjs
+next.config.js
+next-env.d.ts
+
+

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import styles from './multi_select.module.scss'
+import React, { useState } from "react";
+import styles from "./multi_select.module.scss";
 
 interface SelectItem {
   value: string;
@@ -13,78 +13,101 @@ interface MultiSelectProps {
   items: SelectItem[];
 }
 
-function getInitialSelectedItems(selectedValues: string[] | undefined, items: SelectItem[]): SelectItem[] {
+function getInitialSelectedItems(
+  selectedValues: string[] | undefined,
+  items: SelectItem[]
+): SelectItem[] {
   if (!selectedValues) {
     return [];
   }
-  return items.filter(item => selectedValues.includes(item.value));
+  return items.filter((item) => selectedValues.includes(item.value));
 }
 
-export default function MultiSelect({className, name, selectedValues, items}: MultiSelectProps) {
+export default function MultiSelect({
+  className,
+  name,
+  selectedValues,
+  items,
+}: MultiSelectProps) {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<SelectItem[]>(getInitialSelectedItems(selectedValues, items));
+  const [selected, setSelected] = useState<SelectItem[]>(
+    getInitialSelectedItems(selectedValues, items)
+  );
 
-  const handleToggleOpen = (e: React.MouseEvent<HTMLElement>)=>  {
+  const handleToggleOpen = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     setOpen(!open);
-  }
+  };
 
   const handleSelectItem = (value: string) => {
-    const item = items.find(item => item.value ===value);
+    const item = items.find((item) => item.value === value);
     if (!item) {
       return;
     }
     setSelected([...selected, item]);
     setOpen(false);
-  }
+  };
 
   const handleRemoveItem = (value: string) => {
-    const itemIndex = selected.findIndex(item => item.value === value);
+    const itemIndex = selected.findIndex((item) => item.value === value);
     if (itemIndex === -1) {
       return;
     }
-    let selectedFiltered = selected.filter(item => item.value !== value);
+    let selectedFiltered = selected.filter((item) => item.value !== value);
     setSelected([...selectedFiltered]);
   };
 
-  let selectableItems = items.filter(item => selected.findIndex(selectedItem => selectedItem.value === item.value) === -1);
-  let selectedItemsValues = selected.map(item => item.value).join(' ');
+  let selectableItems = items.filter(
+    (item) =>
+      selected.findIndex(
+        (selectedItem) => selectedItem.value === item.value
+      ) === -1
+  );
+  let selectedItemsValues = selected.map((item) => item.value).join(" ");
 
   return (
     <div>
-      <input type="hidden" name={name} value={selectedItemsValues}/>
-      <div className={`${styles.container} ${className}`}
-        onClick={ e=> handleToggleOpen(e)}
-        style={{cursor: 'pointer', height: 'auto'}}
+      <input type="hidden" name={name} value={selectedItemsValues} />
+      <div
+        className={`${styles.container} ${className}`}
+        onClick={(e) => handleToggleOpen(e)}
+        style={{ cursor: "pointer", height: "auto" }}
       >
-        {selected.length == 0 ?
-          <div className={styles.item}>Add Tag...</div> :
+        {selected.length == 0 ? (
+          <div className={styles.item}>Add Tag...</div>
+        ) : (
           selected.map((item, index) => (
-            <div className={styles.item} key={index}
-              onClick={e => {e.stopPropagation(); handleRemoveItem(item.value)}}
+            <div
+              className={styles.item}
+              key={index}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemoveItem(item.value);
+              }}
             >
               {item.label}
               <div className={styles.icon}>x</div>
             </div>
           ))
-        }
+        )}
       </div>
-      {selectableItems.length > 0 &&
+      {selectableItems.length > 0 && (
         <div
-          className={styles.dropdown} style={{display: open? 'block' : 'none'}}>
+          className={styles.dropdown}
+          style={{ display: open ? "block" : "none" }}
+        >
           {selectableItems.map((item, index) => (
             <div
               key={item.value}
               className={styles.dropdown_item}
-              onClick={e => handleSelectItem(item.value)}
+              onClick={(e) => handleSelectItem(item.value)}
               id={item.value}
             >
               {item.label}
             </div>
           ))}
         </div>
-      }
+      )}
     </div>
-    )
-};
-
+  );
+}
