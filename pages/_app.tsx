@@ -2,7 +2,8 @@ import Head from 'next/head';
 import '../styles/globals.css';
 import { AppProps } from 'next/app';
 import { UserProvider } from '../contexts/user'
-
+import { PasswordEntriesProvider} from '../contexts/password_entries'
+import { TagEntriesProvider } from '../contexts/tag_entries'
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
@@ -21,7 +22,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <meta name="theme-color" content="#317EFB" />
       </Head>
       <UserProvider>
-        <Component {...pageProps} />
+        <TagEntriesProvider>
+          <PasswordEntriesProvider>
+            <Component {...pageProps} />
+          </PasswordEntriesProvider>
+        </TagEntriesProvider>
       </UserProvider>
     </>
   )

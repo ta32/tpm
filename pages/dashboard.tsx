@@ -1,23 +1,21 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styles from './dashboard.module.scss';
 import SidePanel from '../components/dashboard/side_panel';
 import PasswordTable from '../components/dashboard/password_table'
-import { PasswordEntriesProvider} from '../contexts/password_entries'
-import { TagEntriesProvider } from '../contexts/tag_entries'
 import LoaderModal from '../components/dashboard/loader_modal'
+import { useUser } from '../contexts/user'
 
 export default function Dashboard() {
+  const user = useUser();
   return (
     <div className={styles.dashboardLayout}>
-      <TagEntriesProvider>
         <SidePanel/>
         <section className={styles.content}>
-          <PasswordEntriesProvider>
-            <PasswordTable/>
-            <LoaderModal/>
-          </PasswordEntriesProvider>
+          { user.dbc !== null && user.device !== null &&
+            <PasswordTable dbc={user.dbc} accountName={user.dropboxAccountName} masterPublicKey={user.device.masterKey} appDataEncryptionKey={user.device.encryptionKey}/>
+          }
+          <LoaderModal/>
         </section>
-      </TagEntriesProvider>
     </div>
   )
 }

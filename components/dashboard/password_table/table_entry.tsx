@@ -51,55 +51,12 @@ interface Hidden {
 interface TableEntryProps {
   mode: NewEntry  | ViewEntry | Hidden;
   onDiscardCallback?: () => void;
-  onSavedCallback?: () => void;
+  onSavedCallback: () => void;
 }
 export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }: TableEntryProps) {
-  const user = useUser();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [entryState, setEntryState] = useState<EntryState>({type: 'INIT'});
-
-  useEffect(() => {
-    if (entryState.type === 'DECRYPTING' && mode.type === 'VIEW_ENTRY') {
-      const safeEntry = mode.entry;
-      decryptFullEntry(safeEntry).then((clearEntry) => {
-        if (clearEntry != null) {
-          setEntryState({type: 'DECRYPTED', clearEntry: clearEntry});
-        }
-      }).catch((err) => {
-        setEntryState({type: 'ERROR', error: err});
-      });
-    }
-  }, [entryState, mode]);
-
-  // encrypting entry (triggered by saving entry)
-  useEffect(() => {
-    if (entryState.type === 'FORM_SUBMITTED' && passwordEntries.status == PasswordEntriesStatus.SYNCED) {
-      const formData = entryState.formData;
-      const clearEntry: ClearPasswordEntry = {
-        key: '', // key is determined by the reducer for new entries
-        item: formData.item,
-        password: formData.password,
-        safeNote: formData.secretNote,
-        title: formData.title,
-        username: formData.username,
-        tags: formData.tags
-      }
-      encryptFullEntry(clearEntry).then((encryptedEntry) => {
-        if (encryptedEntry) {
-          if (mode.type === 'NEW_ENTRY' || mode.type === 'HIDDEN') {
-            passwordEntriesDispatch({ type: 'ADD_ENTRY', entry: encryptedEntry });
-          }
-          if (mode.type === 'VIEW_ENTRY') {
-            passwordEntriesDispatch({ type: 'UPDATE_ENTRY', entry: encryptedEntry, key: mode.entry.key });
-          }
-        }
-      }).catch((err) => {
-        setEntryState({type: 'ERROR', error: err});
-      });
-      setEntryState({type: 'INIT'});
-    }
-  }, [passwordEntries.status === PasswordEntriesStatus.SYNCED, user, passwordEntriesDispatch, entryState, mode]);
 
   const handleSubmitEntry = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -115,10 +72,33 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }:
       tags: formData.get("tags") as string,
     };
     setEntryState({type: 'FORM_SUBMITTED', formData: newEntry})
-    if(onSavedCallback) {
-      onSavedCallback();
+    if (passwordEntries.status == PasswordEntriesStatus.SYNCED) {
+      const clearEntry: ClearPasswordEntry = {
+        key: '', // key is determined by the reducer for new entries
+        item: newEntry.item,
+        password: newEntry.password,
+        safeNote: newEntry.secretNote,
+        title: newEntry.title,
+        username: newEntry.username,
+        tags: newEntry.tags
+      }
+      encryptFullEntry(clearEntry).then((encryptedEntry) => {
+        if (encryptedEntry) {
+          if (mode.type === 'NEW_ENTRY' || mode.type === 'HIDDEN') {
+            passwordEntriesDispatch({ type: 'ADD_ENTRY', entry: encryptedEntry });
+          }
+          if (mode.type === 'VIEW_ENTRY') {
+            passwordEntriesDispatch({ type: 'UPDATE_ENTRY', entry: encryptedEntry, key: mode.entry.key });
+          }
+        }
+        setEntryState({type: 'INIT'});
+        onSavedCallback();
+      }).catch((err) => {
+        setEntryState({type: 'ERROR', error: 'Error encrypting entry'});
+      });
+    } else {
+      setEntryState({type: 'ERROR', error: 'Password entries are not synced yet'});
     }
-
   }
   const handleDiscardEntry = () => {
     setEntryState({type: 'INIT'})
@@ -126,17 +106,34 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }:
       onDiscardCallback();
     }
   }
-
   const handleEditEntry = () => {
-    setEntryState({type: 'DECRYPTING'})
+    if (mode.type === 'VIEW_ENTRY') {
+      setEntryState({type: 'DECRYPTING'});
+      const safeEntry = mode.entry;
+      decryptFullEntry(safeEntry).then((clearEntry) => {
+        if (clearEntry != null) {
+          setEntryState({type: 'DECRYPTED', clearEntry: clearEntry});
+        }
+      }).catch((err) => {
+        setEntryState({type: 'ERROR', error: err});
+      });
+    }
+    return; // edit is only possible when mode is VIEW_ENTRY
   }
 
   const expanded = mode.type === 'NEW_ENTRY' ||
-                            mode.type === 'VIEW_ENTRY' && entryState.type === 'DECRYPTED'
+                            mode.type === 'VIEW_ENTRY' && ( entryState.type === 'DECRYPTED' || entryState.type === 'FORM_SUBMITTED');
   const clearEntry = entryState.type === 'DECRYPTED' ? entryState.clearEntry : null;
+  const formData = entryState.type === 'FORM_SUBMITTED' ? entryState.formData : null;
 
+  const item = clearEntry?.item ?? formData?.item ?? '';
+  const title = clearEntry?.title ?? formData?.title ?? '';
+  const username = clearEntry?.username ?? formData?.username ?? '';
+  const password = clearEntry?.password ?? formData?.password ?? '';
+  const secretNote = clearEntry?.safeNote ?? formData?.secretNote ?? '';
+  const tags = clearEntry?.tags ?? formData?.tags ?? '';
   return (
-    <div className={styles.card} key={mode.type === 'VIEW_ENTRY' ? mode.entry.key : 'newEntry'}>
+    <div className={styles.card}>
       { expanded &&
         <form className={styles.entry} onSubmit={handleSubmitEntry}>
           <div className={styles.avatar_expanded}>
@@ -144,15 +141,17 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, mode }:
             <IoAddCircleOutline className={styles.icon}></IoAddCircleOutline>
           </div>
           <div className={styles.account_info}>
-            <EntryInput name="item" label={"Item"} placeholder={""} type={"text"} defaultValue={clearEntry?.item ?? null}/>
-            <EntryInput name="title" label={"Title"} placeholder={""} type={"text"} defaultValue={clearEntry?.title ?? null}/>
-            <EntryInput name="username" label={"Username"} placeholder={""} type={"text"} defaultValue={clearEntry?.username ?? null}/>
-            <EntryInput name="password" label={"Password"} placeholder={""} type={"password"} defaultValue={clearEntry?.password ?? null}/>
-            <EntryInput name="tags" label={"Tags"} placeholder={""} type={"tags"} defaultValue={clearEntry?.tags ?? null}/>
-            <EntryInput name="secretNote" label={"Secrete Note"} placeholder={""} type={"secret"} defaultValue={clearEntry?.safeNote ?? null}/>
+            <EntryInput name="item" label={"Item"} placeholder={""} type={"text"} defaultValue={item}/>
+            <EntryInput name="title" label={"Title"} placeholder={""} type={"text"} defaultValue={title}/>
+            <EntryInput name="username" label={"Username"} placeholder={""} type={"text"} defaultValue={username}/>
+            <EntryInput name="password" label={"Password"} placeholder={""} type={"password"} defaultValue={password}/>
+            <EntryInput name="tags" label={"Tags"} placeholder={""} type={"tags"} defaultValue={tags}/>
+            <EntryInput name="secretNote" label={"Secrete Note"} placeholder={""} type={"secret"} defaultValue={secretNote}/>
           </div>
           <div className={styles.account_info_controls}>
-            <button type="submit" className={styles.save_btn}>Save</button>
+            <button type="submit" disabled={entryState.type === 'FORM_SUBMITTED'} className={styles.save_btn}>
+              {entryState.type === 'FORM_SUBMITTED'? "Saving" : "Save"}
+            </button>
             <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>Discard</button>
           </div>
         </form>

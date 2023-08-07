@@ -10,7 +10,7 @@ interface ProgressModalProps {
   completedText?: string;
 }
 export default function ProgressModal({ active, progress, progressText, completedText }: ProgressModalProps) {
-  const progressLabel = progressText || "Saving";
+  const progressLabel = progressText || "Uploading";
   const completedLabel = completedText || "Saved";
   return (
     <div className={`${styles.progress_modal} ${ active ? styles.active : styles.hidden}`}>

@@ -26,9 +26,10 @@ jest.mock('@trezor/connect-web');
 const mTrezorConnectCipherKeyValue = jest.mocked(TrezorConnect.cipherKeyValue)
                                              .mockName('Trezor Connect CipherKeyValue Mock');
 
-// AES-256-CBC encryption of default text will be 128 characters long
-const CIPHER_TEXT = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
 function mTrezorConnectCipherKeyValueOfDefaultNonceReturnsCipherText(mTrezorConnectCipherKeyValue: any) {
+  // AES-256-CBC encryption of default text will be 128 characters long
+  const CIPHER_TEXT = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   let encryptionPassKeyResponse: Success<CipheredValue> = {
     success: true,
     payload: {
@@ -79,6 +80,10 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
   const appDataKey = await getEncryptionKey("path");
   expect(appDataKey).toBeDefined();
   expect(appDataKey?.encryptionKey).toBeDefined();
+  // array with 170 32 elements
+  const expectedKey = new Uint8Array(32);
+  expectedKey.fill(170); // hex value aa is 170
+  expect(appDataKey?.encryptionKey).toEqual(new Uint8Array(expectedKey));
   if (appDataKey === undefined || appDataKey?.encryptionKey === undefined) {
     return;
   }

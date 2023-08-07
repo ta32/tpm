@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styles from './password_table.module.scss'
 import FilterInput from './password_table/filter_input'
 import TableEntry from './password_table/table_entry'
-import { useUser, useUserDispatch } from '../../contexts/user'
 import { usePasswordEntries, usePasswordEntriesDispatch } from '../../contexts/password_entries'
 import { readAppFile, saveAppFile } from '../../lib/dropbox'
 import { fromState } from '../../lib/storage'
@@ -11,64 +10,65 @@ import { decryptAppData, encryptAppData } from '../../lib/trezor'
 import { getSafePasswordEntries, PasswordEntriesStatus } from '../../contexts/reducers/password_entries'
 import { useTagEntries, useTagEntriesDispatch } from '../../contexts/tag_entries'
 import { TagsStatus } from '../../contexts/reducers/tag_entries'
+import { Dropbox } from 'dropbox'
 
-export default function PasswordTable() {
-  const user = useUser();
+interface PasswordTableProps {
+  accountName: string;
+  dbc: Dropbox,
+  masterPublicKey: string,
+  appDataEncryptionKey: Uint8Array
+}
+
+export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionKey, accountName }: PasswordTableProps) {
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
-  const userDispatch = useUserDispatch();
   const [rev, setRev] = useState('');
   const [newEntry, setNewEntry] = useState(false);
+  const passwordSyncStatus = passwordEntries.status;
 
   useEffect(() => {
-    if (user.dbc != null && user.device?.encryptionKey != null) {
-      const encryptionKey = user.device.encryptionKey;
-      if (passwordEntries.status == PasswordEntriesStatus.UNINITIALIZED || passwordEntries.status == PasswordEntriesStatus.SAVED) {
-        readAppFile(user, user.dbc).then((result) => {
-          if (result.initialized) {
-            if (result.data === undefined) {
+    const pullData = passwordSyncStatus == PasswordEntriesStatus.UNINITIALIZED || passwordSyncStatus == PasswordEntriesStatus.SAVED;
+    if (pullData) {
+      readAppFile(masterPublicKey, dbc).then((result) => {
+        if (result.initialized) {
+          if (result.data === undefined) {
+            // TODO: handle error
+            console.error("Could not read app data");
+            return;
+          }
+          decryptAppData(result.data, appDataEncryptionKey).then((appData) => {
+            if (appData === undefined) {
               // TODO: handle error
-              console.error("Could not read app data");
+              console.error("Could not decrypt app data");
               return;
             }
-            decryptAppData(result.data, encryptionKey).then((appData) => {
-              if (appData === undefined) {
-                // TODO: handle error
-                console.error("Could not decrypt app data");
-                return;
-              }
-              setRev(result.rev);
-              tagEntriesDispatch({ type: 'SYNC_TAGS', tags: appData.tags });
-              passwordEntriesDispatch({ version: appData.version, type: 'SYNC', entries: appData.entries});
-            }).catch((e) => {
-              console.log(e);
-            });
-          } else {
-            passwordEntriesDispatch({ version: 0, type: 'SYNC', entries: []});
-          }
-        }).catch((e) => {
-          // TODO: handle error
-          console.log(e);
-        });
-      }
+            setRev(result.rev);
+            tagEntriesDispatch({ type: 'SYNC_TAGS', tags: appData.tags });
+            passwordEntriesDispatch({ version: appData.version, type: 'SYNC', entries: appData.entries});
+          }).catch((e) => {
+            console.log(e);
+          });
+        } else {
+          passwordEntriesDispatch({ version: 0, type: 'SYNC', entries: []});
+        }
+      }).catch((e) => {
+        // TODO: handle error
+        console.log(e);
+      });
     }
-  }, [passwordEntries, passwordEntriesDispatch, user, tagEntries, tagEntriesDispatch]);
+  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordSyncStatus, tagEntriesDispatch, passwordEntriesDispatch])
 
   useEffect(() => {
-    if (user.dbc == null || user.device == null || user.device.encryptionKey == undefined) {
-      return;
-    }
-    let dbc = user.dbc;
-    const masterKey = user.device.masterKey;
-    const appDataEncryptionKey = user.device.encryptionKey;
-    if (passwordEntries.status === PasswordEntriesStatus.SAVE_REQUIRED || tagEntries.status === TagsStatus.SAVE_REQUIRED) {
+    const pushData = passwordEntries.status === PasswordEntriesStatus.SAVE_REQUIRED || tagEntries.status === TagsStatus.SAVE_REQUIRED;
+    if (pushData) {
       const latestVersion = passwordEntries.version + 1;
       const appData = fromState(passwordEntries, tagEntries, latestVersion);
-      appFileName(masterKey).then((appFileName) => {
+      appFileName(masterPublicKey).then((appFileName) => {
         encryptAppData(appData, appDataEncryptionKey).then( appDataEnc => {
           if(appDataEnc === undefined) {
+            // TODO: handle error
             console.error("Could not encrypt app data");
             return;
           }
@@ -81,7 +81,7 @@ export default function PasswordTable() {
         })
       });
     }
-  }, [passwordEntries, passwordEntriesDispatch, user, setNewEntry, rev, tagEntries, tagEntriesDispatch]);
+  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordEntries, rev, tagEntries, tagEntriesDispatch, passwordEntriesDispatch])
 
   const handleAddEntry = useCallback(() => {
     setNewEntry(true);
@@ -91,7 +91,7 @@ export default function PasswordTable() {
     setNewEntry(false);
   }, [])
 
-  const handleSaveNewEntry = useCallback(() => {
+  const handleSaveCallback = useCallback(() => {
     setNewEntry(false);
   }, [])
 
@@ -111,13 +111,13 @@ export default function PasswordTable() {
         </div>
         <div className={styles.col2}>
           <button className={styles.grey_btn}>Sort</button>
-          <button className={styles.drop_box_btn}>{user.dropboxAccountName}</button>
+          <button className={styles.drop_box_btn}>{accountName}</button>
         </div>
       </div>
       <div className={styles.dashboard}>
-        {<TableEntry mode={newEntry? {type:'NEW_ENTRY'}: {type:'HIDDEN'}} key={"newEntry"} onDiscardCallback={handleDiscardEntry} onSavedCallback={handleSaveNewEntry} />}
+        {<TableEntry mode={newEntry? {type:'NEW_ENTRY'}: {type:'HIDDEN'}} key={"newEntry"} onDiscardCallback={handleDiscardEntry} onSavedCallback={handleSaveCallback} />}
         {entries.map((entry) => {
-          return <TableEntry mode={{type: 'VIEW_ENTRY', entry: entry}} key={entry.key} />
+          return <TableEntry mode={{type: 'VIEW_ENTRY', entry: entry}} key={entry.key} onSavedCallback={handleSaveCallback} />
         })}
       </div>
       {passwordEntries.status == PasswordEntriesStatus.ERROR &&

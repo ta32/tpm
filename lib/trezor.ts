@@ -93,7 +93,7 @@ export async function getEncryptionKey(devicePath: string): Promise<KeyPair|null
     const tmp = result.payload.value;
     return {
       masterKey: result.payload.value, // assumes master key is 128 bytes long
-      encryptionKey: uint8ArrayFromHex(tmp.substring(tmp.length / 2, tmp.length))
+      encryptionKey: uint8ArrayFromHex(tmp.substring(tmp.length/2, tmp.length))
     }
   }
   return null;

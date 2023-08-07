@@ -17,21 +17,6 @@ const mReadBlob = jest.mocked(readBlob);
 
 it('app reads password entries file in app folder once device has been connected', async () => {
   const data = new Uint8Array([1, 2, 3]);
-  const initialUser = {
-    status: UserStatus.ONLINE_WITH_TREZOR,
-    device: {
-      label: 'device must be connected in order to determine the app file name',
-      model: '1',
-      deviceId: '1',
-      path: '1',
-      masterKey: '1',
-      encryptionKey: new Uint8Array()
-    },
-    dropboxAccountName: '',
-    dbc: null,
-    errorMsg: ''
-  };
-
   mReadBlob.mockResolvedValue(data);
   const APP_FILE_NAME = 'unique_file_name_per_hw_account.pswd';
   mDropbox.mockImplementation((options): Dropbox => {
@@ -71,7 +56,7 @@ it('app reads password entries file in app folder once device has been connected
 
   // sut
   const dropbox = new Dropbox({ auth: new DropboxAuth({ clientId: '123' }) });
-  const entries = await readAppFile(initialUser, dropbox);
+  const entries = await readAppFile("", dropbox);
 
   expect(entries.data).toStrictEqual(data);
   expect(entries.rev).toStrictEqual('must_use_this_rev_when_updating_file_rev_1');

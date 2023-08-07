@@ -21,12 +21,8 @@ export async function connectDropbox(redirectUri: string, codeVerifier: string):
   throw new Error("No access token");
 }
 
-export async function readAppFile(user: User, dbc: Dropbox): Promise<{data: Uint8Array|undefined, rev: string, initialized: boolean}> {
-  if (user.device == null) {
-    throw new Error("Error getting device");
-  }
-  // check if app file exists
-  const fileName = await appFileName(user.device.masterKey);
+export async function readAppFile(masterPublicKey: string, dbc: Dropbox): Promise<{data: Uint8Array|undefined, rev: string, initialized: boolean}> {
+  const fileName = await appFileName(masterPublicKey);
   const files = await listFiles(dbc)
   const fileExists = files.includes(fileName);
   if (fileExists) {
