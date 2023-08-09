@@ -9,53 +9,47 @@ import { useEffect, useState, useCallback } from "react";
 import { DropboxAuth, DropboxResponse, users } from "dropbox";
 import { connectDropbox, hasRedirectedFromAuth } from "../lib/dropbox";
 import { initTrezor, getDevices, getEncryptionKey } from "../lib/trezor";
-import Layout from "../components/layout/layout";
-import PinDialog from "../components/pin_dialog/pin_dialog";
+import Layout from "../components/index/layout";
+import PinDialog from "../components/index/pin_dialog";
 import { useUser, useUserDispatch } from "../contexts/user";
 import Router from "next/router";
 import { UserStatus } from "../contexts/reducers/users";
 
-const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
+const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI ?? "http://localhost:3000/";
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 const STORAGE = "tpmDropboxToken";
-const logoutUrl = "https://www.dropbox.com/logout";
+const LOGOUT_URL = "https://www.dropbox.com/logout";
 const ADDRS_PATH = "/";
 
+let trezorConnectInit = false;
+
 export default function Home() {
-  const [trezorConnectInit, setTrezorConnectInit] = useState(false);
   const user = useUser();
   const userDispatch = useUserDispatch();
 
   const updateDevice = useCallback(
     (event: DeviceEventMessage) => {
       if (event.type === DEVICE.CONNECT) {
-        let trezor = event.payload;
-        if (user.device === null) {
-          getDevices()
-            .then((device) => {
-              if (device !== null) {
-                userDispatch({ type: "ADD_DEVICE", device: device });
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-              return;
-            });
-        }
+        getDevices()
+          .then((device) => {
+            if (device !== null) {
+              userDispatch({ type: "ADD_DEVICE", device: device });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            return;
+        });
       }
       if (event.type === DEVICE.DISCONNECT) {
         userDispatch({ type: "REMOVE_DEVICE" });
       }
     },
-    [user, userDispatch]
+    [userDispatch]
   );
 
   useEffect(() => {
-    if (REDIRECT_URI === undefined) {
-      console.error("REDIRECT_URI is undefined");
-      return;
-    }
     let codeVerifier = window.sessionStorage.getItem("codeVerifier");
     if (
       user.status === UserStatus.OFFLINE &&
@@ -93,15 +87,15 @@ export default function Home() {
   }, [user, userDispatch]);
 
   useEffect(() => {
-    if (!trezorConnectInit) {
+    if(!trezorConnectInit) {
       initTrezor(updateDevice).catch((error) => {
         // FATAL ERROR
         console.log(error);
         return;
       });
-      setTrezorConnectInit(true);
     }
-  }, [trezorConnectInit, updateDevice]);
+    trezorConnectInit = true;
+  }, [updateDevice]);
 
   const openPinDialog = () => {
     if (user.device === null) {
