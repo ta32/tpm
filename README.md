@@ -2,22 +2,20 @@
 
 This example uses [`next-pwa`](https://github.com/shadowwalker/next-pwa) to create a progressive web app (PWA) powered by [Workbox](https://developers.google.com/web/tools/workbox/).
 
-## Deploy your own
+## About this Project
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+* A free and open-source password manager.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/progressive-web-app&project-name=progressive-web-app&repository-name=progressive-web-app)
+* password manager that protects all your passwords **without** a master password
 
-## How to use
+* password manager where the encrypted passwords when synced online are stored using an account you control
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+These requirements were met by the Trezor Password Manager (TPM), but was sadly deprecated.
+This project aims to re-build this Chrome extension as a PWA-WebAPP, but with better offline support 
+and a more trustless way for users to install the app.
 
-```bash
-npx create-next-app --example progressive-web-app progressive-web-app
-# or
-yarn create next-app --example progressive-web-app progressive-web-app
-# or
-pnpm create next-app --example progressive-web-app progressive-web-app
-```
+see Wiki for more information: https://github.com/ta32/tpm/wiki
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+## Build and Install locally
+
+ -[ ] TODO: add instructions
