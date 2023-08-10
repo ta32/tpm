@@ -4,11 +4,11 @@ This example uses [`next-pwa`](https://github.com/shadowwalker/next-pwa) to crea
 
 ## About this Project
 
-* A free and open-source password manager.
+* A free and open-source password manager
 
 * password manager that protects all your passwords **without** a master password
 
-* password manager where the encrypted passwords when synced online are stored using an account you control
+* password manager where the encrypted passwords is synced online using a storage account you control
 
 These requirements were met by the Trezor Password Manager (TPM), but was sadly deprecated.
 This project aims to re-build this Chrome extension as a PWA-WebAPP, but with better offline support 
