@@ -18,4 +18,4 @@ see Wiki for more information: https://github.com/ta32/tpm/wiki
 
 ## Build and Install locally
 
- -[ ] TODO: add instructions
+ TODO: add instructions
