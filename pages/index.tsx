@@ -59,6 +59,7 @@ export default function Home() {
       userDispatch({ type: "LOADING_DROPBOX_API_TOKEN" });
       connectDropbox(REDIRECT_URI, codeVerifier)
         .then((dbc) => {
+          console.log("connected to dropbox");
           dbc
             .usersGetCurrentAccount()
             .then((dropBoxUser: DropboxResponse<users.FullAccount>) => {
@@ -90,6 +91,7 @@ export default function Home() {
     if(!trezorConnectInit) {
       initTrezor(updateDevice).catch((error) => {
         // FATAL ERROR
+        console.log("Could not initialize trezor");
         console.log(error);
         return;
       });
@@ -137,6 +139,7 @@ export default function Home() {
         window.location.href = authUrl as string;
       })
       .catch((error) => {
+        console.log("error in dbxAuth.getAuthenticationUrl");
         console.log(error);
       });
   };
