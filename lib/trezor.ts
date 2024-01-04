@@ -50,14 +50,12 @@ export async function initTrezor(
   await TrezorConnect.init({
     transportReconnect: true,
     debug: true,
-    popup: false,
+    popup: true,
     lazyLoad: false,
     manifest: {
       email: "test@gmail.com",
-      appUrl: "",
+      appUrl: appUrl,
     },
-  }).then((result) => {
-    console.log("TrezorConnect init result: ", result);
   })
   .catch((error) => {
     console.log("TrezorConnect init error");
