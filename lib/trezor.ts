@@ -49,7 +49,6 @@ export async function initTrezor(
   console.log("initTrezor for appUrl: ", appUrl);
   await TrezorConnect.init({
     transportReconnect: true,
-    webusb: true,
     debug: true,
     popup: true,
     lazyLoad: false,
@@ -63,10 +62,6 @@ export async function initTrezor(
     return error;
   });
   await TrezorConnect.getFeatures();
-  TrezorConnect.getPublicKey({
-    "path": "m/49'/0'/0'",
-    "showOnTrezor": true
-  });
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
 }
 
