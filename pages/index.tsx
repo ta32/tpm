@@ -34,6 +34,7 @@ export default function Home() {
   const updateDevice = useCallback(
     (event: DeviceEventMessage) => {
       if (event.type === DEVICE.CONNECT) {
+        console.log("device connected");
         getDevices()
           .then((device) => {
             if (device !== null) {

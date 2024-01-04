@@ -53,9 +53,10 @@ export async function initTrezor(
     lazyLoad: false,
     manifest: {
       email: "test@gmail.com",
-      appUrl: "http://localhost:3000",
+      appUrl: appUrl,
     },
   }).catch((error) => {
+    console.log("TrezorConnect init error");
     return error;
   });
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
@@ -74,6 +75,7 @@ export async function getDevices(): Promise<TrezorDevice | null> {
       deviceId: device_id ?? "",
     };
   }
+  console.log("getFeatures failed");
   return null;
 }
 
