@@ -46,6 +46,7 @@ export async function initTrezor(
   appUrl: string,
   deviceEventCallback: (event: DeviceEventMessage) => void
 ) {
+  console.log("initTrezor for appUrl: ", appUrl);
   await TrezorConnect.init({
     transportReconnect: true,
     debug: false,
