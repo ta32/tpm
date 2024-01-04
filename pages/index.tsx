@@ -89,6 +89,7 @@ export default function Home() {
 
   useEffect(() => {
     if(!trezorConnectInit) {
+      console.log("initializing trezor");
       initTrezor(updateDevice).catch((error) => {
         // FATAL ERROR
         console.log("Could not initialize trezor");
@@ -96,6 +97,7 @@ export default function Home() {
         return;
       });
     }
+    console.log("trezor initialized OK");
     trezorConnectInit = true;
   }, [updateDevice]);
 
