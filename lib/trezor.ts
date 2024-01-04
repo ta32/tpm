@@ -54,7 +54,7 @@ export async function initTrezor(
     lazyLoad: false,
     manifest: {
       email: "test@gmail.com",
-      appUrl: appUrl,
+      appUrl: "",
     },
   }).catch((error) => {
     console.log("TrezorConnect init error");

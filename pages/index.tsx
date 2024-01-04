@@ -17,7 +17,7 @@ import { UserStatus } from "../contexts/reducers/users";
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
   `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
-  "http://localhost:3000/";
+  "http://localhosta:3000/";
 console.log("APP_URL: " + APP_URL);
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;

@@ -3,10 +3,19 @@ import { User, UserAction, userReducer, UserStatus } from "./reducers/users";
 import { Dropbox } from "dropbox";
 export { type User } from "./reducers/users";
 
+// const initialUser = {
+//   status: UserStatus.OFFLINE,
+//   device: null,
+//   dropboxAccountName: "",
+//   dbc: null,
+//   errorMsg: "",
+// };
+
+// State for testing Trezor connect without doing the dropbox auth flow
 const initialUser = {
-  status: UserStatus.OFFLINE,
+  status: UserStatus.ONLINE_NO_TREZOR,
   device: null,
-  dropboxAccountName: "",
+  dropboxAccountName: "Ta32Mock",
   dbc: null,
   errorMsg: "",
 };
