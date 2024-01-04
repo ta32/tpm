@@ -15,7 +15,10 @@ import { useUser, useUserDispatch } from "../contexts/user";
 import Router from "next/router";
 import { UserStatus } from "../contexts/reducers/users";
 
-const REDIRECT_URI = `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}` ?? "http://localhost:3000/";
+const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
+  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
+  "http://localhost:3000/";
+console.log("APP_URL: " + APP_URL);
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 const STORAGE = "tpmDropboxToken";
@@ -57,7 +60,7 @@ export default function Home() {
       codeVerifier !== null
     ) {
       userDispatch({ type: "LOADING_DROPBOX_API_TOKEN" });
-      connectDropbox(REDIRECT_URI, codeVerifier)
+      connectDropbox(APP_URL, codeVerifier)
         .then((dbc) => {
           console.log("connected to dropbox");
           dbc
@@ -90,7 +93,8 @@ export default function Home() {
   useEffect(() => {
     if(!trezorConnectInit) {
       console.log("initializing trezor");
-      initTrezor(updateDevice).catch((error) => {
+      initTrezor(APP_URL, updateDevice)
+        .catch((error) => {
         // FATAL ERROR
         console.log("Could not initialize trezor");
         console.log(error);
@@ -117,14 +121,14 @@ export default function Home() {
     userDispatch({ type: "SHOW_PIN_DIALOG" });
   };
   const connectToDropbox = () => {
-    if (REDIRECT_URI === undefined) {
-      console.error("REDIRECT_URI is undefined");
+    if (APP_URL === undefined) {
+      console.error("APP_URI is undefined");
       return;
     }
     const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
     dbxAuth
       .getAuthenticationUrl(
-        REDIRECT_URI,
+        APP_URL,
         undefined,
         "code",
         "offline",

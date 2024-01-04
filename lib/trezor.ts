@@ -43,6 +43,7 @@ export interface ClearPasswordEntry {
 }
 
 export async function initTrezor(
+  appUrl: string,
   deviceEventCallback: (event: DeviceEventMessage) => void
 ) {
   await TrezorConnect.init({
