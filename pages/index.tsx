@@ -15,7 +15,7 @@ import { useUser, useUserDispatch } from "../contexts/user";
 import Router from "next/router";
 import { UserStatus } from "../contexts/reducers/users";
 
-const REDIRECT_URI = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?? "http://localhost:3000/";
+const REDIRECT_URI = `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}` ?? "http://localhost:3000/";
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 const STORAGE = "tpmDropboxToken";
