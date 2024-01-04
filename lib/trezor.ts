@@ -56,7 +56,10 @@ export async function initTrezor(
       email: "test@gmail.com",
       appUrl: "",
     },
-  }).catch((error) => {
+  }).then((result) => {
+    console.log("TrezorConnect init result: ", result);
+  })
+  .catch((error) => {
     console.log("TrezorConnect init error");
     return error;
   });
