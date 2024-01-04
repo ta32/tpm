@@ -49,6 +49,7 @@ export async function initTrezor(
   console.log("initTrezor for appUrl: ", appUrl);
   await TrezorConnect.init({
     transportReconnect: true,
+    webusb: true,
     debug: true,
     popup: true,
     lazyLoad: false,
