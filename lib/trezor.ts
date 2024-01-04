@@ -62,6 +62,11 @@ export async function initTrezor(
     console.log("TrezorConnect init error");
     return error;
   });
+  await TrezorConnect.getFeatures();
+  TrezorConnect.getPublicKey({
+    "path": "m/49'/0'/0'",
+    "showOnTrezor": true
+  });
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
 }
 
