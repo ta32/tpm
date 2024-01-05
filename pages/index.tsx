@@ -39,6 +39,7 @@ export default function Home() {
         getDevices()
           .then((device) => {
             if (device !== null) {
+              console.log("device found adding device to state");
               userDispatch({ type: "ADD_DEVICE", device: device });
             }
           })

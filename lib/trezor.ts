@@ -61,7 +61,7 @@ export async function initTrezor(
     console.log("TrezorConnect init error");
     return error;
   });
-  await TrezorConnect.getFeatures();
+  const result = await TrezorConnect.getFeatures();
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
 }
 

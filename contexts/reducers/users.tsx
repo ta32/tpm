@@ -78,12 +78,14 @@ export function userReducer(state: User, action: UserAction): User {
     }
     case "ADD_DEVICE": {
       if (state.status === UserStatus.ONLINE_NO_TREZOR) {
+        console.log("adding device trezor is online");
         return {
           ...state,
           status: UserStatus.ONLINE_WITH_TREZOR,
           device: action.device,
         };
       } else {
+        console.log("adding device existing trezor is online");
         return { ...state, device: action.device };
       }
     }
