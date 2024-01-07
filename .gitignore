@@ -47,3 +47,5 @@ next-env.d.ts
 /public/fallback-*.js
 .idea
 analyze
+
+certificates

@@ -19,6 +19,8 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
   `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
   "http://localhost:3000/";
 console.log("APP_URL: " + APP_URL);
+// Trezor bridge whitelists localhost and trezor.io domains
+const TRUSTED_HOSTS = ["localhost", "trezor.io"];
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 const STORAGE = "tpmDropboxToken";
@@ -96,7 +98,9 @@ export default function Home() {
   useEffect(() => {
     if(!trezorConnectInit) {
       console.log("initializing trezor");
-      initTrezor(APP_URL, updateDevice)
+      const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname)
+      console.log("trustedHost: " + trustedHost);
+      initTrezor(APP_URL, trustedHost, updateDevice)
         .catch((error) => {
         // FATAL ERROR
         console.log("Could not initialize trezor");
