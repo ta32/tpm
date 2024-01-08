@@ -18,7 +18,6 @@ import { UserStatus } from "../contexts/reducers/users";
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
   `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
   "http://localhost:3000/";
-console.log("APP_URL: " + APP_URL);
 // Trezor bridge whitelists localhost and trezor.io domains
 const TRUSTED_HOSTS = ["localhost", "trezor.io"];
 // App key from dropbox app console. This is not secret.
@@ -35,18 +34,15 @@ export default function Home() {
 
   const updateDevice = useCallback(
     (event: DeviceEventMessage) => {
-      console.log("updateDevice callback");
       if (event.type === DEVICE.CONNECT) {
-        console.log("device connected");
         getDevices()
           .then((device) => {
             if (device !== null) {
-              console.log("device found adding device to state");
               userDispatch({ type: "ADD_DEVICE", device: device });
             }
           })
           .catch((error) => {
-            console.log(error);
+            console.error(error);
             return;
         });
       }
@@ -67,7 +63,6 @@ export default function Home() {
       userDispatch({ type: "LOADING_DROPBOX_API_TOKEN" });
       connectDropbox(APP_URL, codeVerifier)
         .then((dbc) => {
-          console.log("connected to dropbox");
           dbc
             .usersGetCurrentAccount()
             .then((dropBoxUser: DropboxResponse<users.FullAccount>) => {
@@ -80,35 +75,31 @@ export default function Home() {
             })
             .catch((error) => {
               // TODO: handle error could not get current user account
-              console.log(error);
+              console.error(error);
             });
         })
         .catch((error) => {
           // TODO: handle error
           window.sessionStorage.clear();
-          console.log(error);
+          console.error(error);
         });
     }
     if (user.status === UserStatus.TPM_READY_TO_LOAD) {
       // navigate to the dashboard
-      Router.push("/dashboard").catch((err) => console.log(err));
+      Router.push("/dashboard").catch((err) => console.error(err));
     }
   }, [user, userDispatch]);
 
   useEffect(() => {
     if(!trezorConnectInit) {
-      console.log("initializing trezor");
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname)
-      console.log("trustedHost: " + trustedHost);
       initTrezor(APP_URL, trustedHost, updateDevice)
         .catch((error) => {
         // FATAL ERROR
-        console.log("Could not initialize trezor");
-        console.log(error);
+        console.error(error);
         return;
       });
     }
-    console.log("trezor initialized OK");
     trezorConnectInit = true;
   }, [updateDevice]);
 
@@ -152,8 +143,7 @@ export default function Home() {
         window.location.href = authUrl as string;
       })
       .catch((error) => {
-        console.log("error in dbxAuth.getAuthenticationUrl");
-        console.log(error);
+        console.error(error);
       });
   };
   const enterPin = (pin: string) => {

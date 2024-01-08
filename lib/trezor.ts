@@ -47,7 +47,6 @@ export async function initTrezor(
   trustedHost: boolean,
   deviceEventCallback: (event: DeviceEventMessage) => void
 ) {
-  console.log("initTrezor for appUrl: ", appUrl);
   await TrezorConnect.init({
     transportReconnect: true,
     debug: true,
@@ -59,7 +58,6 @@ export async function initTrezor(
     },
   })
   .catch((error) => {
-    console.log("TrezorConnect init error");
     return error;
   });
   if (!trustedHost) {
@@ -85,7 +83,6 @@ export async function getDevices(): Promise<TrezorDevice | null> {
       deviceId: device_id ?? "",
     };
   }
-  console.log("getFeatures failed");
   return null;
 }
 
