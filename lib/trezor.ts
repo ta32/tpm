@@ -43,20 +43,30 @@ export interface ClearPasswordEntry {
 }
 
 export async function initTrezor(
+  appUrl: string,
+  trustedHost: boolean,
   deviceEventCallback: (event: DeviceEventMessage) => void
 ) {
   await TrezorConnect.init({
     transportReconnect: true,
-    debug: false,
-    popup: false,
+    debug: true,
+    popup: !trustedHost,
     lazyLoad: false,
     manifest: {
       email: "test@gmail.com",
-      appUrl: "http://localhost:3000",
+      appUrl: appUrl,
     },
-  }).catch((error) => {
+  })
+  .catch((error) => {
     return error;
   });
+  if (!trustedHost) {
+    // need to call a method that will prompt user to trust this host
+    await TrezorConnect.requestLogin({
+      challengeHidden: 'TmpPasswordManager',
+      challengeVisual: 'Login to Tmp Password Manager',
+    });
+  }
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
 }
 

@@ -15,7 +15,11 @@ import { useUser, useUserDispatch } from "../contexts/user";
 import Router from "next/router";
 import { UserStatus } from "../contexts/reducers/users";
 
-const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI ?? "http://localhost:3000/";
+const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
+  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
+  "http://localhost:3000/";
+// Trezor bridge whitelists localhost and trezor.io domains
+const TRUSTED_HOSTS = ["localhost", "trezor.io"];
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 const STORAGE = "tpmDropboxToken";
@@ -38,7 +42,7 @@ export default function Home() {
             }
           })
           .catch((error) => {
-            console.log(error);
+            console.error(error);
             return;
         });
       }
@@ -57,7 +61,7 @@ export default function Home() {
       codeVerifier !== null
     ) {
       userDispatch({ type: "LOADING_DROPBOX_API_TOKEN" });
-      connectDropbox(REDIRECT_URI, codeVerifier)
+      connectDropbox(APP_URL, codeVerifier)
         .then((dbc) => {
           dbc
             .usersGetCurrentAccount()
@@ -71,26 +75,28 @@ export default function Home() {
             })
             .catch((error) => {
               // TODO: handle error could not get current user account
-              console.log(error);
+              console.error(error);
             });
         })
         .catch((error) => {
           // TODO: handle error
           window.sessionStorage.clear();
-          console.log(error);
+          console.error(error);
         });
     }
     if (user.status === UserStatus.TPM_READY_TO_LOAD) {
       // navigate to the dashboard
-      Router.push("/dashboard").catch((err) => console.log(err));
+      Router.push("/dashboard").catch((err) => console.error(err));
     }
   }, [user, userDispatch]);
 
   useEffect(() => {
     if(!trezorConnectInit) {
-      initTrezor(updateDevice).catch((error) => {
+      const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname)
+      initTrezor(APP_URL, trustedHost, updateDevice)
+        .catch((error) => {
         // FATAL ERROR
-        console.log(error);
+        console.error(error);
         return;
       });
     }
@@ -113,14 +119,14 @@ export default function Home() {
     userDispatch({ type: "SHOW_PIN_DIALOG" });
   };
   const connectToDropbox = () => {
-    if (REDIRECT_URI === undefined) {
-      console.error("REDIRECT_URI is undefined");
+    if (APP_URL === undefined) {
+      console.error("APP_URI is undefined");
       return;
     }
     const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
     dbxAuth
       .getAuthenticationUrl(
-        REDIRECT_URI,
+        APP_URL,
         undefined,
         "code",
         "offline",
@@ -137,7 +143,7 @@ export default function Home() {
         window.location.href = authUrl as string;
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
   const enterPin = (pin: string) => {
