@@ -19,3 +19,16 @@ see Wiki for more information: https://github.com/ta32/tpm/wiki
 ## Build and Install locally
 
  TODO: add instructions
+
+
+### Running on non-localhost origin
+
+Starting the dev server with TLS
+```shell
+next dev --experimental-https
+```
+Edit the host file to point a domain e.g. tmp.local to 127.0.0.1
+Then run the server with TLS support. This allows the app to be tested
+with an Origin URL that is not localhost, by connecting to https://tmp.local:3000
+
+Without TLS CORS policy of chrome will block the app making requests to the Trezor Bridge
