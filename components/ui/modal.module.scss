@@ -1,0 +1,36 @@
+@use "styles/colors";
+
+.modal_backdrop {
+  position: fixed;
+  inset: 0 0 0 0;
+  opacity: 0.5;
+  background-color: #000;
+  z-index: 1040;
+}
+
+.modal_backdrop_inactive {
+  position: fixed;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal_background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100vw;
+  height: 100vh;
+  background-color: colors.$grey_bg;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.modal_content {
+  position: relative;
+  z-index: 1055;
+  height: auto;
+}
