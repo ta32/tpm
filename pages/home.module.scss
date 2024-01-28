@@ -1,5 +1,5 @@
-@use "animations";
-@use "colors";
+@use "../styles/animations";
+@use "../styles/colors";
 
 @mixin flex-center {
   display: flex;

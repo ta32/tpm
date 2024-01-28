@@ -10,7 +10,8 @@ export default function PinModal({ submitCallback }: PinDialogProps) {
     <div>
       <Modal active={true} style={{
         backgroundColor: "#1A2942",
-        width: "40%",
+        width: '40%',
+        padding: '10px',
         marginLeft: 'auto',
         marginRight: 'auto',
       }}>

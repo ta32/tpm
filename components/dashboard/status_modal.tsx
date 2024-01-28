@@ -7,6 +7,8 @@ import styles from "./loader_modal.module.scss";
 import Image from "next/image";
 import ProgressModal from "../ui/progress_modal";
 
+// Maybe this component should be removed?
+
 export default function LoaderModal() {
   const tagEntries = useTagEntries();
   const passwordEntries = usePasswordEntries();

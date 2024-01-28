@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import styles from "../styles/home.module.scss";
+import styles from "./home.module.scss";
 import Router, { useRouter } from "next/router";
 import Image from "next/image";
 export default function OAuthReceiver() {
