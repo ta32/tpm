@@ -3,8 +3,8 @@ import Image from "next/image";
 import TrezorConnect, {
   DeviceEventMessage,
   UI,
-  DEVICE,
-} from "@trezor/connect-web";
+  DEVICE, TransportEventMessage, UiEventMessage,
+} from '@trezor/connect-web'
 import { useEffect, useState, useCallback } from "react";
 import { DropboxAuth, DropboxResponse, users } from "dropbox";
 import { connectDropbox, hasRedirectedFromAuth } from "../lib/dropbox";
@@ -32,6 +32,18 @@ export default function Home() {
   const user = useUser();
   const userDispatch = useUserDispatch();
 
+  const uiEventCb = useCallback(
+    (event: UiEventMessage) => {
+      if (event.type === UI.REQUEST_PIN) {
+        userDispatch({ type: "SHOW_PIN_DIALOG" });
+      }
+    },[userDispatch]
+  );
+
+  const transportEventCb = useCallback(
+    (event: TransportEventMessage) => {
+    },[]
+  )
   const updateDevice = useCallback(
     (event: DeviceEventMessage) => {
       if (event.type === DEVICE.CONNECT) {
@@ -93,7 +105,7 @@ export default function Home() {
   useEffect(() => {
     if(!trezorConnectInit) {
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname)
-      initTrezor(APP_URL, trustedHost, updateDevice)
+      initTrezor(APP_URL, trustedHost, updateDevice, transportEventCb, uiEventCb)
         .catch((error) => {
         // FATAL ERROR
         console.error(error);
@@ -103,12 +115,11 @@ export default function Home() {
     trezorConnectInit = true;
   }, [updateDevice]);
 
-  const openPinDialog = () => {
+  const openDevice = () => {
     if (user.device === null) {
       console.error("wallet is not initialized");
       return;
     }
-    // this will trigger the pin dialog to open on the hardware wallet
     getEncryptionKey(user.device.path).then((keyPair) => {
       if (keyPair !== null) {
         userDispatch({ type: "ACTIVATED_TMP_ON_DEVICE", keyPair });
@@ -116,7 +127,6 @@ export default function Home() {
         // TODO: handle error -- user decided not to activate error or pin was wrong
       }
     });
-    userDispatch({ type: "SHOW_PIN_DIALOG" });
   };
   const connectToDropbox = () => {
     if (APP_URL === undefined) {
@@ -203,7 +213,7 @@ export default function Home() {
               </h3>
               <ul className={styles.dev_list}>
                 <li key="1">
-                  <a onClick={openPinDialog}>
+                  <a onClick={openDevice}>
                     <span
                       className={
                         user.device?.model == "1" ? styles.t1 : styles.t2

@@ -7,16 +7,17 @@ interface PinDialogProps {
 }
 export default function PinModal({ submitCallback }: PinDialogProps) {
   return (
-    <div>
-      <Modal active={true} style={{
+    <Modal active={true} style={{
         backgroundColor: "#1A2942",
-        width: '40%',
+        width: '100%',
+        minWidth: '330px',
+        maxWidth: '550px',
         padding: '10px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        left: '50%',
+        top: '10%',
+        transform: 'translate(-50%, 0)',
       }}>
           <PinDialog submitCallback={submitCallback} />
-      </Modal>
-    </div>
+    </Modal>
   )
 }

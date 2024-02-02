@@ -1,11 +1,12 @@
 import TrezorConnect, {
   DEVICE_EVENT,
-  DeviceEventMessage,
-} from "@trezor/connect-web";
+  DeviceEventMessage, TransportEventMessage, UI_EVENT, UiEventMessage,
+} from '@trezor/connect-web'
 import { hexFromUint8Array, uint8ArrayFromHex } from "./buffer";
 
 import { AppData, deserializeObject, serializeObject } from "./storage";
 import { SafePasswordEntry } from "../contexts/reducers/password_entries";
+import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport'
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
 const SLIP_16_PATH = 10016;
@@ -45,7 +46,9 @@ export interface ClearPasswordEntry {
 export async function initTrezor(
   appUrl: string,
   trustedHost: boolean,
-  deviceEventCallback: (event: DeviceEventMessage) => void
+  deviceEventCallback: (event: DeviceEventMessage) => void,
+  transportEventCallback: (event: TransportEventMessage) => void,
+  uiEventCallback: (event: UiEventMessage) => void
 ) {
   await TrezorConnect.init({
     transportReconnect: true,
@@ -68,6 +71,8 @@ export async function initTrezor(
     });
   }
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
+  TrezorConnect.on(TRANSPORT_EVENT, transportEventCallback);
+  TrezorConnect.on(UI_EVENT, uiEventCallback);
 }
 
 export async function getDevices(): Promise<TrezorDevice | null> {

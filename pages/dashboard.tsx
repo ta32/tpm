@@ -6,6 +6,7 @@ import StatusModal from "../components/dashboard/status_modal";
 import { useUser, useUserDispatch } from '../contexts/user'
 import PinModal from '../components/ui/pin_modal'
 import TrezorConnect, { UI } from '@trezor/connect-web'
+import { UserStatus } from '../contexts/reducers/users'
 
 export default function Dashboard() {
   const user = useUser();
@@ -17,6 +18,9 @@ export default function Dashboard() {
   return (
     <div className={styles.dashboardLayout}>
       <SidePanel />
+      {user.status === UserStatus.SHOW_PIN_DIALOG && (
+        <PinModal submitCallback={enterPin} />
+      )}
       <section className={styles.content}>
         {user.dbc !== null && user.device !== null && (
           <PasswordTable
@@ -27,7 +31,6 @@ export default function Dashboard() {
           />
         )}
         <StatusModal />
-        <PinModal submitCallback={enterPin} />
       </section>
     </div>
   );

@@ -9,7 +9,7 @@ import ProgressModal from "../ui/progress_modal";
 
 // Maybe this component should be removed?
 
-export default function LoaderModal() {
+export default function StatusModal() {
   const tagEntries = useTagEntries();
   const passwordEntries = usePasswordEntries();
 
