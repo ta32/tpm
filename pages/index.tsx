@@ -133,6 +133,7 @@ export default function Home() {
       console.error("APP_URI is undefined");
       return;
     }
+    // TODO this auth logic shouldn't be here
     const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
     dbxAuth
       .getAuthenticationUrl(

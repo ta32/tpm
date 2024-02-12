@@ -22,6 +22,7 @@ export async function connectDropbox(
   );
   if (response.result.access_token) {
     dbxAuth.setAccessToken(response.result.access_token);
+    // console.log("token expires in: ", response.result.expires_in);
     return new Dropbox({ auth: dbxAuth });
   }
   throw new Error("No access token");
@@ -89,6 +90,7 @@ export async function saveAppFile(
       return response.result.rev;
     })
     .catch((e) => {
+      console.error("Error saving file to Dropbox: ", e);
       throw new Error(e);
     });
 }

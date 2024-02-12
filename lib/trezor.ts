@@ -52,7 +52,7 @@ export async function initTrezor(
 ) {
   await TrezorConnect.init({
     transportReconnect: true,
-    debug: true,
+    debug: false,
     popup: !trustedHost,
     lazyLoad: false,
     manifest: {
