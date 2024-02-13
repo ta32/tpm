@@ -40,6 +40,7 @@ export default function PasswordTable({
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [rev, setRev] = useState("");
   const [newEntry, setNewEntry] = useState(false);
+  const [filter, setFilter] = useState("");
   const passwordSyncStatus = passwordEntries.status;
 
   useEffect(() => {
@@ -140,11 +141,16 @@ export default function PasswordTable({
     setNewEntry(false);
   }, []);
 
-  const entries = getSafePasswordEntries(passwordEntries);
-  for (const entry of entries) {
-    entry.key;
-  }
+  const handleFilterChange = useCallback((filter: string) => {
+    setFilter(filter);
+  }, [filter]);
 
+  let entries = getSafePasswordEntries(passwordEntries);
+  if (filter !== "") {
+    entries = entries.filter((entry) => {
+      return entry.title.includes(filter);
+    });
+  }
   return (
     <div className={styles.container}>
       <div className={styles.start_bar}>
@@ -153,7 +159,7 @@ export default function PasswordTable({
             Add entry
           </button>
           <div className={styles.filter_container}>
-            <FilterInput />
+            <FilterInput placeholder={"Quick filter ..."} onChangeCallback={handleFilterChange}/>
           </div>
         </div>
         <div className={styles.col2}>
