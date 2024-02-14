@@ -23,7 +23,10 @@ $green: #01B757;
 
 $pink: #EF6088;
 
-
+// https://stackoverflow.com/questions/22252472/how-can-i-change-the-color-of-an-svg-element
+// from black to grey
+$grey_filter: invert(49%) sepia(0%) saturate(1343%) hue-rotate(188deg) brightness(96%) contrast(88%);
+// from black to white
 $white_filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(317deg) brightness(107%) contrast(101%);
 // from black to #2c3e50 $blue_dark
 $filter_dark_blue_shadow: drop-shadow(2px 2px 2px black) invert(21%) sepia(11%) saturate(1787%) hue-rotate(169deg) brightness(91%) contrast(89%);

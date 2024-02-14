@@ -1,8 +1,20 @@
 @use "styles/colors";
 @use "styles/mixins";
 
+$close_button_size: 40;
+
+:export {
+  close_button_size: $close_button_size;
+}
+
 .filter {
   width: 100%;
+
+  .filter_wrapper {
+    width: 100%;
+    position: relative;
+    display: inline-block;
+  }
 
   input {
     @include mixins.text_sm;
@@ -10,7 +22,7 @@
     box-shadow: none;
     outline: none;
     border-radius: 0.25rem;
-    height: 2.5rem;
+    height: #{$close_button_size}px;
     border: 1px solid colors.$grey_border;
 
     padding-left: calc(2.25rem/3);
@@ -29,4 +41,22 @@
   }
 }
 
+.clear_button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    cursor: pointer;
+    color: colors.$grey_font;
 
+    &:hover {
+        color: colors.$blue;
+    }
+}
+
+.icon_white {
+  filter: colors.$grey_filter;
+}

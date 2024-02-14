@@ -34,6 +34,7 @@ export function getUiIconPath(icon: string): string {
 
 export const UI_DONE = "done_FILL1_wght700_GRAD200_opsz48.svg";
 export const UI_MORE = "more_horiz_FILL1_wght700_GRAD200_opsz48.svg";
+export const UI_CLOSE = "close_FILL1_wght700_GRAD200_opsz48.svg";
 
 export const ALL_ICON = "apps_FILL1_wght700_GRAD200_opsz48.svg";
 export const BITCOIN_ICON = "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg";
