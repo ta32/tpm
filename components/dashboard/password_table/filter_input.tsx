@@ -1,7 +1,7 @@
-import React, { ChangeEvent, FormEvent, } from 'react'
+import React, { ChangeEvent, FormEvent, useState, } from 'react'
 import styles from "./filter_input.module.scss";
 import Image from 'next/image'
-import { getUiIconPath, UI_CLOSE, UI_MORE } from '../../../lib/icons'
+import { getUiIconPath, UI_CLOSE } from '../../../lib/icons'
 
 interface FilterInputProps {
   placeholder: string;
@@ -9,6 +9,7 @@ interface FilterInputProps {
 }
 
 export default function FilterInput({ placeholder, onChangeCallback }: FilterInputProps) {
+  const [filter, setFilter] = useState("")
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,7 +19,13 @@ export default function FilterInput({ placeholder, onChangeCallback }: FilterInp
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilter(e.target.value);
     onChangeCallback(e.target.value);
+  }
+
+  const onClearFilter = () => {
+    setFilter("");
+    onChangeCallback("");
   }
 
   const closeButtonSize = parseInt(styles.close_button_size);
@@ -32,15 +39,20 @@ export default function FilterInput({ placeholder, onChangeCallback }: FilterInp
             className={styles.filter}
             type="text"
             placeholder={placeholder}
+            value={filter}
             onChange={onChange}
           />
+          {filter && (
             <Image
               className={`${styles.icon_white} ${styles.clear_button}`}
               src={getUiIconPath(UI_CLOSE)}
               alt={'close'}
               height={closeButtonSize}
               width={closeButtonSize}
+              onClick={onClearFilter}
+              style={{marginRight: '10px'}}
             />
+          )}
         </div>
       </form>
     </span>
