@@ -17,6 +17,7 @@ $close_button_size: 40;
   }
 
   input {
+    color: colors.$black_font;
     @include mixins.text_sm;
     font-size: 1rem;
     box-shadow: none;

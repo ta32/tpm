@@ -4,3 +4,13 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+
+@mixin text_headline {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+@mixin text_subheading {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}

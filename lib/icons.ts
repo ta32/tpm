@@ -24,6 +24,11 @@ export const TAG_ICONS = [
   "wifi_FILL1_wght700_GRAD200_opsz48.svg",
 ];
 
+
+export function getImagePath(image: string): string {
+  return `/images/${image}`;
+}
+
 export function getTagIconPath(icon: string): string {
   return `/images/tags/${icon}`;
 }
