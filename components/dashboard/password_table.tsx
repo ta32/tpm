@@ -172,7 +172,7 @@ export default function PasswordTable({
       <div className={styles.dashboard}>
         {
           <TableEntry
-            mode={newEntry ? { type: "NEW_ENTRY" } : { type: "HIDDEN" }}
+            row={newEntry ? { type: "NEW_ENTRY" } : { type: "HIDDEN" }}
             key={"newEntry"}
             onDiscardCallback={handleDiscardEntry}
             onSavedCallback={handleSaveCallback}
@@ -181,7 +181,7 @@ export default function PasswordTable({
         {entries.map((entry) => {
           return (
             <TableEntry
-              mode={{ type: "VIEW_ENTRY", entry: entry }}
+              row={{ type: "VIEW_ENTRY", entry: entry }}
               key={entry.key}
               onSavedCallback={handleSaveCallback}
             />

@@ -59,18 +59,19 @@ interface Hidden {
 }
 
 interface TableEntryProps {
-  mode: NewEntry | ViewEntry | Hidden;
+  row: NewEntry | ViewEntry | Hidden;
   onDiscardCallback?: () => void;
   onSavedCallback: () => void;
 }
 export default function TableEntry({
   onDiscardCallback,
   onSavedCallback,
-  mode,
+  row,
 }: TableEntryProps) {
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [entryState, setEntryState] = useState<EntryState>({ type: "INIT" });
+  const [copiedUsername, setCopiedUsername] = useState(false);
 
   const handleSubmitEntry = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,17 +100,17 @@ export default function TableEntry({
       encryptFullEntry(clearEntry)
         .then((encryptedEntry) => {
           if (encryptedEntry) {
-            if (mode.type === "NEW_ENTRY" || mode.type === "HIDDEN") {
+            if (row.type === "NEW_ENTRY" || row.type === "HIDDEN") {
               passwordEntriesDispatch({
                 type: "ADD_ENTRY",
                 entry: encryptedEntry,
               });
             }
-            if (mode.type === "VIEW_ENTRY") {
+            if (row.type === "VIEW_ENTRY") {
               passwordEntriesDispatch({
                 type: "UPDATE_ENTRY",
                 entry: encryptedEntry,
-                key: mode.entry.key,
+                key: row.entry.key,
               });
             }
           }
@@ -133,9 +134,9 @@ export default function TableEntry({
     }
   };
   const handleEditEntry = () => {
-    if (mode.type === "VIEW_ENTRY") {
+    if (row.type === "VIEW_ENTRY") {
       setEntryState({ type: "DECRYPTING" });
-      const safeEntry = mode.entry;
+      const safeEntry = row.entry;
       decryptFullEntry(safeEntry)
         .then((clearEntry) => {
           if (clearEntry != null) {
@@ -149,9 +150,18 @@ export default function TableEntry({
     return; // edit is only possible when mode is VIEW_ENTRY
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedUsername(true);
+      setTimeout(() => setCopiedUsername(false), 2000);
+    }).catch((err) => {
+      console.error('Failed to copy to clipboard', err);
+    });
+  };
+
   const expanded =
-    mode.type === "NEW_ENTRY" ||
-    (mode.type === "VIEW_ENTRY" &&
+    row.type === "NEW_ENTRY" ||
+    (row.type === "VIEW_ENTRY" &&
       (entryState.type === "DECRYPTED" ||
         entryState.type === "FORM_SUBMITTED"));
   const clearEntry =
@@ -240,7 +250,7 @@ export default function TableEntry({
           </div>
         </form>
       )}
-      {!expanded && mode.type === "VIEW_ENTRY" && (
+      {!expanded && row.type === "VIEW_ENTRY" && (
         <div className={styles.entry}>
           <div className={styles.avatar_mini}>
             <Image
@@ -252,11 +262,11 @@ export default function TableEntry({
             <IoAddCircleOutline className={styles.icon}></IoAddCircleOutline>
           </div>
           <div className={styles.account_info}>
-            <label className={styles.title}>{mode.entry.title}</label>
+            <label className={styles.title}>{row.entry.title}</label>
             <div className={styles.credentials}>
               <div className={styles.tooltip}>
-                <div className={styles.label}>{mode.entry.username}</div>
-                <span className={styles.tooltip_text}>Copy username</span>
+                <div className={styles.label} onClick={() => copyToClipboard(row.entry.username)}>{row.entry.username}</div>
+                <span className={styles.tooltip_text}>{copiedUsername? 'Copied!' : 'Copy username'}</span>
               </div>
               <div className={styles.tooltip}>
                 <input
