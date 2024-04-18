@@ -15,7 +15,6 @@ export default function PinModal({ submitCallback }: PinDialogProps) {
         padding: '10px',
         left: '50%',
         top: '10%',
-        transform: 'translate(-50%, 0)',
       }}>
           <PinDialog submitCallback={submitCallback} />
     </Modal>

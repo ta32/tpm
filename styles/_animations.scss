@@ -69,3 +69,16 @@
     transform: translate3d(4px, 0, 0);
   }
 }
+
+@mixin createSlideInAnimationWithOffset($translateX) {
+  @keyframes slideInModal-#{$translateX} {
+    0% {
+      opacity: 0;
+      transform: translateY(-100px) translate($translateX, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) translate($translateX, 0);
+    }
+  }
+}
