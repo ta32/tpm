@@ -32,20 +32,18 @@
 
 .modal_content {
   position: fixed;
-  z-index: 1055;
+  z-index: 1050;
+  width: 100%;
   height: auto;
+  padding: 10px;
   box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.5);
-  animation: slideInModal 600ms ease-out;
-  transform: translate(-50%, 0);
+  transition: transform 1s, opacity 0.5s;
 }
-
-@keyframes slideInModal {
-  0% {
-    opacity: 0;
-    transform: translateY(-100px) translate(-50%, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) translate(-50%, 0);
-  }
+.modal_hidden {
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+.modal_active {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }

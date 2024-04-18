@@ -18,9 +18,7 @@ export default function Dashboard() {
   return (
     <div className={styles.dashboardLayout}>
       <SidePanel />
-      {user.status === UserStatus.SHOW_PIN_DIALOG && (
-        <PinModal submitCallback={enterPin} />
-      )}
+      <PinModal show={user.status === UserStatus.SHOW_PIN_DIALOG} submitCallback={enterPin} />
       <section className={styles.content}>
         {user.dbc !== null && user.device !== null && (
           <PasswordTable
