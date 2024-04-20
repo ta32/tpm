@@ -16,6 +16,7 @@
   pointer-events: none;
 }
 
+// TODO try re-use the modal component and use the transition-behavior: allow-discrete; property (experimental)
 .modal_fade_in {
   position: fixed;
   width: 100%;
@@ -23,7 +24,6 @@
   z-index: 1050;
   transition: opacity 0.15s linear;
 }
-
 .modal_fade_out {
   pointer-events: none;
   position: fixed;
