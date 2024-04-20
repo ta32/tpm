@@ -1,5 +1,6 @@
 @use "styles/colors";
 @use "styles/animations";
+@use "styles/constants";
 
 .left_panel_wrapper {
   .backdrop {
@@ -19,7 +20,7 @@ aside.left_panel {
   left: 0;
   z-index: 100;
   background-size: 100% 100%;
-  background: url("/images/tmp_background.png") no-repeat center top fixed;
+  background: url( constants.$backgroundBasePath + "tmp_background.png") no-repeat center top fixed;
   box-shadow: 0 2px 50px rgba(0, 0, 0, 0.4);
 }
 

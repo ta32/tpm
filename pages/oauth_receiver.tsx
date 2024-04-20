@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import styles from "./home.module.scss";
 import Router, { useRouter } from "next/router";
 import Image from "next/image";
+// TODO: not used - complete this or delete
 export default function OAuthReceiver() {
   const router = useRouter();
   useEffect(() => {

@@ -12,6 +12,7 @@ import {
   TagsStatus,
 } from "../../contexts/reducers/tag_entries";
 import Tag from "./side_panel/tag";
+import { getAppLogoPath, getTrezorLogoPath } from '../../lib/Images'
 
 interface Add {
   type: "ADD";
@@ -110,7 +111,7 @@ export default function SidePanel() {
         <div className={styles.logo}>
           <span className="logo-expanded">
             <Image
-              src="/images/tpm-logo.svg"
+              src={getAppLogoPath("tpm-logo.svg")}
               alt="logo"
               height={34}
               width={141}

@@ -1,5 +1,6 @@
-@use "../styles/animations";
-@use "../styles/colors";
+@use "styles/animations";
+@use "styles/colors";
+@use "styles/constants";
 
 @mixin flex-center {
   display: flex;
@@ -29,7 +30,7 @@
 .dropbox {
   background: {
     color: colors.$white;
-    image: url('/images/dropbox-blue.svg');
+    image: url( constants.$dropboxLogoBasePath + 'dropbox-blue.svg');
     size: 30px 30px;
     repeat: no-repeat;
     position: 15px center;
@@ -156,10 +157,10 @@
 
 .t1:after {
   @extend .trezor;
-  background-image: url("/images/t1.png");
+  background-image: url(constants.$trezorLogoBasePath + "t1.png");
 }
 
 .t2:after {
   @extend .trezor;
-  background-image: url("/images/t2.png");
+  background-image: url(constants.$trezorLogoBasePath + "t2.png");
 }

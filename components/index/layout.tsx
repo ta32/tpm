@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./layout.module.scss";
 import Image from "next/image";
+import { getBackgroundImagePath } from '../../lib/Images'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Image
           alt=""
           priority
-          src="/images/tmp_background.png"
+          src={getBackgroundImagePath("tmp_background.png")}
           quality={100}
           fill
           sizes="100vw"

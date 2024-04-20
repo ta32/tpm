@@ -15,7 +15,7 @@ import {
   getTagTitle,
   TagsStatus,
 } from "../../../contexts/reducers/tag_entries";
-import { getTagIconPath, TAG_ICONS } from "../../../lib/icons";
+import { getTagIconPath, TAG_ICONS } from "../../../lib/Images";
 
 interface Tag {
   title: string;

@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, useState, } from 'react'
 import styles from "./filter_input.module.scss";
 import Image from 'next/image'
-import { getUiIconPath, UI_CLOSE } from '../../../lib/icons'
+import { getUiIconPath, UI_CLOSE } from '../../../lib/Images'
 
 interface FilterInputProps {
   placeholder: string;

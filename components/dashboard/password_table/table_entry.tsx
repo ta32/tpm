@@ -17,6 +17,7 @@ import {
   PasswordEntriesStatus,
   SafePasswordEntry,
 } from "../../../contexts/reducers/password_entries";
+import { getUiIconPath } from '../../../lib/Images'
 
 interface Init {
   type: "INIT";
@@ -181,7 +182,7 @@ export default function TableEntry({
         <form className={styles.entry} onSubmit={handleSubmitEntry}>
           <div className={styles.avatar_expanded}>
             <Image
-              src="/images/transparent.png"
+              src={getUiIconPath("transparent.png")}
               height={100}
               width={100}
               alt="avatar"
@@ -254,7 +255,7 @@ export default function TableEntry({
         <div className={styles.entry}>
           <div className={styles.avatar_mini}>
             <Image
-              src="/images/transparent.png"
+              src={getUiIconPath("transparent.png")}
               height={50}
               width={50}
               alt="avatar"
