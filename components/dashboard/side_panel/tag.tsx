@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import styles from "./tag.module.scss";
 import Image from "next/image";
-import { getTagIconPath, getUiIconPath, UI_MORE } from "../../../lib/icons";
+import { getTagIconPath, getUiIconPath, UI_MORE } from "../../../lib/Images";
 
 interface TagProps {
   id: string;

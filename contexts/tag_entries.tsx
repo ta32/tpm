@@ -5,23 +5,23 @@ import {
   tagsReducer,
   TagsStatus,
 } from "./reducers/tag_entries";
-import { ALL_ICON, BITCOIN_ICON, SOCIAL_ICON } from "../lib/icons";
+import { TAG_ALL, TAG_BITCOIN, TAG_SOCIAL } from "../lib/Images";
 
 const initialTageEntries: TagEntries = {
   "0": {
     id: "0",
     title: "ALL",
-    icon: ALL_ICON,
+    icon: TAG_ALL,
   },
   "1": {
     id: "1",
     title: "Bitcoin",
-    icon: BITCOIN_ICON,
+    icon: TAG_BITCOIN,
   },
   "2": {
     id: "2",
     title: "Social Media",
-    icon: SOCIAL_ICON,
+    icon: TAG_SOCIAL,
   },
   status: TagsStatus.UNINITIALIZED,
   lastError: "",

@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./progress_modal.module.scss";
 import Image from "next/image";
-import { getUiIconPath, UI_DONE } from "lib/icons";
+import { getUiIconPath, UI_DONE } from "lib/Images";
 
 interface ProgressModalProps {
   progress: boolean;

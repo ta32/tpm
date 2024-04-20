@@ -14,6 +14,7 @@ import PinDialog from "../components/index/pin_dialog";
 import { useUser, useUserDispatch } from "../contexts/user";
 import Router from "next/router";
 import { UserStatus } from "../contexts/reducers/users";
+import { getAppLogoPath, getDropboxLogoPath, getTrezorLogoPath } from '../lib/Images'
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
   `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
@@ -164,7 +165,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <Image src="/images/tpm-logo.svg" width={500} height={120} alt="" />
+      <Image src={getAppLogoPath("tpm-logo.svg")} width={500} height={120} alt="" />
       <div className={styles.grid}>
         {user.status === UserStatus.OFFLINE && (
           <button className={styles.dropbox} onClick={connectToDropbox}>
@@ -177,7 +178,7 @@ export default function Home() {
         {user.status === UserStatus.ONLINE_NO_TREZOR && (
           <div className={styles.dropbox_user}>
             <Image
-              src={"images/dropbox.svg"}
+              src={getDropboxLogoPath("dropbox.svg")}
               alt={"signed in as dropbox user"}
               width={110}
               height={110}
@@ -189,7 +190,7 @@ export default function Home() {
               </h3>
               <span className={styles.connect_trezor}>
                 <Image
-                  src={"images/connect-trezor.svg"}
+                  src={getTrezorLogoPath("connect-trezor.svg")}
                   alt={"trezor-disconnected"}
                   width={20}
                   height={45}
@@ -202,7 +203,7 @@ export default function Home() {
         {user.status === UserStatus.ONLINE_WITH_TREZOR && (
           <div className={styles.dropbox_user}>
             <Image
-              src={"images/dropbox.svg"}
+              src={getDropboxLogoPath("dropbox.svg")}
               alt={"signed in as dropbox user"}
               width={110}
               height={110}

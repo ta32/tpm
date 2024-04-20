@@ -21,7 +21,7 @@ import {
 import { TagsStatus } from "../../contexts/reducers/tag_entries";
 import { Dropbox } from "dropbox";
 import Image from 'next/image'
-import { getImagePath } from '../../lib/icons'
+import { getUiIconPath } from '../../lib/Images'
 
 interface PasswordTableProps {
   accountName: string;
@@ -189,7 +189,7 @@ export default function PasswordTable({
         })}
         {entries.length == 0 && filter !== "" && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
-            <Image src={getImagePath("nosearch.svg")} height={300} width={300} alt={'no results'}/>
+            <Image src={getUiIconPath("nosearch.svg")} height={300} width={300} alt={'no results'}/>
             <div>
               <h1 className={styles.heading}>No results.</h1>
               <p className={styles.subheading}>Try a different filter.</p>

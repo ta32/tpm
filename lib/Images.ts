@@ -24,23 +24,36 @@ export const TAG_ICONS = [
   "wifi_FILL1_wght700_GRAD200_opsz48.svg",
 ];
 
-
-export function getImagePath(image: string): string {
-  return `/images/${image}`;
-}
-
 export function getTagIconPath(icon: string): string {
-  return `/images/tags/${icon}`;
+  return `/images/icons/tags/${icon}`;
 }
 
 export function getUiIconPath(icon: string): string {
-  return `/icons/ui/${icon}`;
+  return `/images/icons/ui/${icon}`;
 }
 
+export function getBackgroundImagePath(image: string): string {
+  return `/images/background/${image}`;
+}
+
+export function getTrezorLogoPath(image: string): string {
+  return `/images/logos/trezor/${image}`;
+}
+
+export function getDropboxLogoPath(image: string): string {
+  return `/images/logos/dropbox/${image}`;
+}
+
+export function getAppLogoPath(image: string): string {
+  return `/images/logos/${image}`;
+}
+
+// Alias for icons with long names from Google fonts
 export const UI_DONE = "done_FILL1_wght700_GRAD200_opsz48.svg";
 export const UI_MORE = "more_horiz_FILL1_wght700_GRAD200_opsz48.svg";
 export const UI_CLOSE = "close_FILL1_wght700_GRAD200_opsz48.svg";
+export const TAG_ALL = "apps_FILL1_wght700_GRAD200_opsz48.svg";
+export const TAG_BITCOIN = "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg";
+export const TAG_SOCIAL = "group_FILL1_wght700_GRAD200_opsz48.svg";
 
-export const ALL_ICON = "apps_FILL1_wght700_GRAD200_opsz48.svg";
-export const BITCOIN_ICON = "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg";
-export const SOCIAL_ICON = "group_FILL1_wght700_GRAD200_opsz48.svg";
+
