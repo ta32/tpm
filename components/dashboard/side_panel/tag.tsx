@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import styles from "./tag.module.scss";
-import Image from "next/image";
-import { getTagIconPath, getUiIconPath, UI_MORE } from "../../../lib/Images";
+import React from 'react'
+import styles from './tag.module.scss'
+import Image from 'next/image'
+import { getTagIconPath, getUiIconPath, UI_ICON } from '../../../lib/Images'
 
 interface TagProps {
   id: string;
@@ -61,7 +61,7 @@ export default function Tag({
         <Image
           onClick={handleClickedMore}
           className={`${styles.ui_icon_white} ${iconVisibility}`}
-          src={getUiIconPath(UI_MORE)}
+          src={getUiIconPath(UI_ICON.MORE)}
           alt={"more"}
           height={24}
           width={24}

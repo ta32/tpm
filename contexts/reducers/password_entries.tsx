@@ -10,6 +10,8 @@ export interface SafePasswordEntry {
   secretNoteEnc: Uint8Array;
   safeKey: string;
   tags: string;
+  createdDate: number;
+  lastModifiedDate: number;
 }
 export enum PasswordEntriesStatus {
   UNINITIALIZED,
@@ -34,13 +36,11 @@ export interface AddEntry {
   type: "ADD_ENTRY";
   entry: SafePasswordEntry;
 }
-
 export interface UpdateEntry {
   type: "UPDATE_ENTRY";
   key: string;
   entry: SafePasswordEntry;
 }
-
 export interface UploadEntries {
   type: "UPLOADED_ENTRIES";
   version_uploaded: number;
@@ -121,7 +121,7 @@ export function passwordEntriesReducer(
       }
       let new_entries: PasswordEntries = { ...state };
       let nextKey = uniqueId();
-      new_entries[nextKey] = { ...action.entry, key: nextKey };
+      new_entries[nextKey] = { ...action.entry, key: nextKey, createdDate: Date.now(), lastModifiedDate: Date.now() };
       return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case "UPDATE_ENTRY": {
@@ -135,6 +135,7 @@ export function passwordEntriesReducer(
       let new_entries: PasswordEntries = { ...state };
       const updatedEntry = action.entry;
       updatedEntry.key = action.key;
+      updatedEntry.lastModifiedDate = Date.now();
       new_entries[action.key] = updatedEntry;
       return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }

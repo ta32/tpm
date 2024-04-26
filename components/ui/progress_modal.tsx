@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./progress_modal.module.scss";
 import Image from "next/image";
-import { getUiIconPath, UI_DONE } from "lib/Images";
+import { getUiIconPath, UI_ICON } from "lib/Images";
 
 interface ProgressModalProps {
   progress: boolean;
@@ -33,7 +33,7 @@ export default function ProgressModal({
         <div className={styles.label}>
           <Image
             className={`${styles.icon} ${styles.ui_icon_white}`}
-            src={getUiIconPath(UI_DONE)}
+            src={getUiIconPath(UI_ICON.DONE)}
             alt={"done"}
             height={24}
             width={24}

@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, useState, } from 'react'
 import styles from "./filter_input.module.scss";
 import Image from 'next/image'
-import { getUiIconPath, UI_CLOSE } from '../../../lib/Images'
+import { getUiIconPath, UI_ICON } from '../../../lib/Images'
 
 interface FilterInputProps {
   placeholder: string;
@@ -45,7 +45,7 @@ export default function FilterInput({ placeholder, onChangeCallback }: FilterInp
           {filter && (
             <Image
               className={`${styles.icon_white} ${styles.clear_button}`}
-              src={getUiIconPath(UI_CLOSE)}
+              src={getUiIconPath(UI_ICON.CLOSE)}
               alt={'close'}
               height={closeButtonSize}
               width={closeButtonSize}

@@ -1,23 +1,12 @@
-import React, { FormEvent, useEffect, useState } from "react";
-import styles from "./table_entry.module.scss";
-import Image from "next/image";
-import { IoAddCircleOutline } from "react-icons/io5";
-import EntryInput from "./table_entry/entry_input";
-import { useUser } from "../../../contexts/user";
-import {
-  ClearPasswordEntry,
-  decryptFullEntry,
-  encryptFullEntry,
-} from "../../../lib/trezor";
-import {
-  usePasswordEntries,
-  usePasswordEntriesDispatch,
-} from "../../../contexts/password_entries";
-import {
-  PasswordEntriesStatus,
-  SafePasswordEntry,
-} from "../../../contexts/reducers/password_entries";
-import { getUiIconPath } from '../../../lib/Images'
+import React, { FormEvent, useState } from 'react'
+import styles from './table_entry.module.scss'
+import Image from 'next/image'
+import { IoAddCircleOutline } from 'react-icons/io5'
+import EntryInput from './table_entry/entry_input'
+import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry, } from '../../../lib/trezor'
+import { usePasswordEntries, usePasswordEntriesDispatch, } from '../../../contexts/password_entries'
+import { PasswordEntriesStatus, SafePasswordEntry, } from '../../../contexts/reducers/password_entries'
+import { getUiIconPath, UI_ICON } from '../../../lib/Images'
 
 interface Init {
   type: "INIT";
@@ -182,7 +171,7 @@ export default function TableEntry({
         <form className={styles.entry} onSubmit={handleSubmitEntry}>
           <div className={styles.avatar_expanded}>
             <Image
-              src={getUiIconPath("transparent.png")}
+              src={getUiIconPath(UI_ICON.TRANSPARENT_PNG)}
               height={100}
               width={100}
               alt="avatar"
@@ -255,7 +244,7 @@ export default function TableEntry({
         <div className={styles.entry}>
           <div className={styles.avatar_mini}>
             <Image
-              src={getUiIconPath("transparent.png")}
+              src={getUiIconPath(UI_ICON.TRANSPARENT_PNG)}
               height={50}
               width={50}
               alt="avatar"

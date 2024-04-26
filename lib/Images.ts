@@ -28,7 +28,7 @@ export function getTagIconPath(icon: string): string {
   return `/images/icons/tags/${icon}`;
 }
 
-export function getUiIconPath(icon: string): string {
+export function getUiIconPath(icon: UI_ICON): string {
   return `/images/icons/ui/${icon}`;
 }
 
@@ -48,10 +48,14 @@ export function getAppLogoPath(image: string): string {
   return `/images/logos/${image}`;
 }
 
-// Alias for icons with long names from Google fonts
-export const UI_DONE = "done_FILL1_wght700_GRAD200_opsz48.svg";
-export const UI_MORE = "more_horiz_FILL1_wght700_GRAD200_opsz48.svg";
-export const UI_CLOSE = "close_FILL1_wght700_GRAD200_opsz48.svg";
+export enum UI_ICON {
+  SORT = "sort_FILL1_wght700_GRAD200_opsz48.svg",
+  DONE = "done_FILL1_wght700_GRAD200_opsz48.svg",
+  MORE = "more_horiz_FILL1_wght700_GRAD200_opsz48.svg",
+  CLOSE = "close_FILL1_wght700_GRAD200_opsz48.svg",
+  NO_SEARCH = "nosearch.svg",
+  TRANSPARENT_PNG = "transparent.png",
+}
 export const TAG_ALL = "apps_FILL1_wght700_GRAD200_opsz48.svg";
 export const TAG_BITCOIN = "currency_bitcoin_FILL1_wght700_GRAD200_opsz48.svg";
 export const TAG_SOCIAL = "group_FILL1_wght700_GRAD200_opsz48.svg";

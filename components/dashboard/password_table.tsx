@@ -1,33 +1,31 @@
-import React, { useCallback, useEffect, useState } from "react";
-import styles from "./password_table.module.scss";
-import FilterInput from "./password_table/filter_input";
-import TableEntry from "./password_table/table_entry";
-import {
-  usePasswordEntries,
-  usePasswordEntriesDispatch,
-} from "../../contexts/password_entries";
-import { readAppFile, saveAppFile } from "../../lib/dropbox";
-import { fromState } from "../../lib/storage";
-import { appFileName } from "../../lib/appfile";
-import { decryptAppData, encryptAppData } from "../../lib/trezor";
-import {
-  getSafePasswordEntries,
-  PasswordEntriesStatus,
-} from "../../contexts/reducers/password_entries";
-import {
-  useTagEntries,
-  useTagEntriesDispatch,
-} from "../../contexts/tag_entries";
-import { TagsStatus } from "../../contexts/reducers/tag_entries";
-import { Dropbox } from "dropbox";
+import React, { useCallback, useEffect, useState } from 'react'
+import styles from './password_table.module.scss'
+import FilterInput from './password_table/filter_input'
+import TableEntry from './password_table/table_entry'
+import { usePasswordEntries, usePasswordEntriesDispatch, } from '../../contexts/password_entries'
+import { readAppFile, saveAppFile } from '../../lib/dropbox'
+import { fromState } from '../../lib/storage'
+import { appFileName } from '../../lib/appfile'
+import { decryptAppData, encryptAppData } from '../../lib/trezor'
+import { getSafePasswordEntries, PasswordEntriesStatus, } from '../../contexts/reducers/password_entries'
+import { useTagEntries, useTagEntriesDispatch, } from '../../contexts/tag_entries'
+import { TagsStatus } from '../../contexts/reducers/tag_entries'
+import { Dropbox } from 'dropbox'
 import Image from 'next/image'
-import { getUiIconPath } from '../../lib/Images'
+import { getUiIconPath, UI_ICON } from '../../lib/Images'
+import DropdownMenu from '../ui/dropdown_menu'
+
 
 interface PasswordTableProps {
   accountName: string;
   dbc: Dropbox;
   masterPublicKey: string;
   appDataEncryptionKey: Uint8Array;
+}
+
+enum SortType {
+  TITLE,
+  DATE,
 }
 
 export default function PasswordTable({
@@ -43,6 +41,8 @@ export default function PasswordTable({
   const [rev, setRev] = useState("");
   const [newEntry, setNewEntry] = useState(false);
   const [filter, setFilter] = useState("");
+  const [sortType, setSortType] = useState(SortType.TITLE);
+
   const passwordSyncStatus = passwordEntries.status;
 
   useEffect(() => {
@@ -147,12 +147,25 @@ export default function PasswordTable({
     setFilter(filter);
   }, [filter]);
 
+  const handleSortFilter = useCallback((index: number) => {
+      setSortType(index); // Enum variants need to be listed in the same order in the dropdown
+    },
+    [sortType]);
+
   let entries = getSafePasswordEntries(passwordEntries);
   if (filter !== "") {
     entries = entries.filter((entry) => {
       return entry.title.includes(filter);
     });
   }
+  // apply the sort (default is by title)
+  entries.sort((a, b) => {
+    if (sortType === SortType.TITLE) {
+      return a.title.localeCompare(b.title);
+    } else {
+      return b.createdDate - a.createdDate;
+    }
+  });
   return (
     <div className={styles.container}>
       <div className={styles.start_bar}>
@@ -165,7 +178,13 @@ export default function PasswordTable({
           </div>
         </div>
         <div className={styles.col2}>
-          <button className={styles.grey_btn}>Sort</button>
+          <DropdownMenu xOffset={-20} yOffset={40} initSelectedKey={0}
+            button={<button className={styles.sort_btn}>Sort</button>}
+            onClickCallback={handleSortFilter}
+          >
+            <div className={styles.dropdown_button}>Title</div>
+            <div className={styles.dropdown_button}>Date</div>
+          </DropdownMenu>
           <button className={styles.drop_box_btn}>{accountName}</button>
         </div>
       </div>
@@ -189,7 +208,7 @@ export default function PasswordTable({
         })}
         {entries.length == 0 && filter !== "" && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
-            <Image src={getUiIconPath("nosearch.svg")} height={300} width={300} alt={'no results'}/>
+            <Image src={getUiIconPath(UI_ICON.NO_SEARCH)} height={300} width={300} alt={'no results'}/>
             <div>
               <h1 className={styles.heading}>No results.</h1>
               <p className={styles.subheading}>Try a different filter.</p>
