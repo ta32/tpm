@@ -20,22 +20,13 @@ interface Decrypted {
 }
 interface FormSubmitted {
   type: "FORM_SUBMITTED";
-  formData: FormData;
+  formData: ClearPasswordEntry;
 }
 interface Error {
   type: "ERROR";
   error: string;
 }
 type EntryState = Init | Decrypting | Decrypted | FormSubmitted | Error;
-
-interface FormData {
-  item: string;
-  title: string;
-  username: string;
-  password: string;
-  secretNote: string;
-  tags: string;
-}
 
 interface NewEntry {
   type: "NEW_ENTRY";
@@ -68,26 +59,20 @@ export default function TableEntry({
     const form = e.currentTarget;
     const formData = new FormData(form);
     form.reset();
-    const newEntry: FormData = {
+    const newEntry: ClearPasswordEntry = {
+      key: "", // key is determined by the reducer for new entries
       item: formData.get("item") as string,
       title: formData.get("title") as string,
       username: formData.get("username") as string,
       password: formData.get("password") as string,
-      secretNote: formData.get("secretNote") as string,
+      safeNote: formData.get("safeNote") as string,
       tags: formData.get("tags") as string,
+      lastModifiedDate: parseInt(formData.get("lastModifiedDate") as string),
+      createdDate:parseInt(formData.get("createdDate") as string),
     };
     setEntryState({ type: "FORM_SUBMITTED", formData: newEntry });
     if (passwordEntries.status == PasswordEntriesStatus.SYNCED) {
-      const clearEntry: ClearPasswordEntry = {
-        key: "", // key is determined by the reducer for new entries
-        item: newEntry.item,
-        password: newEntry.password,
-        safeNote: newEntry.secretNote,
-        title: newEntry.title,
-        username: newEntry.username,
-        tags: newEntry.tags,
-      };
-      encryptFullEntry(clearEntry)
+      encryptFullEntry(newEntry)
         .then((encryptedEntry) => {
           if (encryptedEntry) {
             if (row.type === "NEW_ENTRY" || row.type === "HIDDEN") {
@@ -163,7 +148,7 @@ export default function TableEntry({
   const title = clearEntry?.title ?? formData?.title ?? "";
   const username = clearEntry?.username ?? formData?.username ?? "";
   const password = clearEntry?.password ?? formData?.password ?? "";
-  const secretNote = clearEntry?.safeNote ?? formData?.secretNote ?? "";
+  const secretNote = clearEntry?.safeNote ?? formData?.safeNote ?? "";
   const tags = clearEntry?.tags ?? formData?.tags ?? "";
   return (
     <div className={styles.card}>
@@ -215,7 +200,7 @@ export default function TableEntry({
               defaultValue={tags}
             />
             <EntryInput
-              name="secretNote"
+              name="safeNote"
               label={"Secrete Note"}
               placeholder={""}
               type={"secret"}

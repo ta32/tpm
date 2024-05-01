@@ -14,6 +14,7 @@ import { uniqueId } from "lib/utils";
 
 jest.mock("lib/utils");
 const mUniqueId = jest.mocked(uniqueId);
+const mDateNow = jest.spyOn(Date, "now");
 
 function initialEntries(): PasswordEntries {
   return {
@@ -33,6 +34,8 @@ function entry(num: number): SafePasswordEntry {
     secretNoteEnc: new Uint8Array([num]),
     safeKey: `safeKey${num}`,
     tags: `tag${num}`,
+    createdDate: 0,
+    lastModifiedDate: 0,
   };
 }
 
@@ -108,6 +111,7 @@ test("Adding new entry to loaded database", () => {
   let entry2 = { ...entry(2), key: "value set by reducer when added" };
   const action: AddEntry = { type: "ADD_ENTRY", entry: entry2 };
   mUniqueId.mockReturnValue("key2");
+  mDateNow.mockReturnValue(0);
 
   // noinspection DuplicatedCode
   const actual = passwordEntriesReducer(initialState, action);
