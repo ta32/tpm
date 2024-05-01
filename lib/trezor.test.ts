@@ -106,6 +106,8 @@ it("can generate valid key derived from trezor that can encrypt and decrypt the 
     tags: "tags",
     safeKey:
       "Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted",
+    createdDate: 0,
+    lastModifiedDate: 0,
   };
   const appData: AppData = {
     tags: [],
@@ -151,6 +153,8 @@ it("encrypt then decrypt result in the same value", async () => {
     password: "password",
     safeNote: "safeNote",
     tags: "tags",
+    createdDate: 0,
+    lastModifiedDate: 0,
   };
   // This method of TrezorConnect is responsible for symmetric encryption and decryption
   // It is used to encrypt the "passKey", AES key that is used to encrypt the clear password entry

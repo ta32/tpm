@@ -41,6 +41,8 @@ export interface ClearPasswordEntry {
   password: string;
   safeNote: string;
   tags: string;
+  createdDate: number;
+  lastModifiedDate: number;
 }
 
 export async function initTrezor(
@@ -179,6 +181,8 @@ export async function encryptFullEntry(
       secretNoteEnc: safeNoteEnc,
       safeKey: response.payload.value, // passKey encrypted with Trezor
       tags: entry.tags,
+      createdDate: entry.createdDate,
+      lastModifiedDate: entry.lastModifiedDate,
     };
   }
   return undefined;
