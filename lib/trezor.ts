@@ -223,6 +223,8 @@ export async function decryptFullEntry(
       password: passwordClear,
       safeNote: safeNoteClear,
       tags: entry.tags,
+      createdDate: entry.createdDate,
+      lastModifiedDate: entry.lastModifiedDate,
     };
   }
   return undefined;
