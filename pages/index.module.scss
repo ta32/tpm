@@ -1,6 +1,5 @@
 @use "styles/animations";
-@use "styles/colors";
-@use "styles/constants";
+@use "../styles/colors.module";
 
 @mixin flex-center {
   display: flex;
@@ -27,14 +26,15 @@
   }
 }
 
+.icon_over_button {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+}
+
 .dropbox {
-  background: {
-    color: colors.$white;
-    image: url( constants.$dropboxLogoBasePath + 'dropbox-blue.svg');
-    size: 30px 30px;
-    repeat: no-repeat;
-    position: 15px center;
-  }
+  position: relative;
   border: 2px solid colors.$white;
   padding: 12px 25px 12px 55px;
   color: colors.$blue;
@@ -141,8 +141,7 @@
   }
 }
 
-.trezor {
-  content: '';
+.trezor_logo {
   position: absolute;
   display: block;
   width: 24px;
@@ -153,14 +152,4 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: auto 30px;
-}
-
-.t1:after {
-  @extend .trezor;
-  background-image: url(constants.$trezorLogoBasePath + "t1.png");
-}
-
-.t2:after {
-  @extend .trezor;
-  background-image: url(constants.$trezorLogoBasePath + "t2.png");
 }

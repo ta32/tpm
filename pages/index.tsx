@@ -1,4 +1,4 @@
-import styles from "./home.module.scss";
+import styles from "./index.module.scss";
 import Image from "next/image";
 import TrezorConnect, {
   DeviceEventMessage,
@@ -14,7 +14,7 @@ import PinDialog from "../components/index/pin_dialog";
 import { useUser, useUserDispatch } from "../contexts/user";
 import Router from "next/router";
 import { UserStatus } from "../contexts/reducers/users";
-import { getAppLogoPath, getDropboxLogoPath, getTrezorLogoPath } from '../lib/Images'
+import { IMAGE_FILE } from '../lib/Images'
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
   `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
@@ -163,12 +163,21 @@ export default function Home() {
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
+  const trezorLogo = user.device?.model == "1" ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
+
   return (
     <Layout>
-      <Image src={getAppLogoPath("tpm-logo.svg")} width={500} height={120} alt="" />
+      <Image src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt=""/>
       <div className={styles.grid}>
         {user.status === UserStatus.OFFLINE && (
           <button className={styles.dropbox} onClick={connectToDropbox}>
+            <Image
+              className={styles.icon_over_button}
+              src={IMAGE_FILE.DROPBOX_BLUE.path()}
+              width={30}
+              height={30}
+              alt={"sign in with dropbox"}
+            />
             Sign in with Dropbox
           </button>
         )}
@@ -178,7 +187,7 @@ export default function Home() {
         {user.status === UserStatus.ONLINE_NO_TREZOR && (
           <div className={styles.dropbox_user}>
             <Image
-              src={getDropboxLogoPath("dropbox.svg")}
+              src={IMAGE_FILE.DROPBOX.path()}
               alt={"signed in as dropbox user"}
               width={110}
               height={110}
@@ -190,7 +199,7 @@ export default function Home() {
               </h3>
               <span className={styles.connect_trezor}>
                 <Image
-                  src={getTrezorLogoPath("connect-trezor.svg")}
+                  src={IMAGE_FILE.CONNECT_TREZOR.path()}
                   alt={"trezor-disconnected"}
                   width={20}
                   height={45}
@@ -203,7 +212,7 @@ export default function Home() {
         {user.status === UserStatus.ONLINE_WITH_TREZOR && (
           <div className={styles.dropbox_user}>
             <Image
-              src={getDropboxLogoPath("dropbox.svg")}
+              src={IMAGE_FILE.DROPBOX.path()}
               alt={"signed in as dropbox user"}
               width={110}
               height={110}
@@ -216,6 +225,8 @@ export default function Home() {
               <ul className={styles.dev_list}>
                 <li key="1">
                   <a onClick={openDevice}>
+                    <span className={styles.trezor_logo} style={{backgroundImage: `url(${trezorLogo})`}}
+                    />
                     <span
                       className={
                         user.device?.model == "1" ? styles.t1 : styles.t2

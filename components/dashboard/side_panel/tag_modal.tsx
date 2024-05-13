@@ -1,5 +1,5 @@
 import Styles from "./tag_modal.module.scss";
-import Image from "next/image";
+import Colors from "../../../styles/colors.module.scss";
 import {
   ChangeEvent,
   FormEvent,
@@ -15,7 +15,7 @@ import {
   getTagTitle,
   TagsStatus,
 } from "../../../contexts/reducers/tag_entries";
-import { getTagIconPath, TAG_ICONS } from "../../../lib/Images";
+import { SELECTABLE_TAG_ICONS } from "../../../lib/Images";
 
 interface Tag {
   title: string;
@@ -39,6 +39,8 @@ export default function TagModal({
   const [tagIconIndex, setTagIconIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
 
+  const tagIconNamesArray = Array.from(SELECTABLE_TAG_ICONS.keys());
+
   let error = "";
   if (tagEntries.status === TagsStatus.ERROR) {
     error = "tag already exists";
@@ -48,14 +50,14 @@ export default function TagModal({
     if (!showControls) {
       setShowControls(true);
     }
-    setTagIconIndex((tagIconIndex + TAG_ICONS.length - 1) % TAG_ICONS.length);
+    setTagIconIndex((tagIconIndex + tagIconNamesArray.length - 1) % tagIconNamesArray.length);
   };
 
   const handleRightClick = () => {
     if (!showControls) {
       setShowControls(true);
     }
-    setTagIconIndex((tagIconIndex + 1) % TAG_ICONS.length);
+    setTagIconIndex((tagIconIndex + 1) % tagIconNamesArray.length);
   };
 
   const handleClose = () => {
@@ -75,7 +77,7 @@ export default function TagModal({
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const tagIcon = TAG_ICONS[tagIconIndex];
+      const tagIcon = tagIconNamesArray[tagIconIndex];
       const form = e.currentTarget;
       const formData = new FormData(form);
       const tagTitle = formData.get("title") as string;
@@ -85,7 +87,7 @@ export default function TagModal({
     [onSubmit, tagIconIndex]
   );
 
-  const tagIcon = TAG_ICONS[tagIconIndex];
+  const tagIcon = tagIconNamesArray[tagIconIndex];
   const showControlsClass =
     showControls || mode === "REMOVE" ? "" : Styles.hidden;
   const modalClass =
@@ -116,6 +118,8 @@ export default function TagModal({
   const tagTitle = tagId && getTagTitle(tagEntries, tagId);
   const chevronVisibility =
     mode === "ADD" || mode === "EDIT" ? "" : Styles.none;
+
+  const tagIconSvg = SELECTABLE_TAG_ICONS.get(tagIconNamesArray[tagIconIndex]);
   return (
     <>
       <div className={modalBackdropClass} />
@@ -136,13 +140,9 @@ export default function TagModal({
                   className={`${Styles.chevron_left} ${chevronVisibility}`}
                   onClick={handleLeftClick}
                 />
-                <Image
-                  className={Styles.filter_icon}
-                  src={getTagIconPath(tagIcon)}
-                  alt={"test"}
-                  height={60}
-                  width={60}
-                ></Image>
+                <div className={Styles.icon}>
+                  {tagIconSvg && tagIconSvg({ fill: Colors.blue_dark, width: "60"}) }
+                </div>
                 <a
                   className={`${Styles.chevron_right} ${chevronVisibility}`}
                   onClick={handleRightClick}

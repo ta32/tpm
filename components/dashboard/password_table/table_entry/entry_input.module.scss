@@ -1,21 +1,18 @@
-@use "styles/colors";
+@use "../../../../styles/colors.module";
+@use "components/dashboard/password_table/table_entry.module.scss" as table_entry;
 
 .container {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 1rem;
-  justify-content: flex-end;
+  @include table_entry.container
+}
+
+.layout {
+  @include table_entry.layout;
 }
 
 .container_row_no_wrap {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 7rem;
 }
 
 .label {

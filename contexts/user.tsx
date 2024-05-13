@@ -35,6 +35,22 @@ const initialUser = {
 //   dbc: new Dropbox()
 // }
 
+// State for showing Trezor logo
+// const initialUser: User = {
+//   status: UserStatus.ONLINE_WITH_TREZOR,
+//   device: {
+//     label: "test",
+//     model: "1",
+//     deviceId: "test",
+//     path: "test",
+//     masterKey: "test",
+//     encryptionKey: new Uint8Array()
+//   },
+//   dropboxAccountName: 'test',
+//   dbc: new Dropbox()
+// }
+
+
 const UserContext = createContext<User | undefined>(undefined);
 const UserDispatchContext = createContext<Dispatch<UserAction> | undefined>(
   undefined

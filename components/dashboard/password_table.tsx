@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styles from './password_table.module.scss'
+import Colors from '../../styles/colors.module.scss'
 import FilterInput from './password_table/filter_input'
 import TableEntry from './password_table/table_entry'
 import { usePasswordEntries, usePasswordEntriesDispatch, } from '../../contexts/password_entries'
@@ -11,9 +12,10 @@ import { getSafePasswordEntries, PasswordEntriesStatus, } from '../../contexts/r
 import { useTagEntries, useTagEntriesDispatch, } from '../../contexts/tag_entries'
 import { TagsStatus } from '../../contexts/reducers/tag_entries'
 import { Dropbox } from 'dropbox'
-import Image from 'next/image'
-import { getUiIconPath, UI_ICON } from '../../lib/Images'
 import DropdownMenu from '../ui/dropdown_menu'
+import SortIcon from '../../svg/ui/sort_icon'
+import NoSearchIcon from '../../svg/ui/nosearch_icon'
+import { IMAGE_FILE } from '../../lib/Images'
 
 
 interface PasswordTableProps {
@@ -160,10 +162,11 @@ export default function PasswordTable({
   }
   // apply the sort (default is by title)
   entries.sort((a, b) => {
-    if (sortType === SortType.TITLE) {
-      return a.title.localeCompare(b.title);
-    } else {
-      return b.createdDate - a.createdDate;
+    switch (sortType) {
+      case SortType.TITLE:
+        return a.title.localeCompare(b.title);
+      case SortType.DATE:
+        return b.createdDate - a.createdDate;
     }
   });
   return (
@@ -179,13 +182,28 @@ export default function PasswordTable({
         </div>
         <div className={styles.col2}>
           <DropdownMenu xOffset={-20} yOffset={40} initSelectedKey={0}
-            button={<button className={styles.sort_btn}>Sort</button>}
+            button={
+              <button className={styles.sort_btn}>
+                <SortIcon className={styles.icon_over_button} width="1rem" fill={Colors.grey_content_bg}/>
+                Sort
+              </button>
+            }
             onClickCallback={handleSortFilter}
           >
             <div className={styles.dropdown_button}>Title</div>
             <div className={styles.dropdown_button}>Date</div>
           </DropdownMenu>
-          <button className={styles.drop_box_btn}>{accountName}</button>
+
+          <button className={styles.drop_box_btn}
+          style={{
+            backgroundSize: '1rem 1rem',
+            backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
+            backgroundPosition: '20px center',
+            backgroundRepeat: 'no-repeat',
+          }}
+          >
+            {accountName}
+          </button>
         </div>
       </div>
       <div className={styles.dashboard}>
@@ -208,7 +226,7 @@ export default function PasswordTable({
         })}
         {entries.length == 0 && filter !== "" && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
-            <Image src={getUiIconPath(UI_ICON.NO_SEARCH)} height={300} width={300} alt={'no results'}/>
+            <NoSearchIcon width={300} />
             <div>
               <h1 className={styles.heading}>No results.</h1>
               <p className={styles.subheading}>Try a different filter.</p>

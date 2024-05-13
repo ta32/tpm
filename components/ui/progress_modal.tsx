@@ -1,7 +1,7 @@
 import React from "react";
-import styles from "./progress_modal.module.scss";
-import Image from "next/image";
-import { getUiIconPath, UI_ICON } from "lib/Images";
+import Styles from "./progress_modal.module.scss";
+import DoneIcon from '../../svg/ui/done_icon'
+import Colors from "../../styles/colors.module.scss";
 
 interface ProgressModalProps {
   progress: boolean;
@@ -19,25 +19,19 @@ export default function ProgressModal({
   const completedLabel = completedText || "Saved";
   return (
     <div
-      className={`${styles.progress_modal} ${
-        active ? styles.active : styles.hidden
+      className={`${Styles.progress_modal} ${
+        active ? Styles.active : Styles.hidden
       }`}
     >
       {progress && active && (
-        <div className={styles.label}>
-          <span className={styles.spinner} />
+        <div className={Styles.label}>
+          <span className={Styles.spinner} />
           {progressLabel}
         </div>
       )}
       {!progress && active && (
-        <div className={styles.label}>
-          <Image
-            className={`${styles.icon} ${styles.ui_icon_white}`}
-            src={getUiIconPath(UI_ICON.DONE)}
-            alt={"done"}
-            height={24}
-            width={24}
-          />
+        <div className={Styles.label}>
+          <DoneIcon className={Styles.icon} width={24} fill={Colors.white} />
           {completedLabel}
         </div>
       )}

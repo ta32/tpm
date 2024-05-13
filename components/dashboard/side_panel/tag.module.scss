@@ -1,18 +1,13 @@
-@use "styles/colors";
+@use "../../../styles/colors.module";
 @use "styles/animations";
 
 .nav_label {
   vertical-align: middle;
 }
 
-
 .tag_icon {
   margin-right: 10px;
   height: 34px;
-}
-
-.ui_icon_white {
-  filter: colors.$white_filter;
 }
 
 .hidden {

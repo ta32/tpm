@@ -1,4 +1,4 @@
-@use "styles/colors";
+@use "../../styles/colors.module";
 @use "styles/animations";
 
 .hidden {
@@ -44,7 +44,6 @@
   .icon {
     margin-right: 10px;
     float: left;
-    filter: colors.$white_filter
   }
 }
 

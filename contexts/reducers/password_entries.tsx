@@ -36,6 +36,10 @@ export interface AddEntry {
   type: "ADD_ENTRY";
   entry: SafePasswordEntry;
 }
+export interface RemoveEntry {
+  type: "REMOVE_ENTRY";
+  key: string;
+}
 export interface UpdateEntry {
   type: "UPDATE_ENTRY";
   key: string;
@@ -49,6 +53,7 @@ export interface UploadEntries {
 export type PasswordEntriesAction =
   | Sync
   | AddEntry
+  | RemoveEntry
   | UpdateEntry
   | UploadEntries;
 
@@ -122,6 +127,18 @@ export function passwordEntriesReducer(
       let new_entries: PasswordEntries = { ...state };
       let nextKey = uniqueId();
       new_entries[nextKey] = { ...action.entry, key: nextKey, createdDate: Date.now(), lastModifiedDate: Date.now() };
+      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
+    }
+    case 'REMOVE_ENTRY': {
+      if (state.status !== PasswordEntriesStatus.SYNCED) {
+        return {
+          ...state,
+          status: PasswordEntriesStatus.ERROR,
+          lastError: "Cannot remove entry from un-synced state",
+        };
+      }
+      let new_entries: PasswordEntries = { ...state };
+      delete new_entries[action.key];
       return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case "UPDATE_ENTRY": {

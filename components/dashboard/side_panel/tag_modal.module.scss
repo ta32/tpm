@@ -1,4 +1,4 @@
-@use "styles/colors";
+@use "../../../styles/colors.module";
 @use "styles/animations";
 
 .modal_backdrop {
@@ -135,9 +135,8 @@
   height: 100px;
 }
 
-.filter_icon {
+.icon {
   padding: 0 10px;
-  filter: colors.$filter_dark_blue_shadow;
 }
 
 .chevron_left {

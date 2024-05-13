@@ -1,7 +1,9 @@
 import React from 'react'
 import styles from './tag.module.scss'
-import Image from 'next/image'
-import { getTagIconPath, getUiIconPath, UI_ICON } from '../../../lib/Images'
+import Colors from "../../../styles/colors.module.scss";
+import { SELECTABLE_TAG_ICONS } from '../../../lib/Images'
+import AllIcon from '../../../svg/tags/all_icon'
+import MoreIcon from '../../../svg/ui/more_icon'
 
 interface TagProps {
   id: string;
@@ -43,6 +45,7 @@ export default function Tag({
   };
 
   const iconVisibility = selected && !permanent ? "" : styles.hidden;
+  const IconSvg = SELECTABLE_TAG_ICONS.get(icon) ?? AllIcon;
   return (
     <>
       <a
@@ -50,22 +53,13 @@ export default function Tag({
         data-tag-key={title}
         data-tag-name={title}
       >
-        <Image
-          className={`${styles.ui_icon_white} ${styles.tag_icon}`}
-          src={getTagIconPath(icon)}
-          alt={"icon"}
-          width={55}
-          height={55}
-        />
+        <div className={styles.tag_icon}>
+          {IconSvg && <IconSvg width={34} fill={Colors.white} />}
+        </div>
         <span className={styles.nav_label}>{title}</span>
-        <Image
-          onClick={handleClickedMore}
-          className={`${styles.ui_icon_white} ${iconVisibility}`}
-          src={getUiIconPath(UI_ICON.MORE)}
-          alt={"more"}
-          height={24}
-          width={24}
-        />
+        <div className={iconVisibility} onClick={handleClickedMore}>
+          <MoreIcon fill={Colors.white} width={24} />
+        </div>
       </a>
       {showControls && (
         <div className={`${styles.tag_controls} ${styles.active}`}>

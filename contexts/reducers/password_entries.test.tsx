@@ -4,12 +4,12 @@ import {
   getSafePasswordEntries,
   PasswordEntries,
   passwordEntriesReducer,
-  PasswordEntriesStatus,
+  PasswordEntriesStatus, RemoveEntry,
   SafePasswordEntry,
   Sync,
   UpdateEntry,
   UploadEntries,
-} from "./password_entries";
+} from './password_entries'
 import { uniqueId } from "lib/utils";
 
 jest.mock("lib/utils");
@@ -220,5 +220,31 @@ test("Update entry test", () => {
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
   expect(actual.key1).toEqual(expectedState.key1);
+  expect(actual.key2).toEqual(expectedState.key2);
+});
+
+test("Entry is removed by key", () => {
+  const initialState: PasswordEntries = {
+    ...initialEntries(),
+    version: 1,
+    status: PasswordEntriesStatus.SYNCED,
+  };
+  const entry1 = entry(1);
+  const entry2 = entry(2);
+  initialState.key1 = entry1;
+  initialState.key2 = entry2;
+
+  const action: RemoveEntry = { type: "REMOVE_ENTRY", key: entry1.key };
+  const actual = passwordEntriesReducer(initialState, action);
+
+  const expectedState: PasswordEntries = {
+    ...initialState,
+    status: PasswordEntriesStatus.SAVE_REQUIRED,
+  };
+  delete expectedState.key1;
+
+  expect(actual.version).toEqual(expectedState.version);
+  expect(actual.status).toEqual(expectedState.status);
+  expect(actual.key1).toBeUndefined();
   expect(actual.key2).toEqual(expectedState.key2);
 });

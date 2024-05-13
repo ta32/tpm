@@ -6,7 +6,8 @@ import EntryInput from './table_entry/entry_input'
 import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry, } from '../../../lib/trezor'
 import { usePasswordEntries, usePasswordEntriesDispatch, } from '../../../contexts/password_entries'
 import { PasswordEntriesStatus, SafePasswordEntry, } from '../../../contexts/reducers/password_entries'
-import { getUiIconPath, UI_ICON } from '../../../lib/Images'
+import { IMAGE_FILE } from '../../../lib/Images'
+import Delete_icon from '../../../svg/ui/delete_icon'
 
 interface Init {
   type: "INIT";
@@ -156,7 +157,7 @@ export default function TableEntry({
         <form className={styles.entry} onSubmit={handleSubmitEntry}>
           <div className={styles.avatar_expanded}>
             <Image
-              src={getUiIconPath(UI_ICON.TRANSPARENT_PNG)}
+              src={IMAGE_FILE.TRANSPARENT_PNG.path()}
               height={100}
               width={100}
               alt="avatar"
@@ -166,51 +167,60 @@ export default function TableEntry({
           <div className={styles.account_info}>
             <EntryInput
               name="item"
-              label={"Item"}
-              placeholder={""}
-              type={"text"}
+              label={'Item'}
+              placeholder={''}
+              type={'text'}
               defaultValue={item}
             />
             <EntryInput
               name="title"
-              label={"Title"}
-              placeholder={""}
-              type={"text"}
+              label={'Title'}
+              placeholder={''}
+              type={'text'}
               defaultValue={title}
             />
             <EntryInput
               name="username"
-              label={"Username"}
-              placeholder={""}
-              type={"text"}
+              label={'Username'}
+              placeholder={''}
+              type={'text'}
               defaultValue={username}
             />
             <EntryInput
               name="password"
-              label={"Password"}
-              placeholder={""}
-              type={"password"}
+              label={'Password'}
+              placeholder={''}
+              type={'password'}
               defaultValue={password}
             />
             <EntryInput
               name="tags"
-              label={"Tags"}
-              placeholder={""}
-              type={"tags"}
+              label={'Tags'}
+              placeholder={''}
+              type={'tags'}
               defaultValue={tags}
             />
             <EntryInput
               name="safeNote"
-              label={"Secrete Note"}
-              placeholder={""}
-              type={"secret"}
+              label={'Secret Note'}
+              placeholder={''}
+              type={'secret'}
               defaultValue={secretNote}
             />
+            <div className={styles.layout}>
+              <div className={styles.container}>
+                <label className={styles.label}>Actions</label>
+                <button className={styles.remove_button}>
+                  <Delete_icon className={styles.delete_icon} width={15}></Delete_icon>
+                  <span>REMOVE ENTRY</span>
+                </button>
+              </div>
+            </div>
           </div>
           <div className={styles.account_info_controls}>
             <button
               type="submit"
-              disabled={entryState.type === "FORM_SUBMITTED"}
+              disabled={entryState.type === 'FORM_SUBMITTED'}
               className={styles.save_btn}
             >
               {entryState.type === "FORM_SUBMITTED" ? "Saving" : "Save"}
@@ -229,7 +239,7 @@ export default function TableEntry({
         <div className={styles.entry}>
           <div className={styles.avatar_mini}>
             <Image
-              src={getUiIconPath(UI_ICON.TRANSPARENT_PNG)}
+              src={IMAGE_FILE.TRANSPARENT_PNG.path()} // TODO: this is from the old tpm code -- understand what this does
               height={50}
               width={50}
               alt="avatar"

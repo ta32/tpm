@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, useState, } from 'react'
 import styles from "./filter_input.module.scss";
-import Image from 'next/image'
-import { getUiIconPath, UI_ICON } from '../../../lib/Images'
+import CloseIcon from '../../../svg/ui/close_icon'
+import colors from '../../../styles/colors.module.scss'
 
 interface FilterInputProps {
   placeholder: string;
@@ -28,7 +28,7 @@ export default function FilterInput({ placeholder, onChangeCallback }: FilterInp
     onChangeCallback("");
   }
 
-  const closeButtonSize = parseInt(styles.close_button_size);
+  const closeButtonSize = parseInt(styles.input_height)/2;
 
   return (
     <span className={styles.filter}>
@@ -43,15 +43,9 @@ export default function FilterInput({ placeholder, onChangeCallback }: FilterInp
             onChange={onChange}
           />
           {filter && (
-            <Image
-              className={`${styles.icon_white} ${styles.clear_button}`}
-              src={getUiIconPath(UI_ICON.CLOSE)}
-              alt={'close'}
-              height={closeButtonSize}
-              width={closeButtonSize}
-              onClick={onClearFilter}
-              style={{marginRight: '10px'}}
-            />
+            <div className={styles.clear_button} onClick={onClearFilter}>
+              <CloseIcon fill={colors.grey_content_bg} style={{marginRight: '10px'}} width={closeButtonSize} />
+            </div>
           )}
         </div>
       </form>

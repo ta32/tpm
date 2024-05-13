@@ -1,9 +1,30 @@
-@use "styles/colors";
+@use "../../../styles/colors.module";
 @use "styles/mixins";
 
 $avatar_size: 50px;
 
 $account_info_controls_margin: 2rem;
+
+@mixin layout {
+  display: grid;
+  grid-template-columns: 1fr 7rem;
+}
+
+@mixin container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+}
+
+@mixin label {
+  color: colors.$grey_content_font;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  margin-bottom: 0.25rem;
+  margin-right: 1rem;
+ }
 
 .card {
   display: block;
@@ -221,3 +242,29 @@ $account_info_controls_margin: 2rem;
   }
 }
 
+.remove_button {
+  display: flex;
+  align-items: center;
+  width: 15rem;
+  border-radius: 3px;
+  background-color: colors.$red;
+  color: colors.$white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border: none;
+}
+
+.delete_icon {
+  margin-right: 0.5rem;
+  fill: colors.$white;
+}
+
+.label {
+  @include label;
+}
+.layout {
+  @include layout;
+}
+.container {
+  @include container;
+}

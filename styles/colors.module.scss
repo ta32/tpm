@@ -1,0 +1,48 @@
+
+$white: #fff;
+
+$grey_bg: #f6f7f8;
+$grey_bg_header_hover: #edf1f2;
+$grey_border: #E9E9E9;
+$grey_font: #b4b6bd;
+$grey_font_header_links: #979898;
+$grey_content_font: #797979;
+$grey_content_bg: #797979;
+
+$highlight_bg: rgba($grey_bg, .9);
+
+
+$black_font: #424242;
+$black: #494949;
+
+$blue: #2877CD;
+$blue_dark: #2c3e50;
+$blue_dark_very: #1A2942;
+$blue_dark_very_much: #162338;
+
+$red: #E93C34;
+
+$green: #01B757;
+
+$pink: #EF6088;
+
+:export {
+    white: $white;
+    grey_bg: $grey_bg;
+    grey_bg_header_hover: $grey_bg_header_hover;
+    grey_border: $grey_border;
+    grey_font: $grey_font;
+    grey_font_header_links: $grey_font_header_links;
+    grey_content_font: $grey_content_font;
+    grey_content_bg: $grey_content_bg;
+    highlight_bg: $highlight_bg;
+    black_font: $black_font;
+    black: $black;
+    blue: $blue;
+    blue_dark: $blue_dark;
+    blue_dark_very: $blue_dark_very;
+    blue_dark_very_much: $blue_dark_very_much;
+    red: $red;
+    green: $green;
+    pink: $pink;
+}

@@ -12,7 +12,7 @@ import {
   TagsStatus,
 } from "../../contexts/reducers/tag_entries";
 import Tag from "./side_panel/tag";
-import { getAppLogoPath, getTrezorLogoPath } from '../../lib/Images'
+import { IMAGE_FILE } from '../../lib/Images'
 
 interface Add {
   type: "ADD";
@@ -106,12 +106,16 @@ export default function SidePanel() {
         mode={mode}
         tagId={tagId}
       />
-      <div className="backdrop" /*onClick={onSelectTag} TODO */ />
-      <aside className={styles.left_panel}>
+      <aside className={styles.left_panel} style={{
+        backgroundImage: `url(${IMAGE_FILE.BACKGROUND.path()})`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center top",
+        backgroundAttachment: "fixed",
+      }}>
         <div className={styles.logo}>
           <span className="logo-expanded">
             <Image
-              src={getAppLogoPath("tpm-logo.svg")}
+              src={IMAGE_FILE.TPM_LOGO.path()}
               alt="logo"
               height={34}
               width={141}
