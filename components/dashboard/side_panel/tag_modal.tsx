@@ -121,6 +121,7 @@ export default function TagModal({
 
   const tagIconSvg = SELECTABLE_TAG_ICONS.get(tagIconNamesArray[tagIconIndex]);
   return (
+    // TODO: refactor to use a modal component
     <>
       <div className={modalBackdropClass} />
       <div className={modalClass}>

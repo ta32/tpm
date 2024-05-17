@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './tag.module.scss'
-import Colors from "../../../styles/colors.module.scss";
+import Colors from "styles/colors.module.scss";
 import { SELECTABLE_TAG_ICONS } from '../../../lib/Images'
 import AllIcon from '../../../svg/tags/all_icon'
 import MoreIcon from '../../../svg/ui/more_icon'

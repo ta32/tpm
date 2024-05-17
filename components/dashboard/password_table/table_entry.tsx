@@ -8,6 +8,7 @@ import { usePasswordEntries, usePasswordEntriesDispatch, } from '../../../contex
 import { PasswordEntriesStatus, SafePasswordEntry, } from '../../../contexts/reducers/password_entries'
 import { IMAGE_FILE } from '../../../lib/Images'
 import Delete_icon from '../../../svg/ui/delete_icon'
+import DeleteModal from './table_entry/delete_modal'
 
 interface Init {
   type: "INIT";
@@ -52,6 +53,7 @@ export default function TableEntry({
 }: TableEntryProps) {
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entryState, setEntryState] = useState<EntryState>({ type: "INIT" });
   const [copiedUsername, setCopiedUsername] = useState(false);
 
@@ -123,8 +125,28 @@ export default function TableEntry({
           setEntryState({ type: "ERROR", error: err });
         });
     }
-    return; // edit is only possible when mode is VIEW_ENTRY
+    return; // Unreachable, edit is only possible when mode is VIEW_ENTRY
   };
+
+  const handleRemoveEntry = () => {
+    if (row.type === "VIEW_ENTRY") {
+      setShowDeleteModal(true);
+    }
+  }
+
+  const handleRemoveEntryConfirm = () => {
+    if (row.type === "VIEW_ENTRY") {
+      passwordEntriesDispatch({
+        type: "REMOVE_ENTRY",
+        key: row.entry.key,
+      });
+      setShowDeleteModal(false);
+    }
+  }
+
+  const handleCancelRemoveEntry = () => {
+    setShowDeleteModal(false);
+  }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -153,6 +175,12 @@ export default function TableEntry({
   const tags = clearEntry?.tags ?? formData?.tags ?? "";
   return (
     <div className={styles.card}>
+      <DeleteModal
+        entryName={title}
+        show={showDeleteModal}
+        submitCallback={handleRemoveEntryConfirm}
+        cancelCallback={handleCancelRemoveEntry}
+      />
       {expanded && (
         <form className={styles.entry} onSubmit={handleSubmitEntry}>
           <div className={styles.avatar_expanded}>
@@ -210,7 +238,7 @@ export default function TableEntry({
             <div className={styles.layout}>
               <div className={styles.container}>
                 <label className={styles.label}>Actions</label>
-                <button className={styles.remove_button}>
+                <button className={styles.remove_button} onClick={handleRemoveEntry} type="button">
                   <Delete_icon className={styles.delete_icon} width={15}></Delete_icon>
                   <span>REMOVE ENTRY</span>
                 </button>
