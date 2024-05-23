@@ -1,31 +1,33 @@
-import styles from "./index.module.scss";
-import Image from "next/image";
+import styles from './index.module.scss';
+import Image from 'next/image';
 import TrezorConnect, {
   DeviceEventMessage,
   UI,
-  DEVICE, TransportEventMessage, UiEventMessage,
-} from '@trezor/connect-web'
-import { useEffect, useState, useCallback } from "react";
-import { DropboxAuth, DropboxResponse, users } from "dropbox";
-import { connectDropbox, hasRedirectedFromAuth } from "../lib/dropbox";
-import { initTrezor, getDevices, getEncryptionKey } from "../lib/trezor";
-import Layout from "../components/index/layout";
-import PinDialog from "../components/index/pin_dialog";
-import { useUser, useUserDispatch } from "../contexts/user";
-import Router from "next/router";
-import { UserStatus } from "../contexts/reducers/users";
-import { IMAGE_FILE } from '../lib/Images'
+  DEVICE,
+  TransportEventMessage,
+  UiEventMessage,
+} from '@trezor/connect-web';
+import { useEffect, useState, useCallback } from 'react';
+import { DropboxAuth, DropboxResponse, users } from 'dropbox';
+import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
+import { initTrezor, getDevices, getEncryptionKey } from '../lib/trezor';
+import Layout from '../components/index/Layout';
+import PinDialog from '../components/index/PinDialog';
+import { useUser, useUserDispatch } from '../contexts/use-user';
+import Router from 'next/router';
+import { UserStatus } from '../contexts/reducers/user-reducer';
+import { IMAGE_FILE } from '../lib/images';
 
-const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
-  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`:
-  "http://localhost:3000/";
+const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+  : 'http://localhost:3000/';
 // Trezor bridge whitelists localhost and trezor.io domains
-const TRUSTED_HOSTS = ["localhost", "trezor.io"];
+const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
-const STORAGE = "tpmDropboxToken";
-const LOGOUT_URL = "https://www.dropbox.com/logout";
-const ADDRS_PATH = "/";
+const STORAGE = 'tpmDropboxToken';
+const LOGOUT_URL = 'https://www.dropbox.com/logout';
+const ADDRS_PATH = '/';
 
 let trezorConnectInit = false;
 
@@ -36,44 +38,38 @@ export default function Home() {
   const uiEventCb = useCallback(
     (event: UiEventMessage) => {
       if (event.type === UI.REQUEST_PIN) {
-        userDispatch({ type: "SHOW_PIN_DIALOG" });
+        userDispatch({ type: 'SHOW_PIN_DIALOG' });
       }
-    },[userDispatch]
+    },
+    [userDispatch]
   );
 
-  const transportEventCb = useCallback(
-    (event: TransportEventMessage) => {
-    },[]
-  )
+  const transportEventCb = useCallback((event: TransportEventMessage) => {}, []);
   const updateDevice = useCallback(
     (event: DeviceEventMessage) => {
       if (event.type === DEVICE.CONNECT) {
         getDevices()
           .then((device) => {
             if (device !== null) {
-              userDispatch({ type: "ADD_DEVICE", device: device });
+              userDispatch({ type: 'ADD_DEVICE', device: device });
             }
           })
           .catch((error) => {
             console.error(error);
             return;
-        });
+          });
       }
       if (event.type === DEVICE.DISCONNECT) {
-        userDispatch({ type: "REMOVE_DEVICE" });
+        userDispatch({ type: 'REMOVE_DEVICE' });
       }
     },
     [userDispatch]
   );
 
   useEffect(() => {
-    let codeVerifier = window.sessionStorage.getItem("codeVerifier");
-    if (
-      user.status === UserStatus.OFFLINE &&
-      hasRedirectedFromAuth() &&
-      codeVerifier !== null
-    ) {
-      userDispatch({ type: "LOADING_DROPBOX_API_TOKEN" });
+    let codeVerifier = window.sessionStorage.getItem('codeVerifier');
+    if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth() && codeVerifier !== null) {
+      userDispatch({ type: 'LOADING_DROPBOX_API_TOKEN' });
       connectDropbox(APP_URL, codeVerifier)
         .then((dbc) => {
           dbc
@@ -81,7 +77,7 @@ export default function Home() {
             .then((dropBoxUser: DropboxResponse<users.FullAccount>) => {
               let name = dropBoxUser.result.name.display_name;
               userDispatch({
-                type: "DROPBOX_USER_LOGGED_IN",
+                type: 'DROPBOX_USER_LOGGED_IN',
                 userName: name,
                 dbc,
               });
@@ -99,31 +95,30 @@ export default function Home() {
     }
     if (user.status === UserStatus.TPM_READY_TO_LOAD) {
       // navigate to the dashboard
-      Router.push("/dashboard").catch((err) => console.error(err));
+      Router.push('/dashboard').catch((err) => console.error(err));
     }
   }, [user, userDispatch]);
 
   useEffect(() => {
-    if(!trezorConnectInit) {
-      const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname)
-      initTrezor(APP_URL, trustedHost, updateDevice, transportEventCb, uiEventCb)
-        .catch((error) => {
+    if (!trezorConnectInit) {
+      const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
+      initTrezor(APP_URL, trustedHost, updateDevice, transportEventCb, uiEventCb).catch((error) => {
         // FATAL ERROR
         console.error(error);
         return;
       });
     }
     trezorConnectInit = true;
-  }, [updateDevice]);
+  }, [updateDevice, transportEventCb, uiEventCb]);
 
   const openDevice = () => {
     if (user.device === null) {
-      console.error("wallet is not initialized");
+      console.error('wallet is not initialized');
       return;
     }
     getEncryptionKey(user.device.path).then((keyPair) => {
       if (keyPair !== null) {
-        userDispatch({ type: "ACTIVATED_TMP_ON_DEVICE", keyPair });
+        userDispatch({ type: 'ACTIVATED_TMP_ON_DEVICE', keyPair });
       } else {
         // TODO: handle error -- user decided not to activate error or pin was wrong
       }
@@ -131,27 +126,16 @@ export default function Home() {
   };
   const connectToDropbox = () => {
     if (APP_URL === undefined) {
-      console.error("APP_URI is undefined");
+      console.error('APP_URI is undefined');
       return;
     }
     // TODO this auth logic shouldn't be here
     const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
     dbxAuth
-      .getAuthenticationUrl(
-        APP_URL,
-        undefined,
-        "code",
-        "offline",
-        undefined,
-        undefined,
-        true
-      )
+      .getAuthenticationUrl(APP_URL, undefined, 'code', 'offline', undefined, undefined, true)
       .then((authUrl) => {
         window.sessionStorage.clear();
-        window.sessionStorage.setItem(
-          "codeVerifier",
-          dbxAuth.getCodeVerifier()
-        );
+        window.sessionStorage.setItem('codeVerifier', dbxAuth.getCodeVerifier());
         window.location.href = authUrl as string;
       })
       .catch((error) => {
@@ -159,15 +143,15 @@ export default function Home() {
       });
   };
   const enterPin = (pin: string) => {
-    userDispatch({ type: "DEVICE_PIN_ENTERED" });
+    userDispatch({ type: 'DEVICE_PIN_ENTERED' });
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
-  const trezorLogo = user.device?.model == "1" ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
+  const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
 
   return (
     <Layout>
-      <Image src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt=""/>
+      <Image src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
       <div className={styles.grid}>
         {user.status === UserStatus.OFFLINE && (
           <button className={styles.dropbox} onClick={connectToDropbox}>
@@ -176,34 +160,22 @@ export default function Home() {
               src={IMAGE_FILE.DROPBOX_BLUE.path()}
               width={30}
               height={30}
-              alt={"sign in with dropbox"}
+              alt={'sign in with dropbox'}
             />
             Sign in with Dropbox
           </button>
         )}
-        {user.status === UserStatus.LOADING && (
-          <span className={styles.spinner}></span>
-        )}
+        {user.status === UserStatus.LOADING && <span className={styles.spinner}></span>}
         {user.status === UserStatus.ONLINE_NO_TREZOR && (
           <div className={styles.dropbox_user}>
-            <Image
-              src={IMAGE_FILE.DROPBOX.path()}
-              alt={"signed in as dropbox user"}
-              width={110}
-              height={110}
-            />
+            <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
             <div className={styles.dropbox_user}>
               <span className={styles.dropbox_user}>Signed in as</span>
               <h3 className={styles.dropbox_user}>
                 <b>{user.dropboxAccountName}</b>
               </h3>
               <span className={styles.connect_trezor}>
-                <Image
-                  src={IMAGE_FILE.CONNECT_TREZOR.path()}
-                  alt={"trezor-disconnected"}
-                  width={20}
-                  height={45}
-                />
+                <Image src={IMAGE_FILE.CONNECT_TREZOR.path()} alt={'trezor-disconnected'} width={20} height={45} />
                 <span>Connect TREZOR to continue</span>
               </span>
             </div>
@@ -211,12 +183,7 @@ export default function Home() {
         )}
         {user.status === UserStatus.ONLINE_WITH_TREZOR && (
           <div className={styles.dropbox_user}>
-            <Image
-              src={IMAGE_FILE.DROPBOX.path()}
-              alt={"signed in as dropbox user"}
-              width={110}
-              height={110}
-            />
+            <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
             <div>
               <span>Signed in as</span>
               <h3>
@@ -225,25 +192,16 @@ export default function Home() {
               <ul className={styles.dev_list}>
                 <li key="1">
                   <a onClick={openDevice}>
-                    <span className={styles.trezor_logo} style={{backgroundImage: `url(${trezorLogo})`}}
-                    />
-                    <span
-                      className={
-                        user.device?.model == "1" ? styles.t1 : styles.t2
-                      }
-                    />
-                    <span className="nav-label">
-                      {user.device?.label || ""}
-                    </span>
+                    <span className={styles.trezor_logo} style={{ backgroundImage: `url(${trezorLogo})` }} />
+                    <span className={user.device?.model == '1' ? styles.t1 : styles.t2} />
+                    <span className="nav-label">{user.device?.label || ''}</span>
                   </a>
                 </li>
               </ul>
             </div>
           </div>
         )}
-        {user.status === UserStatus.SHOW_PIN_DIALOG && (
-          <PinDialog submitCallback={enterPin}></PinDialog>
-        )}
+        {user.status === UserStatus.SHOW_PIN_DIALOG && <PinDialog submitCallback={enterPin}></PinDialog>}
         {user.status === UserStatus.TREZOR_PIN_ENTERED && (
           <div className={styles.main}>
             <h1>Waking up ...</h1>

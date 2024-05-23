@@ -1,19 +1,22 @@
 import TrezorConnect, {
   DEVICE_EVENT,
-  DeviceEventMessage, TransportEventMessage, UI_EVENT, UiEventMessage,
-} from '@trezor/connect-web'
-import { hexFromUint8Array, uint8ArrayFromHex } from "./buffer";
+  DeviceEventMessage,
+  TransportEventMessage,
+  UI_EVENT,
+  UiEventMessage,
+} from '@trezor/connect-web';
+import { hexFromUint8Array, uint8ArrayFromHex } from './buffer';
 
-import { AppData, deserializeObject, serializeObject } from "./storage";
-import { SafePasswordEntry } from "../contexts/reducers/password_entries";
-import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport'
+import { AppData, deserializeObject, serializeObject } from './storage';
+import { SafePasswordEntry } from '../contexts/reducers/password-entries-reducer';
+import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport';
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
 const SLIP_16_PATH = 10016;
 const PATH = [(SLIP_16_PATH | BIP_44_COIN_TYPE_BTC) >>> 0, 0];
 const DEFAULT_NONCE =
-  "2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee";
-const DEFAULT_KEY_PHRASE = "Activate Temp Password Manager?";
+  '2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee';
+const DEFAULT_KEY_PHRASE = 'Activate Temp Password Manager?';
 
 // AES-256-GCM
 const IV_SIZE = 12;
@@ -58,11 +61,10 @@ export async function initTrezor(
     popup: !trustedHost,
     lazyLoad: false,
     manifest: {
-      email: "test@gmail.com",
+      email: 'test@gmail.com',
       appUrl: appUrl,
     },
-  })
-  .catch((error) => {
+  }).catch((error) => {
     return error;
   });
   if (!trustedHost) {
@@ -83,19 +85,17 @@ export async function getDevices(): Promise<TrezorDevice | null> {
     let { unlocked, label, model, device_id } = result.payload;
     return {
       encryptionKey: new Uint8Array(),
-      masterKey: "",
-      path: "",
-      label: label ?? "",
-      model: model ?? "1",
-      deviceId: device_id ?? "",
+      masterKey: '',
+      path: '',
+      label: label ?? '',
+      model: model ?? '1',
+      deviceId: device_id ?? '',
     };
   }
   return null;
 }
 
-export async function getEncryptionKey(
-  devicePath: string
-): Promise<KeyPair | null> {
+export async function getEncryptionKey(devicePath: string): Promise<KeyPair | null> {
   const result = await TrezorConnect.cipherKeyValue({
     device: {
       path: devicePath,
@@ -113,54 +113,36 @@ export async function getEncryptionKey(
     const tmp = result.payload.value;
     return {
       masterKey: result.payload.value, // assumes master key is 128 bytes long
-      encryptionKey: uint8ArrayFromHex(
-        tmp.substring(tmp.length / 2, tmp.length)
-      ),
+      encryptionKey: uint8ArrayFromHex(tmp.substring(tmp.length / 2, tmp.length)),
     };
   }
   return null;
 }
 
-export async function encryptAppData(
-  appData: AppData,
-  key: Uint8Array
-): Promise<Uint8Array> {
-  const passKey = await crypto.subtle.importKey("raw", key, "AES-GCM", true, [
-    "encrypt",
-    "decrypt",
-  ]);
+export async function encryptAppData(appData: AppData, key: Uint8Array): Promise<Uint8Array> {
+  const passKey = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
   return encryptWithKey(passKey, serializeObject(appData));
 }
 
-export async function decryptAppData(
-  appDataCipherText: Uint8Array,
-  key: Uint8Array
-): Promise<AppData | undefined> {
-  const passKey = await crypto.subtle.importKey("raw", key, "AES-GCM", true, [
-    "encrypt",
-    "decrypt",
-  ]);
+export async function decryptAppData(appDataCipherText: Uint8Array, key: Uint8Array): Promise<AppData | undefined> {
+  const passKey = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
   const result = await decryptWithKey(passKey, appDataCipherText);
   return deserializeObject(result);
 }
 
-export async function encryptFullEntry(
-  entry: ClearPasswordEntry
-): Promise<SafePasswordEntry | undefined> {
+export async function encryptFullEntry(entry: ClearPasswordEntry): Promise<SafePasswordEntry | undefined> {
   let passKey = await crypto.subtle.generateKey(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       length: KEY_SIZE_BITS,
     },
     true,
-    ["encrypt", "decrypt"]
+    ['encrypt', 'decrypt']
   );
   let response = await TrezorConnect.cipherKeyValue({
     path: PATH,
     key: `Unlock ${entry.title} for username ${entry.username}?`,
-    value: hexFromUint8Array(
-      new Uint8Array(await crypto.subtle.exportKey("raw", passKey))
-    ),
+    value: hexFromUint8Array(new Uint8Array(await crypto.subtle.exportKey('raw', passKey))),
     askOnEncrypt: false,
     askOnDecrypt: true,
     encrypt: true,
@@ -168,10 +150,7 @@ export async function encryptFullEntry(
   if (response.success) {
     const enc = new TextEncoder();
     const passEnc = await encryptWithKey(passKey, enc.encode(entry.password));
-    const safeNoteEnc = await encryptWithKey(
-      passKey,
-      enc.encode(entry.safeNote)
-    );
+    const safeNoteEnc = await encryptWithKey(passKey, enc.encode(entry.safeNote));
     return {
       key: entry.key,
       item: entry.item,
@@ -188,9 +167,7 @@ export async function encryptFullEntry(
   return undefined;
 }
 
-export async function decryptFullEntry(
-  entry: SafePasswordEntry
-): Promise<ClearPasswordEntry | undefined> {
+export async function decryptFullEntry(entry: SafePasswordEntry): Promise<ClearPasswordEntry | undefined> {
   const entryUnlockKey = entry.safeKey;
   const response = await TrezorConnect.cipherKeyValue({
     path: PATH,
@@ -201,20 +178,13 @@ export async function decryptFullEntry(
     askOnDecrypt: true,
   });
   if (response.success) {
-    const passKey = await crypto.subtle.importKey(
-      "raw",
-      uint8ArrayFromHex(response.payload.value),
-      "AES-GCM",
-      false,
-      ["encrypt", "decrypt"]
-    );
+    const passKey = await crypto.subtle.importKey('raw', uint8ArrayFromHex(response.payload.value), 'AES-GCM', false, [
+      'encrypt',
+      'decrypt',
+    ]);
     const dec = new TextDecoder();
-    const passwordClear = dec.decode(
-      await decryptWithKey(passKey, entry.passwordEnc)
-    );
-    const safeNoteClear = dec.decode(
-      await decryptWithKey(passKey, entry.secretNoteEnc)
-    );
+    const passwordClear = dec.decode(await decryptWithKey(passKey, entry.passwordEnc));
+    const safeNoteClear = dec.decode(await decryptWithKey(passKey, entry.secretNoteEnc));
     return {
       key: entry.key,
       item: entry.item,
@@ -230,17 +200,14 @@ export async function decryptFullEntry(
   return undefined;
 }
 
-async function encryptWithKey(
-  key: CryptoKey,
-  data: Uint8Array
-): Promise<Uint8Array> {
+async function encryptWithKey(key: CryptoKey, data: Uint8Array): Promise<Uint8Array> {
   // https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/aes-gcm.js
   // The iv must never be reused with a given key.
   const iv = crypto.getRandomValues(new Uint8Array(IV_SIZE));
   //  AES-GCM
   const cipherText = await crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv: iv,
     },
     key,
@@ -253,17 +220,14 @@ async function encryptWithKey(
   return cipherTextWithIv;
 }
 
-async function decryptWithKey(
-  key: CryptoKey,
-  cipherText: Uint8Array
-): Promise<ArrayBuffer> {
+async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array): Promise<ArrayBuffer> {
   // CipherText is prepended with the IV
   const iv = cipherText.slice(0, IV_SIZE);
   const cipherTextArray = cipherText.slice(IV_SIZE, cipherText.byteLength);
   // The iv value is the same as that used for encryption
   return await crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
+      name: 'AES-GCM',
       iv: iv,
     },
     key,
