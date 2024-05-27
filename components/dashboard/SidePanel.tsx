@@ -27,7 +27,11 @@ interface Close {
 
 type TagModalAction = Add | Remove | Edit | Close;
 
-export default function SidePanel() {
+interface SidePanelProps {
+  onSelectedTag: (tagId: string) => void;
+}
+
+export default function SidePanel({ onSelectedTag }: SidePanelProps) {
   const [selectedTag, setSelectedTag] = useState<string | undefined>(undefined);
   const [tagModalAction, setTagModalAction] = useState<TagModalAction>({
     type: 'CLOSED',
@@ -42,6 +46,7 @@ export default function SidePanel() {
 
   function handleSelect(e: React.MouseEvent<HTMLLIElement>) {
     const tagId = e.currentTarget.id;
+    onSelectedTag(tagId);
     setSelectedTag(tagId);
   }
 
@@ -143,7 +148,6 @@ function tagList({
   const tag_array = [];
   for (const tag of tags) {
     const tagId = tag.id;
-    const permanent = tagId === '0';
     const selected = selectedId === tagId;
     tag_array.push(
       <li id={tagId} key={tagId} className={styles.fadeIn} onClick={onSelect}>
@@ -151,7 +155,6 @@ function tagList({
           id={tagId}
           onEdit={onEdit}
           onRemove={onRemove}
-          permanent={permanent}
           selected={selected}
           title={tag.title}
           icon={tag.icon}

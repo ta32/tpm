@@ -2,19 +2,28 @@ import React, { createContext, Dispatch, useReducer } from 'react';
 import { TagEntries, TagsAction, tagsReducer, TagsStatus } from './reducers/tag-entries-reducer';
 import { TAG_ALL, TAG_BITCOIN, TAG_SOCIAL } from '../lib/images';
 
+
+const ALL_ID = '0';
+const BITCOIN_ID = '1';
+const SOCIAL_ID = '2';
+export const enum DEFAULT_TAGS {
+  ALL = ALL_ID,
+  BITCOIN = BITCOIN_ID,
+  SOCIAL = SOCIAL_ID,
+}
 const initialTageEntries: TagEntries = {
-  '0': {
-    id: '0',
+  [ALL_ID]: {
+    id: ALL_ID,
     title: 'ALL',
     icon: TAG_ALL,
   },
-  '1': {
-    id: '1',
+  [BITCOIN_ID]: {
+    id: BITCOIN_ID,
     title: 'Bitcoin',
     icon: TAG_BITCOIN,
   },
-  '2': {
-    id: '2',
+  [SOCIAL_ID]: {
+    id: SOCIAL_ID,
     title: 'Social Media',
     icon: TAG_SOCIAL,
   },

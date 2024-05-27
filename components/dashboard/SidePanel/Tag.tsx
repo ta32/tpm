@@ -4,10 +4,10 @@ import Colors from 'styles/colors.module.scss';
 import { SELECTABLE_TAG_ICONS } from 'lib/images';
 import AllIcon from 'components/svg/tags/AllIcon';
 import MoreIcon from 'components/svg/ui/MoreIcon';
+import { DEFAULT_TAGS } from '../../../contexts/use-tag-entries';
 
 interface TagProps {
   id: string;
-  permanent?: boolean;
   selected: boolean;
   title: string;
   icon: string;
@@ -15,7 +15,7 @@ interface TagProps {
   onRemove: (id: string) => void;
 }
 
-export default function Tag({ title, icon, selected, permanent, onEdit, onRemove, id }: TagProps) {
+export default function Tag({ title, icon, selected, onEdit, onRemove, id }: TagProps) {
   const [showControls, setShowControls] = React.useState(false);
 
   if (!selected && showControls) {
@@ -36,14 +36,14 @@ export default function Tag({ title, icon, selected, permanent, onEdit, onRemove
     setShowControls(false);
   };
 
-  const iconVisibility = selected && !permanent ? '' : styles.hidden;
+  const showMoreControls = selected && ! DEFAULT_TAGS.ALL ? '' : styles.hidden;
   const IconSvg = SELECTABLE_TAG_ICONS.get(icon) ?? AllIcon;
   return (
     <>
       <a className={selected ? styles.active : ''} data-tag-key={title} data-tag-name={title}>
         <div className={styles.tag_icon}>{IconSvg && <IconSvg width={34} fill={Colors.white} />}</div>
         <span className={styles.nav_label}>{title}</span>
-        <div className={iconVisibility} onClick={handleClickedMore}>
+        <div className={showMoreControls} onClick={handleClickedMore}>
           <MoreIcon fill={Colors.white} width={24} />
         </div>
       </a>

@@ -9,7 +9,7 @@ import { fromState } from 'lib/storage';
 import { appFileName } from 'lib/appfile';
 import { decryptAppData, encryptAppData } from 'lib/trezor';
 import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
-import { useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
+import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
 import { TagsStatus } from 'contexts/reducers/tag-entries-reducer';
 import { Dropbox } from 'dropbox';
 import DropdownMenu from '../ui/DropdownMenu';
@@ -18,6 +18,7 @@ import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
 
 interface PasswordTableProps {
+  selectedTag: string;
   accountName: string;
   dbc: Dropbox;
   masterPublicKey: string;
@@ -29,7 +30,7 @@ enum SortType {
   DATE,
 }
 
-export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionKey, accountName }: PasswordTableProps) {
+export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionKey, accountName, selectedTag }: PasswordTableProps) {
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
@@ -144,6 +145,11 @@ export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionK
       return entry.title.includes(filter);
     });
   }
+  if (selectedTag !== '' && selectedTag !== DEFAULT_TAGS.ALL) {
+    entries = entries.filter((entry) => {
+      return entry.tags.includes(selectedTag);
+    });
+  }
   // apply the sort (default is by title)
   entries.sort((a, b) => {
     switch (sortType) {
@@ -212,7 +218,7 @@ export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionK
             />
           );
         })}
-        {entries.length == 0 && filter !== '' && (
+        {entries.length == 0 && ( filter !== '' || selectedTag !== DEFAULT_TAGS.ALL ) && (
           <div
             style={{
               display: 'flex',
@@ -225,7 +231,7 @@ export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionK
             <NoSearchIcon width={300} />
             <div>
               <h1 className={styles.heading}>No results.</h1>
-              <p className={styles.subheading}>Try a different filter.</p>
+              <p className={styles.subheading}>Try a different filter or tag.</p>
             </div>
           </div>
         )}
