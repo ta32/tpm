@@ -124,6 +124,30 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
     return; // Unreachable, edit is only possible when mode is VIEW_ENTRY
   };
 
+  const handleCopyPassword = () => {
+    if (row.type === 'VIEW_ENTRY') {
+      setEntryState({ type: 'DECRYPTING' });
+      const safeEntry = row.entry;
+      decryptFullEntry(safeEntry)
+        .then((clearEntry) => {
+          if (clearEntry != null) {
+            navigator.clipboard.writeText(clearEntry.password).then(() => {
+              setTimeout(() => {
+                navigator.clipboard.writeText('').catch(() => {
+                  console.error('Failed to clear clipboard');
+                });
+              }, 10000);
+
+            });
+          }
+        })
+        .catch((err) => {
+          setEntryState({ type: 'ERROR', error: err });
+        });
+    }
+    console.log('Copy password');
+  };
+
   const handleRemoveEntry = () => {
     if (row.type === 'VIEW_ENTRY') {
       setShowDeleteModal(true);
@@ -235,13 +259,13 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
                 </div>
                 <span className={styles.tooltip_text}>{copiedUsername ? 'Copied!' : 'Copy username'}</span>
               </div>
-              <div className={styles.tooltip}>
+              <div className={styles.tooltip} onClick={handleCopyPassword}>
                 <input
                   className={styles.password_shadow}
                   title={'Copy to clipboard'}
                   type="password"
-                  disabled={true}
                   value={'password'}
+                  readOnly
                 />
                 <span className={styles.tooltip_text}>Copy password</span>
               </div>
