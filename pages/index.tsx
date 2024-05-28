@@ -7,7 +7,7 @@ import TrezorConnect, {
   TransportEventMessage,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { DropboxAuth, DropboxResponse, users } from 'dropbox';
 import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
 import { initTrezor, getDevices, getEncryptionKey } from '../lib/trezor';

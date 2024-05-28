@@ -2,7 +2,6 @@ import React, { createContext, Dispatch, useReducer } from 'react';
 import { TagEntries, TagsAction, tagsReducer, TagsStatus } from './reducers/tag-entries-reducer';
 import { TAG_ALL, TAG_BITCOIN, TAG_SOCIAL } from '../lib/images';
 
-
 const ALL_ID = '0';
 const BITCOIN_ID = '1';
 const SOCIAL_ID = '2';

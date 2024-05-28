@@ -151,14 +151,7 @@ function tagList({
     const selected = selectedId === tagId;
     tag_array.push(
       <li id={tagId} key={tagId} className={styles.fadeIn} onClick={onSelect}>
-        <Tag
-          id={tagId}
-          onEdit={onEdit}
-          onRemove={onRemove}
-          selected={selected}
-          title={tag.title}
-          icon={tag.icon}
-        ></Tag>
+        <Tag id={tagId} onEdit={onEdit} onRemove={onRemove} selected={selected} title={tag.title} icon={tag.icon}></Tag>
       </li>
     );
   }

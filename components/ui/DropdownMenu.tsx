@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import styles from './DropdownMenu.module.scss';
 
 interface DropdownMenuProps {
@@ -22,17 +22,14 @@ export default function DropdownMenu({
   const [selectedKey, setSelectedKey] = useState(initSelectedKey);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const onClick = useCallback(
-    (index: number) => {
-      setSelectedKey(index);
-      onClickCallback(index);
-    },
-    [onClickCallback, setSelectedKey]
-  );
+  const handleMenuClick = (index: number) => {
+    setSelectedKey(index);
+    onClickCallback(index);
+  };
 
-  const handleMenuOpen = useCallback(() => {
+  const handleMenuOpen = () => {
     setShow(!show);
-  }, [show]);
+  };
 
   useEffect(() => {
     const handleClickOutside = (ev: MouseEvent) => {
@@ -60,7 +57,7 @@ export default function DropdownMenu({
                 <div
                   key={index}
                   onClick={() => {
-                    onClick(index);
+                    handleMenuClick(index);
                   }}
                 >
                   {child}

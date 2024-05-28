@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './PasswordTable.module.scss';
 import Colors from '../../styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
@@ -30,7 +30,13 @@ enum SortType {
   DATE,
 }
 
-export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionKey, accountName, selectedTag }: PasswordTableProps) {
+export default function PasswordTable({
+  dbc,
+  masterPublicKey,
+  appDataEncryptionKey,
+  accountName,
+  selectedTag,
+}: PasswordTableProps) {
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
@@ -119,25 +125,25 @@ export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionK
     passwordEntriesDispatch,
   ]);
 
-  const handleAddEntry = useCallback(() => {
+  const handleAddEntry = () => {
     setNewEntry(true);
-  }, []);
+  };
 
-  const handleDiscardEntry = useCallback(() => {
+  const handleDiscardEntry = () => {
     setNewEntry(false);
-  }, []);
+  };
 
-  const handleSaveCallback = useCallback(() => {
+  const handleSave = () => {
     setNewEntry(false);
-  }, []);
+  };
 
-  const handleFilterChange = useCallback((filter: string) => {
+  const handleFilterChange = (filter: string) => {
     setFilter(filter);
-  }, []);
+  };
 
-  const handleSortFilter = useCallback((index: number) => {
-    setSortType(index); // Enum variants need to be listed in the same order in the dropdown
-  }, []);
+  const handleSortFilter = (index: number) => {
+    setSortType(index); // SORT_TYPE Enum variants need to be listed in the same order in the dropdown
+  };
 
   let entries = getSafePasswordEntries(passwordEntries);
   if (filter !== '') {
@@ -206,19 +212,13 @@ export default function PasswordTable({ dbc, masterPublicKey, appDataEncryptionK
             row={newEntry ? { type: 'NEW_ENTRY' } : { type: 'HIDDEN' }}
             key={'newEntry'}
             onDiscardCallback={handleDiscardEntry}
-            onSavedCallback={handleSaveCallback}
+            onSavedCallback={handleSave}
           />
         }
         {entries.map((entry) => {
-          return (
-            <TableEntry
-              row={{ type: 'VIEW_ENTRY', entry: entry }}
-              key={entry.key}
-              onSavedCallback={handleSaveCallback}
-            />
-          );
+          return <TableEntry row={{ type: 'VIEW_ENTRY', entry: entry }} key={entry.key} onSavedCallback={handleSave} />;
         })}
-        {entries.length == 0 && ( filter !== '' || selectedTag !== DEFAULT_TAGS.ALL ) && (
+        {entries.length == 0 && (filter !== '' || selectedTag !== DEFAULT_TAGS.ALL) && (
           <div
             style={{
               display: 'flex',

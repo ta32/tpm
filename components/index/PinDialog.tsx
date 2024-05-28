@@ -56,7 +56,7 @@ export default function PinDialog({ submitCallback }: PinDialogProps) {
     submitCallback(pinDialogState.pin);
   }, [pinDialogState, submitCallback]);
 
-  const pinKeyDownHandler = useCallback(
+  const handlePinKeyDown = useCallback(
     (event: KeyboardEvent) => {
       let keyCode = event.code;
       // if digit
@@ -74,11 +74,11 @@ export default function PinDialog({ submitCallback }: PinDialogProps) {
   );
 
   React.useEffect(() => {
-    window.addEventListener('keydown', pinKeyDownHandler);
+    window.addEventListener('keydown', handlePinKeyDown);
     return () => {
-      window.removeEventListener('keydown', pinKeyDownHandler);
+      window.removeEventListener('keydown', handlePinKeyDown);
     };
-  }, [pinDialogState, pinKeyDownHandler]);
+  }, [pinDialogState, handlePinKeyDown]);
 
   return (
     <div className={styles.pin_dialog}>

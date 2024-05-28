@@ -1,7 +1,7 @@
 import Styles from './TagModal.module.scss';
 import Colors from '../../../styles/colors.module.scss';
-import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import { useTagEntries, useTagEntriesDispatch } from '../../../contexts/use-tag-entries';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { useTagEntries } from '../../../contexts/use-tag-entries';
 import { getTagTitle, TagsStatus } from '../../../contexts/reducers/tag-entries-reducer';
 import { SELECTABLE_TAG_ICONS } from '../../../lib/images';
 
@@ -57,18 +57,15 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
     setShowControls(true);
   };
 
-  const handleSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const tagIcon = tagIconNamesArray[tagIconIndex];
-      const form = e.currentTarget;
-      const formData = new FormData(form);
-      const tagTitle = formData.get('title') as string;
-      const newTag: Tag = { title: tagTitle, icon: tagIcon };
-      onSubmit(newTag);
-    },
-    [onSubmit, tagIconIndex, tagIconNamesArray]
-  );
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const tagIcon = tagIconNamesArray[tagIconIndex];
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const tagTitle = formData.get('title') as string;
+    const newTag: Tag = { title: tagTitle, icon: tagIcon };
+    onSubmit(newTag);
+  };
 
   const tagIcon = tagIconNamesArray[tagIconIndex];
   const showControlsClass = showControls || mode === 'REMOVE' ? '' : Styles.hidden;

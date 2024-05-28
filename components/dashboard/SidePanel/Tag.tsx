@@ -36,7 +36,7 @@ export default function Tag({ title, icon, selected, onEdit, onRemove, id }: Tag
     setShowControls(false);
   };
 
-  const showMoreControls = selected && ! DEFAULT_TAGS.ALL ? '' : styles.hidden;
+  const showMoreControls = selected && !DEFAULT_TAGS.ALL ? '' : styles.hidden;
   const IconSvg = SELECTABLE_TAG_ICONS.get(icon) ?? AllIcon;
   return (
     <>
