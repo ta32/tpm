@@ -2,7 +2,6 @@ import { Dropbox, DropboxAuth, DropboxResponse, files } from 'dropbox';
 import { appFileName } from './appfile';
 import { readAppFile } from './dropbox';
 import { readBlob } from './utils';
-import { UserStatus } from '../contexts/reducers/user-reducer';
 
 jest.mock('./appfile');
 const mAppFileName = jest.mocked(appFileName);

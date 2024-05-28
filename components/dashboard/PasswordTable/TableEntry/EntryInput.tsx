@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styles from './EntryInput.module.scss';
 import MultiSelect from 'components/ui/MultiSelect';
-import { useTagEntries } from '../../../../contexts/use-tag-entries';
-import { getTags } from '../../../../contexts/reducers/tag-entries-reducer';
+import { useTagEntries } from 'contexts/use-tag-entries';
+import { getTags } from 'contexts/reducers/tag-entries-reducer';
+import generatePassword from 'lib/password';
 
 interface EntryInputProps {
   label: string;
@@ -13,10 +14,16 @@ interface EntryInputProps {
 }
 export default function EntryInput({ label, name, placeholder, defaultValue, type }: EntryInputProps) {
   const tagEntries = useTagEntries();
+  const [inputValue, setInputValue] = useState<string | null>(defaultValue);
   const [showSecret, setShowSecret] = useState(false);
 
   const handleToggleShowPassword = () => {
     setShowSecret(!showSecret);
+  };
+
+  const handleGeneratePassword = () => {
+    const password = generatePassword(16);
+    setInputValue(password);
   };
 
   const passwordInputType = showSecret ? 'text' : 'password';
@@ -40,7 +47,7 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
             className={styles.input}
             type={type == 'text' ? 'text' : passwordInputType}
             placeholder={placeholder}
-            defaultValue={defaultValue != null ? defaultValue : ''}
+            value={inputValue != null ? inputValue : ''}
           />
         )}
       </div>
@@ -49,7 +56,7 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
           <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
             +
           </button>
-          <button type={'button'} className={styles.control_btn}>
+          <button type={'button'} className={styles.control_btn} onClick={handleGeneratePassword}>
             #
           </button>
         </div>
