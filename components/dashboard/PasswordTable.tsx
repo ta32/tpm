@@ -179,7 +179,8 @@ export default function PasswordTable({
         <div className={styles.col2}>
           <DropdownMenu
             xOffset={-20}
-            yOffset={40}
+            yOffset={20}
+            isSelectable={true}
             initSelectedKey={0}
             button={
               <button className={styles.sort_btn}>
@@ -192,18 +193,27 @@ export default function PasswordTable({
             <div className={styles.dropdown_button}>Title</div>
             <div className={styles.dropdown_button}>Date</div>
           </DropdownMenu>
-
-          <button
-            className={styles.drop_box_btn}
-            style={{
-              backgroundSize: '1rem 1rem',
-              backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
-              backgroundPosition: '20px center',
-              backgroundRepeat: 'no-repeat',
-            }}
+          <DropdownMenu
+            xOffset={-20}
+            yOffset={20}
+            isSelectable={false}
+            onClickCallback={handleSortFilter}
+            button={
+              <button
+                className={styles.drop_box_btn}
+                style={{
+                  backgroundSize: '1rem 1rem',
+                  backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
+                  backgroundPosition: '20px center',
+                  backgroundRepeat: 'no-repeat',
+                }}
+              >
+                {accountName}
+              </button>
+            }
           >
-            {accountName}
-          </button>
+            <div className={styles.dropdown_button}>Switch user</div>
+          </DropdownMenu>
         </div>
       </div>
       <div className={styles.dashboard}>
