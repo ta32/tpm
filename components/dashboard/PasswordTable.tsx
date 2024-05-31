@@ -16,6 +16,7 @@ import DropdownMenu from '../ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
+import { useRouter } from 'next/router';
 
 interface PasswordTableProps {
   selectedTag: string;
@@ -37,6 +38,7 @@ export default function PasswordTable({
   accountName,
   selectedTag,
 }: PasswordTableProps) {
+  const router = useRouter();
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
@@ -145,6 +147,14 @@ export default function PasswordTable({
     setSortType(index); // SORT_TYPE Enum variants need to be listed in the same order in the dropdown
   };
 
+  const handleUserMenuClick = (index: number) => {
+    switch (index) {
+      case 0:
+        router.push('/').catch((err) => console.error(err));
+        break;
+    }
+  };
+
   let entries = getSafePasswordEntries(passwordEntries);
   if (filter !== '') {
     entries = entries.filter((entry) => {
@@ -197,7 +207,7 @@ export default function PasswordTable({
             xOffset={-20}
             yOffset={20}
             isSelectable={false}
-            onClickCallback={handleSortFilter}
+            onClickCallback={handleUserMenuClick}
             button={
               <button
                 className={styles.drop_box_btn}

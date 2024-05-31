@@ -1,22 +1,22 @@
 import styles from './index.module.scss';
 import Image from 'next/image';
 import TrezorConnect, {
-  DeviceEventMessage,
-  UI,
   DEVICE,
+  DeviceEventMessage,
   TransportEventMessage,
+  UI,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { DropboxAuth, DropboxResponse, users } from 'dropbox';
 import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
-import { initTrezor, getDevices, getEncryptionKey } from '../lib/trezor';
+import { getDevices, getEncryptionKey, initTrezor } from '../lib/trezor';
 import Layout from '../components/index/Layout';
 import PinDialog from '../components/index/PinDialog';
 import { useUser, useUserDispatch } from '../contexts/use-user';
-import Router from 'next/router';
 import { UserStatus } from '../contexts/reducers/user-reducer';
 import { IMAGE_FILE } from '../lib/images';
+import { useRouter } from 'next/router';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
@@ -32,6 +32,7 @@ const ADDRS_PATH = '/';
 let trezorConnectInit = false;
 
 export default function Home() {
+  const router = useRouter();
   const user = useUser();
   const userDispatch = useUserDispatch();
 
@@ -93,11 +94,7 @@ export default function Home() {
           console.error(error);
         });
     }
-    if (user.status === UserStatus.TPM_READY_TO_LOAD) {
-      // navigate to the dashboard
-      Router.push('/dashboard').catch((err) => console.error(err));
-    }
-  }, [user, userDispatch]);
+  }, [router, user, userDispatch]);
 
   useEffect(() => {
     if (!trezorConnectInit) {
@@ -119,6 +116,7 @@ export default function Home() {
     getEncryptionKey(user.device.path).then((keyPair) => {
       if (keyPair !== null) {
         userDispatch({ type: 'ACTIVATED_TMP_ON_DEVICE', keyPair });
+        router.push('/dashboard').catch((err) => console.error(err));
       } else {
         // TODO: handle error -- user decided not to activate error or pin was wrong
       }
@@ -181,26 +179,27 @@ export default function Home() {
             </div>
           </div>
         )}
-        {user.status === UserStatus.ONLINE_WITH_TREZOR && (
-          <div className={styles.dropbox_user}>
-            <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
-            <div>
-              <span>Signed in as</span>
-              <h3>
-                <b>{user.dropboxAccountName}</b>
-              </h3>
-              <ul className={styles.dev_list}>
-                <li key="1">
-                  <a onClick={openDevice}>
-                    <span className={styles.trezor_logo} style={{ backgroundImage: `url(${trezorLogo})` }} />
-                    <span className={user.device?.model == '1' ? styles.t1 : styles.t2} />
-                    <span className="nav-label">{user.device?.label || ''}</span>
-                  </a>
-                </li>
-              </ul>
+        {user.status === UserStatus.ONLINE_WITH_TREZOR ||
+          (user.status === UserStatus.TPM_READY_TO_LOAD && (
+            <div className={styles.dropbox_user}>
+              <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
+              <div>
+                <span>Signed in as</span>
+                <h3>
+                  <b>{user.dropboxAccountName}</b>
+                </h3>
+                <ul className={styles.dev_list}>
+                  <li key="1">
+                    <a onClick={openDevice}>
+                      <span className={styles.trezor_logo} style={{ backgroundImage: `url(${trezorLogo})` }} />
+                      <span className={user.device?.model == '1' ? styles.t1 : styles.t2} />
+                      <span className="nav-label">{user.device?.label || ''}</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
-        )}
+          ))}
         {user.status === UserStatus.SHOW_PIN_DIALOG && <PinDialog submitCallback={enterPin}></PinDialog>}
         {user.status === UserStatus.TREZOR_PIN_ENTERED && (
           <div className={styles.main}>
