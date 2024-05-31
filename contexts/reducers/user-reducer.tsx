@@ -27,6 +27,9 @@ export interface DropboxUserLoggedIn {
   userName: string;
   dbc: Dropbox;
 }
+export interface LogoutUser {
+  type: 'LOGOUT';
+}
 export interface AddDevice {
   type: 'ADD_DEVICE';
   device: TrezorDevice;
@@ -48,6 +51,7 @@ export interface ActivatedTmpOnDevice {
 export type UserAction =
   | LoadingDropboxApiToken
   | DropboxUserLoggedIn
+  | LogoutUser
   | AddDevice
   | RemoveDevice
   | ShowPinDialog
@@ -115,6 +119,14 @@ export function userReducer(state: User, action: UserAction): User {
       } else {
         return { ...state, status: UserStatus.ONLINE_NO_TREZOR, device: null };
       }
+    }
+    case 'LOGOUT': {
+      return {
+        ...state,
+        status: UserStatus.OFFLINE,
+        dropboxAccountName: '',
+        dbc: null,
+      };
     }
   }
 }

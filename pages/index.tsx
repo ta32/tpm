@@ -7,7 +7,7 @@ import TrezorConnect, {
   UI,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DropboxAuth, DropboxResponse, users } from 'dropbox';
 import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
 import { getDevices, getEncryptionKey, initTrezor } from '../lib/trezor';
@@ -35,6 +35,7 @@ export default function Home() {
   const router = useRouter();
   const user = useUser();
   const userDispatch = useUserDispatch();
+  const [showLogoutUrl, setShowLogoutUrl] = useState(false);
 
   const uiEventCb = useCallback(
     (event: UiEventMessage) => {
@@ -145,6 +146,15 @@ export default function Home() {
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
+  const handleShowLogoutUrl = () => {
+    setShowLogoutUrl(!showLogoutUrl);
+  };
+
+  const handleLogout = () => {
+    userDispatch({ type: 'LOGOUT' });
+    window.sessionStorage.clear();
+  };
+
   const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
 
   return (
@@ -179,15 +189,22 @@ export default function Home() {
             </div>
           </div>
         )}
-        {user.status === UserStatus.ONLINE_WITH_TREZOR ||
-          (user.status === UserStatus.TPM_READY_TO_LOAD && (
+        {(user.status === UserStatus.ONLINE_WITH_TREZOR ||
+          user.status === UserStatus.TPM_READY_TO_LOAD) && (
             <div className={styles.dropbox_user}>
               <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
               <div>
                 <span>Signed in as</span>
-                <h3>
+                <h3 onClick={handleShowLogoutUrl}>
                   <b>{user.dropboxAccountName}</b>
                 </h3>
+                {showLogoutUrl && (
+                  <a onClick={handleLogout} className={styles.logout_link} href={LOGOUT_URL} target="_blank" rel="noreferrer">
+                    <span>
+                      Logout and use a different account
+                    </span>
+                  </a>
+                )}
                 <ul className={styles.dev_list}>
                   <li key="1">
                     <a onClick={openDevice}>
@@ -199,7 +216,7 @@ export default function Home() {
                 </ul>
               </div>
             </div>
-          ))}
+          )}
         {user.status === UserStatus.SHOW_PIN_DIALOG && <PinDialog submitCallback={enterPin}></PinDialog>}
         {user.status === UserStatus.TREZOR_PIN_ENTERED && (
           <div className={styles.main}>
