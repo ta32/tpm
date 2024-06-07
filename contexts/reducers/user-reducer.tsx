@@ -3,12 +3,11 @@ import { TrezorDevice, KeyPair } from '../../lib/trezor';
 import { Dropbox } from 'dropbox';
 
 export enum UserStatus {
-  LOADING,
   ONLINE_NO_TREZOR,
   ONLINE_WITH_TREZOR,
-  SHOW_PIN_DIALOG,
+  TREZOR_REQ_PIN_AUTH,
   TREZOR_PIN_ENTERED,
-  TPM_READY_TO_LOAD,
+  TREZOR_ACTIVATED,
   OFFLINE,
 }
 export interface User {
@@ -19,9 +18,6 @@ export interface User {
 }
 
 // ACTIONS
-export interface LoadingDropboxApiToken {
-  type: 'LOADING_DROPBOX_API_TOKEN';
-}
 export interface DropboxUserLoggedIn {
   type: 'DROPBOX_USER_LOGGED_IN';
   userName: string;
@@ -49,7 +45,6 @@ export interface ActivatedTmpOnDevice {
 }
 
 export type UserAction =
-  | LoadingDropboxApiToken
   | DropboxUserLoggedIn
   | LogoutUser
   | AddDevice
@@ -60,9 +55,6 @@ export type UserAction =
 
 export function userReducer(state: User, action: UserAction): User {
   switch (action.type) {
-    case 'LOADING_DROPBOX_API_TOKEN': {
-      return { ...state, status: UserStatus.LOADING };
-    }
     case 'DROPBOX_USER_LOGGED_IN': {
       if (state.device !== null) {
         return {
@@ -99,7 +91,7 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'SHOW_PIN_DIALOG': {
-      return { ...state, status: UserStatus.SHOW_PIN_DIALOG };
+      return { ...state, status: UserStatus.TREZOR_REQ_PIN_AUTH };
     }
     case 'DEVICE_PIN_ENTERED': {
       return { ...state, status: UserStatus.TREZOR_PIN_ENTERED };
@@ -114,7 +106,7 @@ export function userReducer(state: User, action: UserAction): User {
         return {
           ...state,
           device: device,
-          status: UserStatus.TPM_READY_TO_LOAD,
+          status: UserStatus.TREZOR_ACTIVATED,
         };
       } else {
         return { ...state, status: UserStatus.ONLINE_NO_TREZOR, device: null };
