@@ -16,6 +16,7 @@ import DropdownMenu from '../ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
+import { useRouter } from 'next/router';
 
 interface PasswordTableProps {
   selectedTag: string;
@@ -37,6 +38,7 @@ export default function PasswordTable({
   accountName,
   selectedTag,
 }: PasswordTableProps) {
+  const router = useRouter();
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
@@ -145,6 +147,14 @@ export default function PasswordTable({
     setSortType(index); // SORT_TYPE Enum variants need to be listed in the same order in the dropdown
   };
 
+  const handleUserMenuClick = (index: number) => {
+    switch (index) {
+      case 0:
+        router.push('/').catch((err) => console.error(err));
+        break;
+    }
+  };
+
   let entries = getSafePasswordEntries(passwordEntries);
   if (filter !== '') {
     entries = entries.filter((entry) => {
@@ -179,7 +189,8 @@ export default function PasswordTable({
         <div className={styles.col2}>
           <DropdownMenu
             xOffset={-20}
-            yOffset={40}
+            yOffset={20}
+            isSelectable={true}
             initSelectedKey={0}
             button={
               <button className={styles.sort_btn}>
@@ -192,18 +203,27 @@ export default function PasswordTable({
             <div className={styles.dropdown_button}>Title</div>
             <div className={styles.dropdown_button}>Date</div>
           </DropdownMenu>
-
-          <button
-            className={styles.drop_box_btn}
-            style={{
-              backgroundSize: '1rem 1rem',
-              backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
-              backgroundPosition: '20px center',
-              backgroundRepeat: 'no-repeat',
-            }}
+          <DropdownMenu
+            xOffset={-20}
+            yOffset={20}
+            isSelectable={false}
+            onClickCallback={handleUserMenuClick}
+            button={
+              <button
+                className={styles.drop_box_btn}
+                style={{
+                  backgroundSize: '1rem 1rem',
+                  backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
+                  backgroundPosition: '20px center',
+                  backgroundRepeat: 'no-repeat',
+                }}
+              >
+                {accountName}
+              </button>
+            }
           >
-            {accountName}
-          </button>
+            <div className={styles.dropdown_button}>Switch user</div>
+          </DropdownMenu>
         </div>
       </div>
       <div className={styles.dashboard}>

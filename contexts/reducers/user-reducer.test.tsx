@@ -52,7 +52,7 @@ describe('User state transitions that results in the dashboard component being r
 
     // initial state for userContext so that the dashboard component is loaded
     const expectedState: User = {
-      status: UserStatus.TPM_READY_TO_LOAD,
+      status: UserStatus.TREZOR_ACTIVATED,
       device: {
         label: 'test',
         model: 'test',

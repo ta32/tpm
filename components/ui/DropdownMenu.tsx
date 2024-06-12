@@ -3,10 +3,11 @@ import styles from './DropdownMenu.module.scss';
 
 interface DropdownMenuProps {
   button: ReactElement;
-  children: React.ReactElement[];
+  children: React.ReactElement[] | React.ReactElement;
   xOffset: number;
   yOffset: number;
-  initSelectedKey: number;
+  initSelectedKey?: number;
+  isSelectable: boolean;
   onClickCallback: (index: number) => void;
 }
 
@@ -16,6 +17,7 @@ export default function DropdownMenu({
   xOffset,
   yOffset,
   initSelectedKey = 0,
+  isSelectable,
   onClickCallback,
 }: DropdownMenuProps) {
   const [show, setShow] = useState(false);
@@ -51,7 +53,7 @@ export default function DropdownMenu({
         <div onClick={handleMenuOpen}>{button}</div>
         <ul className={styles.dropdown_menu} style={{ display: display, ...pos }}>
           {React.Children.map(children, (child, index) => {
-            const isActive = selectedKey === index ? `${styles.active}` : ``;
+            const isActive = selectedKey === index && isSelectable ? `${styles.active}` : ``;
             return (
               <li className={isActive} key={index}>
                 <div

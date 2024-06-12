@@ -137,7 +137,6 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
                   console.error('Failed to clear clipboard');
                 });
               }, 10000);
-
             });
           }
         })

@@ -1,6 +1,6 @@
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 const NUMBERS = '0123456789';
-const SPECIALS = "!@#$%^&*()_+;><.:";
+const SPECIALS = '!@#$%^&*()_+;><.:';
 
 function shuffleArray(array: string[]): string[] {
   for (let i = array.length - 1; i > 0; i--) {
@@ -13,7 +13,7 @@ function shuffleArray(array: string[]): string[] {
 function getRandomValues(length: number, charset: string): string[] {
   const values = new Uint32Array(length);
   window.crypto.getRandomValues(values);
-  return Array.from(values).map(val => charset[val % charset.length]);
+  return Array.from(values).map((val) => charset[val % charset.length]);
 }
 
 export default function generatePassword(length: number): string {
