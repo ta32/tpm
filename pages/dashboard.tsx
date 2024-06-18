@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './dashboard.module.scss';
 import SidePanel from '../components/dashboard/SidePanel';
 import PasswordTable from '../components/dashboard/PasswordTable';
@@ -7,9 +7,11 @@ import { useUser, useUserDispatch } from '../contexts/use-user';
 import PinModal from '../components/ui/PinModal';
 import TrezorConnect, { UI } from '@trezor/connect-web';
 import { UserStatus } from '../contexts/reducers/user-reducer';
+import { useRouter } from 'next/router';
 
 export default function Dashboard() {
   const user = useUser();
+  const router = useRouter()
   const userDispatch = useUserDispatch();
   const [selectedTag, setSelectedTag] = useState<string>('');
   const handleTageSelect = (tagId: string) => {
@@ -20,6 +22,11 @@ export default function Dashboard() {
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
+  useEffect(() => {
+    if (user.status === UserStatus.OFFLINE) {
+      router.push('/').catch((error) => console.error('Failed to navigate to the root page:', error));
+    }
+  }, [user.status, router]);
   return (
     <div className={styles.dashboardLayout}>
       <SidePanel onSelectedTag={handleTageSelect} />
