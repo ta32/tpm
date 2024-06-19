@@ -7,6 +7,8 @@ export enum UserStatus {
   ONLINE_WITH_TREZOR,
   TREZOR_REQ_PIN_AUTH,
   TREZOR_PIN_ENTERED,
+  TREZOR_REQ_CONFIRMATION,
+  TREZOR_ENTERED_CONFIRMATION,
   TREZOR_ACTIVATED,
   OFFLINE,
 }
@@ -36,6 +38,12 @@ export interface RemoveDevice {
 export interface ShowPinDialog {
   type: 'SHOW_PIN_DIALOG';
 }
+export interface AskForConfirmation {
+  type: 'ASK_FOR_CONFIRMATION';
+}
+export interface ConfirmationEntered {
+  type: 'CONFIRMATION_ENTERED';
+}
 export interface DevicePinEntered {
   type: 'DEVICE_PIN_ENTERED';
 }
@@ -50,6 +58,8 @@ export type UserAction =
   | AddDevice
   | RemoveDevice
   | ShowPinDialog
+  | AskForConfirmation
+  | ConfirmationEntered
   | ActivatedTmpOnDevice
   | DevicePinEntered;
 
@@ -95,6 +105,12 @@ export function userReducer(state: User, action: UserAction): User {
     }
     case 'DEVICE_PIN_ENTERED': {
       return { ...state, status: UserStatus.TREZOR_PIN_ENTERED };
+    }
+    case 'ASK_FOR_CONFIRMATION': {
+      return { ...state, status: UserStatus.TREZOR_REQ_CONFIRMATION };
+    }
+    case 'CONFIRMATION_ENTERED': {
+      return { ...state, status: UserStatus.TREZOR_ENTERED_CONFIRMATION };
     }
     case 'ACTIVATED_TMP_ON_DEVICE': {
       if (state.device !== null) {

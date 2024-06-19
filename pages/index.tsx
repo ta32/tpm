@@ -17,6 +17,8 @@ import { useUser, useUserDispatch } from '../contexts/use-user';
 import { UserStatus } from '../contexts/reducers/user-reducer';
 import { IMAGE_FILE } from '../lib/images';
 import { useRouter } from 'next/router';
+import DeviceIcon from '../components/svg/ui/DeviceIcon';
+import Colors from '../styles/colors.module.scss';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
@@ -43,6 +45,16 @@ export default function Home() {
       if (event.type === UI.REQUEST_PIN) {
         userDispatch({ type: 'SHOW_PIN_DIALOG' });
       }
+      else if (event.type === UI.REQUEST_BUTTON) {
+        userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
+      }
+      else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
+        userDispatch({ type: 'CONFIRMATION_ENTERED'})
+      }
+      else {
+        console.error('Unknown UI event', event);
+      }
+
     },
     [userDispatch]
   );
@@ -236,7 +248,17 @@ export default function Home() {
           return renderTrezorList();
         case UserStatus.TREZOR_REQ_PIN_AUTH:
           return <PinDialog submitCallback={enterPin}></PinDialog>;
+        case UserStatus.TREZOR_REQ_CONFIRMATION:
+          return (
+            <div className={styles.main}>
+              <h1>Follow the instructions on your</h1>
+              <h1><b>{user.device?.label}</b> device</h1>
+              <DeviceIcon width={100} fill={Colors.red} />
+              <span className={styles.spinner}></span>
+            </div>
+          );
         case UserStatus.TREZOR_PIN_ENTERED:
+        case UserStatus.TREZOR_ENTERED_CONFIRMATION:
           return (
             <div className={styles.main}>
               <h1>Waking up ...</h1>
