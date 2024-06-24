@@ -26,6 +26,11 @@
   }
 }
 
+.desc {
+ color: colors.$soft_white;
+ font-size: 2.1em;
+}
+
 .icon_over_button {
   position: absolute;
   top: 50%;
@@ -165,3 +170,9 @@
   background-position: center;
   background-size: auto 30px;
 }
+
+.device_logo {
+  padding: 20px 0 20px 0;
+}
+
+

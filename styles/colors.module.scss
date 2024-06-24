@@ -1,16 +1,16 @@
 
 $white: #fff;
+$soft_white:  rgba(#fff, 0.7);
 
 $grey_bg: #f6f7f8;
+$highlight_bg: rgba($grey_bg, .9);
+
 $grey_bg_header_hover: #edf1f2;
 $grey_border: #E9E9E9;
 $grey_font: #b4b6bd;
 $grey_font_header_links: #979898;
 $grey_content_font: #797979;
 $grey_content_bg: #797979;
-
-$highlight_bg: rgba($grey_bg, .9);
-
 
 $black_font: #424242;
 $black: #494949;
@@ -28,6 +28,7 @@ $pink: #EF6088;
 
 :export {
     white: $white;
+    soft_white: $soft_white;
     grey_bg: $grey_bg;
     grey_bg_header_hover: $grey_bg_header_hover;
     grey_border: $grey_border;

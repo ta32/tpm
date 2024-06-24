@@ -251,10 +251,11 @@ export default function Home() {
         case UserStatus.TREZOR_REQ_CONFIRMATION:
           return (
             <div className={styles.main}>
-              <h1>Follow the instructions on your</h1>
-              <h1><b>{user.device?.label}</b> device</h1>
-              <DeviceIcon width={100} fill={Colors.red} />
-              <span className={styles.spinner}></span>
+              <div className={styles.device_logo}>
+                <DeviceIcon width={50} fill={Colors.soft_white} />
+              </div>
+              <span className={styles.desc}>Follow the instructions on your</span>
+              <span className={styles.desc}><b>{user.device?.label}</b> device</span>
             </div>
           );
         case UserStatus.TREZOR_PIN_ENTERED:
