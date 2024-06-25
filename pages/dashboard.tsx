@@ -10,9 +10,9 @@ import { UserStatus } from '../contexts/reducers/user-reducer';
 import { useRouter } from 'next/router';
 
 export default function Dashboard() {
-  const user = useUser();
+  const [user] = useUser();
   const router = useRouter();
-  const userDispatch = useUserDispatch();
+  const [userDispatch] = useUserDispatch();
   const [selectedTag, setSelectedTag] = useState<string>('');
   const handleTageSelect = (tagId: string) => {
     setSelectedTag(tagId);

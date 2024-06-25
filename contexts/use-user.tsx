@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, useContext, useReducer } from 'react';
+import React, { createContext, Dispatch, MutableRefObject, useContext, useEffect, useReducer, useRef } from 'react';
 import { User, UserAction, userReducer, UserStatus } from './reducers/user-reducer';
 import { Dropbox } from 'dropbox';
 export { type User } from './reducers/user-reducer';
@@ -50,14 +50,25 @@ const initialUser = {
 //   dbc: new Dropbox()
 // }
 
-const UserContext = createContext<User | undefined>(undefined);
-const UserDispatchContext = createContext<Dispatch<UserAction> | undefined>(undefined);
+type UserContextType = [User, MutableRefObject<User>];
+type UserDispatchContextType = [Dispatch<UserAction>, MutableRefObject<Dispatch<UserAction>>];
+
+const UserContext = createContext<UserContextType| undefined>(undefined);
+const UserDispatchContext = createContext<UserDispatchContextType| undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, dispatch] = useReducer(userReducer, initialUser);
+  const [user, userDispatch] = useReducer(userReducer, initialUser);
+  const userRef = useRef(user);
+  const userDispatchRef = useRef(userDispatch);
+
+  useEffect(() => {
+    userRef.current = user;
+    userDispatchRef.current = userDispatch;
+  }, [user, userDispatch]);
+
   return (
-    <UserContext.Provider value={user}>
-      <UserDispatchContext.Provider value={dispatch}>{children}</UserDispatchContext.Provider>
+    <UserContext.Provider value={[user, userRef ]}>
+      <UserDispatchContext.Provider value={[userDispatch, userDispatchRef]}>{children}</UserDispatchContext.Provider>
     </UserContext.Provider>
   );
 }

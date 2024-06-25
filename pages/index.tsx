@@ -7,7 +7,7 @@ import TrezorConnect, {
   UI,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DropboxAuth, DropboxResponse, users } from 'dropbox';
 import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
 import { getDevices, getEncryptionKey, initTrezor } from '../lib/trezor';
@@ -35,50 +35,10 @@ let trezorConnectInit = false;
 
 export default function Home() {
   const router = useRouter();
-  const user = useUser();
-  const userDispatch = useUserDispatch();
+  const [user, userRef ] = useUser();
+  const [userDispatch, userDispatchRef] = useUserDispatch();
   const [loading, setLoading] = useState(false);
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
-
-  const uiEventCb = useCallback(
-    (event: UiEventMessage) => {
-      if (event.type === UI.REQUEST_PIN) {
-        userDispatch({ type: 'SHOW_PIN_DIALOG' });
-      } else if (event.type === UI.REQUEST_BUTTON) {
-        userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
-      } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
-        userDispatch({ type: 'CONFIRMATION_ENTERED' });
-      } else {
-        console.error('Unknown UI event', event);
-      }
-    },
-    [user.status, userDispatch]
-  );
-
-  const transportEventCb = useCallback((event: TransportEventMessage) => {}, []);
-  const updateDevice = useCallback(
-    (event: DeviceEventMessage) => {
-      console.log('Device event', event);
-      if (event.type === DEVICE.CONNECT) {
-        getDevices()
-          .then((device) => {
-            if (device !== null) {
-              userDispatch({ type: 'ADD_DEVICE', device: device });
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            return;
-          });
-      } else if (event.type === DEVICE.CONNECT_UNACQUIRED) {
-        userDispatch({ type: 'ADD_DEVICE', device: null });
-      }
-      if (event.type === DEVICE.DISCONNECT) {
-        userDispatch({ type: 'REMOVE_DEVICE' });
-      }
-    },
-    [userDispatch]
-  );
 
   useEffect(() => {
     let codeVerifier = window.sessionStorage.getItem('codeVerifier');
@@ -112,6 +72,40 @@ export default function Home() {
 
   useEffect(() => {
     if (!trezorConnectInit) {
+      const transportEventCb = (event: TransportEventMessage) => {};
+      const uiEventCb = (event: UiEventMessage) => {
+          const user = userRef.current;
+          const userDispatch = userDispatchRef.current;
+          if (event.type === UI.REQUEST_PIN) {
+            userDispatch({ type: 'SHOW_PIN_DIALOG' });
+          } else if (event.type === UI.REQUEST_BUTTON) {
+            userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
+          } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
+            userDispatch({ type: 'CONFIRMATION_ENTERED' });
+          } else {
+            console.error('Unknown UI event', event);
+          }
+      };
+      const updateDevice = (event: DeviceEventMessage) => {
+          const userDispatch = userDispatchRef.current;
+          if (event.type === DEVICE.CONNECT) {
+            getDevices()
+              .then((device) => {
+                if (device !== null) {
+                  userDispatch({ type: 'ADD_DEVICE', device: device });
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+                return;
+              });
+          } else if (event.type === DEVICE.CONNECT_UNACQUIRED) {
+            userDispatch({ type: 'ADD_DEVICE', device: null });
+          }
+          if (event.type === DEVICE.DISCONNECT) {
+            userDispatch({ type: 'REMOVE_DEVICE' });
+          }
+      };
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
       initTrezor(APP_URL, trustedHost, updateDevice, transportEventCb, uiEventCb).catch((error) => {
         // FATAL ERROR
@@ -120,7 +114,9 @@ export default function Home() {
       });
     }
     trezorConnectInit = true;
-  }, [updateDevice, transportEventCb, uiEventCb]);
+    // Note: eslint is wrong userRef and userDispatchRef are refs that are passed through the context
+    // adding them to array so eslint will check for other issues
+  }, [userDispatchRef, userRef]);
 
   const loadDashboard = () => {
     setLoading(true);
