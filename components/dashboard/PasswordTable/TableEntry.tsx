@@ -57,7 +57,6 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
-    form.reset();
     const newEntry: ClearPasswordEntry = {
       key: '', // key is determined by the reducer for new entries
       item: formData.get('item') as string,
@@ -93,8 +92,11 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
         })
         .catch((err) => {
           setEntryState({ type: 'ERROR', error: 'Error encrypting entry' });
-        });
+        }).finally(() => {
+        form.reset();
+      });
     } else {
+      form.reset();
       setEntryState({
         type: 'ERROR',
         error: 'Password entries are not synced yet',
