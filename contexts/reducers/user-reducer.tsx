@@ -9,6 +9,7 @@ export enum UserStatus {
   TREZOR_PIN_ENTERED,
   TREZOR_REQ_CONFIRMATION,
   TREZOR_ENTERED_CONFIRMATION,
+  TREZOR_UNACQUIRED_DEVICE,
   TREZOR_ACTIVATED,
   OFFLINE,
 }
@@ -30,7 +31,7 @@ export interface LogoutUser {
 }
 export interface AddDevice {
   type: 'ADD_DEVICE';
-  device: TrezorDevice;
+  device: TrezorDevice | null;
 }
 export interface RemoveDevice {
   type: 'REMOVE_DEVICE';
@@ -83,6 +84,12 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'ADD_DEVICE': {
+      if (action.device === null && state.status === UserStatus.ONLINE_NO_TREZOR) {
+        return {
+          ...state,
+          status: UserStatus.TREZOR_UNACQUIRED_DEVICE,
+        };
+      }
       if (state.status === UserStatus.ONLINE_NO_TREZOR) {
         return {
           ...state,
@@ -94,7 +101,7 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'REMOVE_DEVICE': {
-      if (state.status === UserStatus.ONLINE_WITH_TREZOR) {
+      if (state.status === UserStatus.ONLINE_WITH_TREZOR || state.status === UserStatus.TREZOR_UNACQUIRED_DEVICE) {
         return { ...state, status: UserStatus.ONLINE_NO_TREZOR, device: null };
       } else {
         return { ...state, device: null };

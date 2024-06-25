@@ -1,5 +1,5 @@
 import React from 'react';
-import { SVGProps } from 'react'
+import { SVGProps } from 'react';
 import svgPath from '/assets/ui/device.svg';
 
 // Copied the path from glyph-name="device" in the "icomoon.svg" file in the original project

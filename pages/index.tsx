@@ -44,24 +44,21 @@ export default function Home() {
     (event: UiEventMessage) => {
       if (event.type === UI.REQUEST_PIN) {
         userDispatch({ type: 'SHOW_PIN_DIALOG' });
-      }
-      else if (event.type === UI.REQUEST_BUTTON) {
+      } else if (event.type === UI.REQUEST_BUTTON) {
         userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
-      }
-      else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
-        userDispatch({ type: 'CONFIRMATION_ENTERED'})
-      }
-      else {
+      } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
+        userDispatch({ type: 'CONFIRMATION_ENTERED' });
+      } else {
         console.error('Unknown UI event', event);
       }
-
     },
-    [userDispatch]
+    [user.status, userDispatch]
   );
 
   const transportEventCb = useCallback((event: TransportEventMessage) => {}, []);
   const updateDevice = useCallback(
     (event: DeviceEventMessage) => {
+      console.log('Device event', event);
       if (event.type === DEVICE.CONNECT) {
         getDevices()
           .then((device) => {
@@ -73,6 +70,8 @@ export default function Home() {
             console.error(error);
             return;
           });
+      } else if (event.type === DEVICE.CONNECT_UNACQUIRED) {
+        userDispatch({ type: 'ADD_DEVICE', device: null });
       }
       if (event.type === DEVICE.DISCONNECT) {
         userDispatch({ type: 'REMOVE_DEVICE' });
@@ -255,7 +254,21 @@ export default function Home() {
                 <DeviceIcon width={50} fill={Colors.soft_white} />
               </div>
               <span className={styles.desc}>Follow the instructions on your</span>
-              <span className={styles.desc}><b>{user.device?.label}</b> device</span>
+              <span className={styles.desc}>
+                <b>{user.device?.label}</b> device
+              </span>
+            </div>
+          );
+        case UserStatus.TREZOR_UNACQUIRED_DEVICE:
+          return (
+            <div className={styles.main}>
+              <div className={styles.device_logo}>
+                <DeviceIcon width={50} fill={Colors.soft_white} />
+              </div>
+              <span className={styles.desc}>Device is used elsewhere</span>
+              <span className={styles.desc}>
+                <b>Reconnect</b> your device
+              </span>
             </div>
           );
         case UserStatus.TREZOR_PIN_ENTERED:
