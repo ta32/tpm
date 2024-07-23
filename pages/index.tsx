@@ -7,67 +7,33 @@ import TrezorConnect, {
   UI,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DropboxAuth, DropboxResponse, users } from 'dropbox';
 import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
-import { getDevices, getEncryptionKey, initTrezor } from '../lib/trezor';
+import { setTrezorEventHandlers, getDevices, getEncryptionKey, initTrezor } from '../lib/trezor';
 import Layout from '../components/index/Layout';
 import PinDialog from '../components/index/PinDialog';
 import { useUser, useUserDispatch } from '../contexts/use-user';
 import { UserStatus } from '../contexts/reducers/user-reducer';
 import { IMAGE_FILE } from '../lib/images';
 import { useRouter } from 'next/router';
+import DeviceIcon from '../components/svg/ui/DeviceIcon';
+import Colors from '../styles/colors.module.scss';
 
-const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : 'http://localhost:3000/';
-// Trezor bridge whitelists localhost and trezor.io domains
-const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 const STORAGE = 'tpmDropboxToken';
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
-const ADDRS_PATH = '/';
-
-let trezorConnectInit = false;
+const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+  : 'http://localhost:3000/';
 
 export default function Home() {
   const router = useRouter();
-  const user = useUser();
-  const userDispatch = useUserDispatch();
+  const [user, userRef ] = useUser();
+  const [userDispatch, userDispatchRef] = useUserDispatch();
   const [loading, setLoading] = useState(false);
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
-
-  const uiEventCb = useCallback(
-    (event: UiEventMessage) => {
-      if (event.type === UI.REQUEST_PIN) {
-        userDispatch({ type: 'SHOW_PIN_DIALOG' });
-      }
-    },
-    [userDispatch]
-  );
-
-  const transportEventCb = useCallback((event: TransportEventMessage) => {}, []);
-  const updateDevice = useCallback(
-    (event: DeviceEventMessage) => {
-      if (event.type === DEVICE.CONNECT) {
-        getDevices()
-          .then((device) => {
-            if (device !== null) {
-              userDispatch({ type: 'ADD_DEVICE', device: device });
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            return;
-          });
-      }
-      if (event.type === DEVICE.DISCONNECT) {
-        userDispatch({ type: 'REMOVE_DEVICE' });
-      }
-    },
-    [userDispatch]
-  );
 
   useEffect(() => {
     let codeVerifier = window.sessionStorage.getItem('codeVerifier');
@@ -100,16 +66,42 @@ export default function Home() {
   }, [router, user, userDispatch]);
 
   useEffect(() => {
-    if (!trezorConnectInit) {
-      const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
-      initTrezor(APP_URL, trustedHost, updateDevice, transportEventCb, uiEventCb).catch((error) => {
-        // FATAL ERROR
-        console.error(error);
-        return;
-      });
-    }
-    trezorConnectInit = true;
-  }, [updateDevice, transportEventCb, uiEventCb]);
+    const transportEventCb = (event: TransportEventMessage) => {};
+    const uiEventCb = (event: UiEventMessage) => {
+        const user = userRef.current;
+        const userDispatch = userDispatchRef.current;
+        if (event.type === UI.REQUEST_PIN) {
+          userDispatch({ type: 'SHOW_PIN_DIALOG' });
+        } else if (event.type === UI.REQUEST_BUTTON) {
+          userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
+        } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
+          userDispatch({ type: 'CONFIRMATION_ENTERED' });
+        } else {
+          console.error('Unknown UI event', event);
+        }
+    };
+    const updateDevice = (event: DeviceEventMessage) => {
+        const userDispatch = userDispatchRef.current;
+        if (event.type === DEVICE.CONNECT) {
+          getDevices()
+            .then((device) => {
+              if (device !== null) {
+                userDispatch({ type: 'ADD_DEVICE', device: device });
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+              return;
+            });
+        } else if (event.type === DEVICE.CONNECT_UNACQUIRED) {
+          userDispatch({ type: 'ADD_DEVICE', device: null });
+        }
+        if (event.type === DEVICE.DISCONNECT) {
+          userDispatch({ type: 'REMOVE_DEVICE' });
+        }
+    };
+    setTrezorEventHandlers(updateDevice, transportEventCb, uiEventCb);
+  }, [userDispatchRef, userRef]);
 
   const loadDashboard = () => {
     setLoading(true);
@@ -236,7 +228,32 @@ export default function Home() {
           return renderTrezorList();
         case UserStatus.TREZOR_REQ_PIN_AUTH:
           return <PinDialog submitCallback={enterPin}></PinDialog>;
+        case UserStatus.TREZOR_REQ_CONFIRMATION:
+          return (
+            <div className={styles.main}>
+              <div className={styles.device_logo}>
+                <DeviceIcon width={50} fill={Colors.soft_white} />
+              </div>
+              <span className={styles.desc}>Follow the instructions on your</span>
+              <span className={styles.desc}>
+                <b>{user.device?.label}</b> device
+              </span>
+            </div>
+          );
+        case UserStatus.TREZOR_UNACQUIRED_DEVICE:
+          return (
+            <div className={styles.main}>
+              <div className={styles.device_logo}>
+                <DeviceIcon width={50} fill={Colors.soft_white} />
+              </div>
+              <span className={styles.desc}>Device is used elsewhere</span>
+              <span className={styles.desc}>
+                <b>Reconnect</b> your device
+              </span>
+            </div>
+          );
         case UserStatus.TREZOR_PIN_ENTERED:
+        case UserStatus.TREZOR_ENTERED_CONFIRMATION:
           return (
             <div className={styles.main}>
               <h1>Waking up ...</h1>

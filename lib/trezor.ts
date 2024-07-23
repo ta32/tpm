@@ -51,9 +51,6 @@ export interface ClearPasswordEntry {
 export async function initTrezor(
   appUrl: string,
   trustedHost: boolean,
-  deviceEventCallback: (event: DeviceEventMessage) => void,
-  transportEventCallback: (event: TransportEventMessage) => void,
-  uiEventCallback: (event: UiEventMessage) => void
 ) {
   await TrezorConnect.init({
     transportReconnect: true,
@@ -74,9 +71,20 @@ export async function initTrezor(
       challengeVisual: 'Login to Tmp Password Manager',
     });
   }
+}
+
+export function setTrezorEventHandlers(
+  deviceEventCallback: (event: DeviceEventMessage) => void,
+  transportEventCallback: (event: TransportEventMessage) => void,
+  uiEventCallback: (event: UiEventMessage) => void
+) {
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
   TrezorConnect.on(TRANSPORT_EVENT, transportEventCallback);
   TrezorConnect.on(UI_EVENT, uiEventCallback);
+}
+
+export async function trezorDispose() {
+  await TrezorConnect.dispose();
 }
 
 export async function getDevices(): Promise<TrezorDevice | null> {

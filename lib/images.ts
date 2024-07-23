@@ -68,6 +68,7 @@ export class IMAGE_FILE {
   static CONNECT_TREZOR = new IMAGE_FILE('connect-trezor.svg', IMG_PATH.TREZOR);
   static TREZOR_1 = new IMAGE_FILE('t1.png', IMG_PATH.TREZOR);
   static TREZOR_2 = new IMAGE_FILE('t2.png', IMG_PATH.TREZOR);
+  static TREZOR_BUTTON = new IMAGE_FILE('trezor_button.png', IMG_PATH.TREZOR);
   static TPM_LOGO = new IMAGE_FILE('tpm-logo.svg', IMG_PATH.APP);
   static BACKGROUND = new IMAGE_FILE('tmp_background.png', IMG_PATH.BACKGROUND);
   constructor(

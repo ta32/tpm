@@ -1,4 +1,5 @@
-@use "../../../styles/colors.module";
+@use "styles/colors.module";
+@use "styles/animations";
 @use "styles/mixins";
 
 $avatar_size: 50px;
@@ -26,6 +27,12 @@ $account_info_controls_margin: 2rem;
   margin-right: 1rem;
  }
 
+.clickable {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .card {
   display: block;
   width: 100%;
@@ -35,6 +42,10 @@ $account_info_controls_margin: 2rem;
 
   &:hover {
     background: rgba(colors.$grey_bg, .9);
+  }
+
+  &.unlocking {
+    background-color: colors.$white;
   }
 
   .entry {
@@ -52,6 +63,16 @@ $account_info_controls_margin: 2rem;
         visibility: visible !important;
       }
     }
+
+    &.unlocking {
+      .password_shadow {
+        visibility: hidden !important;
+      }
+      .edit_btn {
+        visibility: hidden !important;
+      }
+    }
+
     .account_info {
       margin: 1rem 0;
       display: flex;
@@ -70,12 +91,14 @@ $account_info_controls_margin: 2rem;
       display: flex;
       position: relative;
       margin: 15px 15px 10px 20px;
-      background-color: rgba(colors.$grey_content_font, .4);
       border-radius: 4px;
       height: $avatar_size;
       width: $avatar_size;
       img {
         position: absolute;
+      }
+      &.shaded {
+        background-color: rgba(colors.$grey_content_font, .4);
       }
     }
 
@@ -94,14 +117,17 @@ $account_info_controls_margin: 2rem;
       }
     }
 
-
     .title {
       padding-left: 1rem;
       display: inline;
       font-size: 1rem;
-      color: colors.$black_font;
+      color: colors.$grey_content_font;
       text-overflow: ellipsis;
       white-space: nowrap;
+
+    }
+    strong.title {
+      font-size: 1.3rem;
     }
 
     .credentials {
@@ -121,10 +147,6 @@ $account_info_controls_margin: 2rem;
 
       .label {
         margin-bottom: 0.25rem;
-
-        &:hover {
-          cursor: pointer;
-        }
       }
 
       .password_shadow {
@@ -188,6 +210,12 @@ $account_info_controls_margin: 2rem;
 
 .pointer {
   cursor: pointer;
+}
+
+.trezor_btn {
+  background: linear-gradient(colors.$blue_dark_very_much, colors.$blue);
+  padding: 0 5px 10px 5px;
+  animation: shake 1.2s cubic-bezier(0.36, 0.07, 0, 0.1) infinite;
 }
 
 .save_btn {

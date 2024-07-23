@@ -44,6 +44,7 @@ export default function PasswordTable({
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [rev, setRev] = useState('');
+  const [lockEntries, setLockEntries] = useState(false);
   const [newEntry, setNewEntry] = useState(false);
   const [filter, setFilter] = useState('');
   const [sortType, setSortType] = useState(SortType.TITLE);
@@ -147,6 +148,11 @@ export default function PasswordTable({
     setSortType(index); // SORT_TYPE Enum variants need to be listed in the same order in the dropdown
   };
 
+  const onLockChange = (status: boolean) => {
+    // when editing an entry, lock all other entries
+    setLockEntries(status);
+  }
+
   const handleUserMenuClick = (index: number) => {
     switch (index) {
       case 0:
@@ -229,6 +235,7 @@ export default function PasswordTable({
       <div className={styles.dashboard}>
         {
           <TableEntry
+            locked={false}
             row={newEntry ? { type: 'NEW_ENTRY' } : { type: 'HIDDEN' }}
             key={'newEntry'}
             onDiscardCallback={handleDiscardEntry}
@@ -236,7 +243,7 @@ export default function PasswordTable({
           />
         }
         {entries.map((entry) => {
-          return <TableEntry row={{ type: 'VIEW_ENTRY', entry: entry }} key={entry.key} onSavedCallback={handleSave} />;
+          return <TableEntry locked={lockEntries} row={{ type: 'VIEW_ENTRY', entry: entry }} key={entry.key} onSavedCallback={handleSave} onLockChange={onLockChange} />;
         })}
         {entries.length == 0 && (filter !== '' || selectedTag !== DEFAULT_TAGS.ALL) && (
           <div

@@ -7,6 +7,9 @@ export enum UserStatus {
   ONLINE_WITH_TREZOR,
   TREZOR_REQ_PIN_AUTH,
   TREZOR_PIN_ENTERED,
+  TREZOR_REQ_CONFIRMATION,
+  TREZOR_ENTERED_CONFIRMATION,
+  TREZOR_UNACQUIRED_DEVICE,
   TREZOR_ACTIVATED,
   OFFLINE,
 }
@@ -28,13 +31,19 @@ export interface LogoutUser {
 }
 export interface AddDevice {
   type: 'ADD_DEVICE';
-  device: TrezorDevice;
+  device: TrezorDevice | null;
 }
 export interface RemoveDevice {
   type: 'REMOVE_DEVICE';
 }
 export interface ShowPinDialog {
   type: 'SHOW_PIN_DIALOG';
+}
+export interface AskForConfirmation {
+  type: 'ASK_FOR_CONFIRMATION';
+}
+export interface ConfirmationEntered {
+  type: 'CONFIRMATION_ENTERED';
 }
 export interface DevicePinEntered {
   type: 'DEVICE_PIN_ENTERED';
@@ -50,6 +59,8 @@ export type UserAction =
   | AddDevice
   | RemoveDevice
   | ShowPinDialog
+  | AskForConfirmation
+  | ConfirmationEntered
   | ActivatedTmpOnDevice
   | DevicePinEntered;
 
@@ -73,6 +84,12 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'ADD_DEVICE': {
+      if (action.device === null && state.status === UserStatus.ONLINE_NO_TREZOR) {
+        return {
+          ...state,
+          status: UserStatus.TREZOR_UNACQUIRED_DEVICE,
+        };
+      }
       if (state.status === UserStatus.ONLINE_NO_TREZOR) {
         return {
           ...state,
@@ -84,7 +101,7 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'REMOVE_DEVICE': {
-      if (state.status === UserStatus.ONLINE_WITH_TREZOR) {
+      if (state.status === UserStatus.ONLINE_WITH_TREZOR || state.status === UserStatus.TREZOR_UNACQUIRED_DEVICE) {
         return { ...state, status: UserStatus.ONLINE_NO_TREZOR, device: null };
       } else {
         return { ...state, device: null };
@@ -95,6 +112,12 @@ export function userReducer(state: User, action: UserAction): User {
     }
     case 'DEVICE_PIN_ENTERED': {
       return { ...state, status: UserStatus.TREZOR_PIN_ENTERED };
+    }
+    case 'ASK_FOR_CONFIRMATION': {
+      return { ...state, status: UserStatus.TREZOR_REQ_CONFIRMATION };
+    }
+    case 'CONFIRMATION_ENTERED': {
+      return { ...state, status: UserStatus.TREZOR_ENTERED_CONFIRMATION };
     }
     case 'ACTIVATED_TMP_ON_DEVICE': {
       if (state.device !== null) {

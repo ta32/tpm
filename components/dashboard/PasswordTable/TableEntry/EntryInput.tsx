@@ -47,7 +47,7 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
             className={styles.input}
             type={type == 'text' ? 'text' : passwordInputType}
             placeholder={placeholder}
-            value={inputValue != null ? inputValue : ''}
+            defaultValue={inputValue != null ? inputValue : ''}
           />
         )}
       </div>

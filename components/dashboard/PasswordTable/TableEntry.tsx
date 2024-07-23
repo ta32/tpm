@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import styles from './TableEntry.module.scss';
 import Image from 'next/image';
 import { IoAddCircleOutline } from 'react-icons/io5';
@@ -9,6 +9,8 @@ import { PasswordEntriesStatus, SafePasswordEntry } from '../../../contexts/redu
 import { IMAGE_FILE } from '../../../lib/images';
 import DeleteIcon from '../../svg/ui/DeleteIcon';
 import DeleteModal from './TableEntry/DeleteModal';
+import { useUser } from '../../../contexts/use-user';
+import { UserStatus } from '../../../contexts/reducers/user-reducer';
 
 interface Init {
   type: 'INIT';
@@ -42,11 +44,14 @@ interface Hidden {
 }
 
 interface TableEntryProps {
+  locked: boolean;
   row: NewEntry | ViewEntry | Hidden;
   onDiscardCallback?: () => void;
+  onLockChange?: (status: boolean) => void;
   onSavedCallback: () => void;
 }
-export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: TableEntryProps) {
+export default function TableEntry({locked, onLockChange, onDiscardCallback, onSavedCallback, row }: TableEntryProps) {
+  const [user] = useUser();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -57,7 +62,6 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
-    form.reset();
     const newEntry: ClearPasswordEntry = {
       key: '', // key is determined by the reducer for new entries
       item: formData.get('item') as string,
@@ -90,11 +94,17 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
           }
           setEntryState({ type: 'INIT' });
           onSavedCallback();
+          if (onLockChange) {
+            onLockChange(false);
+          }
         })
         .catch((err) => {
           setEntryState({ type: 'ERROR', error: 'Error encrypting entry' });
-        });
+        }).finally(() => {
+        form.reset();
+      });
     } else {
+      form.reset();
       setEntryState({
         type: 'ERROR',
         error: 'Password entries are not synced yet',
@@ -106,20 +116,31 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
     if (onDiscardCallback) {
       onDiscardCallback();
     }
+    if (onLockChange) {
+      onLockChange(false);
+    }
   };
   const handleEditEntry = () => {
     if (row.type === 'VIEW_ENTRY') {
+      if (onLockChange) {
+        onLockChange(true);
+      }
       setEntryState({ type: 'DECRYPTING' });
       const safeEntry = row.entry;
       decryptFullEntry(safeEntry)
         .then((clearEntry) => {
           if (clearEntry != null) {
             setEntryState({ type: 'DECRYPTED', clearEntry: clearEntry });
+          } else {
+            if (onLockChange) {
+              onLockChange(false);
+            }
+            setEntryState({type: 'INIT'});
           }
         })
         .catch((err) => {
           setEntryState({ type: 'ERROR', error: err });
-        });
+      });
     }
     return; // Unreachable, edit is only possible when mode is VIEW_ENTRY
   };
@@ -191,8 +212,75 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
   const password = clearEntry?.password ?? formData?.password ?? '';
   const secretNote = clearEntry?.safeNote ?? formData?.safeNote ?? '';
   const tags = clearEntry?.tags ?? formData?.tags ?? '';
+
+  const renderIcon = (unlocking: boolean) => {
+    const stateStyles = {
+      UNLOCKING: {
+        avatarClassName: styles.avatar_mini,
+        className: styles.trezor_btn,
+        iconPath: IMAGE_FILE.TREZOR_BUTTON.path()
+      },
+      DEFAULT: {
+        avatarClassName: `${styles.avatar_mini} ${styles.shaded}`,
+        className: '',
+        iconPath: IMAGE_FILE.TRANSPARENT_PNG.path()
+      }
+    };
+    const { avatarClassName, className, iconPath } = unlocking ? stateStyles.UNLOCKING : stateStyles.DEFAULT;
+    return (
+      <div className={avatarClassName}>
+        <Image
+          className={className}
+          src={iconPath}
+          height={50}
+          width={50}
+          alt="avatar"
+        />
+      </div>
+    )
+  };
+  const renderAccountInfo = (row: ViewEntry, unlocking: boolean) => {
+    if (unlocking) {
+      return (
+        <div className={styles.account_info}>
+          <strong className={styles.title}>{'Look at Trezor!'}</strong>
+          <div className={styles.credentials}>
+            <div className={styles.label}>{'Editing entry'}</div>
+          </div>
+        </div>
+      )
+    }
+    else {
+        return (
+        <div className={styles.account_info}>
+          <label className={styles.title}>{ row.entry.title}</label>
+          <div className={styles.credentials}>
+            <div className={styles.tooltip}>
+              <div className={`${styles.label} ${styles.clickable}`} onClick={() => copyToClipboard(row.entry.username)}>
+                { row.entry.username}
+              </div>
+              <span className={styles.tooltip_text}>{copiedUsername ? 'Copied!' : 'Copy username'}</span>
+            </div>
+            <div className={styles.tooltip} onClick={handleCopyPassword}>
+              <input
+                className={styles.password_shadow}
+                title={'Copy to clipboard'}
+                type="password"
+                value={'password'}
+                readOnly
+              />
+              <span className={styles.tooltip_text}>Copy password</span>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  const unlocking = entryState.type === 'DECRYPTING' && user.status === UserStatus.TREZOR_REQ_CONFIRMATION;
+
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${unlocking ? styles.unlocking: ''}`}>
       <DeleteModal
         entryName={title}
         show={showDeleteModal}
@@ -239,42 +327,16 @@ export default function TableEntry({ onDiscardCallback, onSavedCallback, row }: 
         </form>
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
-        <div className={styles.entry}>
-          <div className={styles.avatar_mini}>
-            <Image
-              src={IMAGE_FILE.TRANSPARENT_PNG.path()} // TODO: this is from the old tpm code -- understand what this does
-              height={50}
-              width={50}
-              alt="avatar"
-            />
-            <IoAddCircleOutline className={styles.icon}></IoAddCircleOutline>
-          </div>
-          <div className={styles.account_info}>
-            <label className={styles.title}>{row.entry.title}</label>
-            <div className={styles.credentials}>
-              <div className={styles.tooltip}>
-                <div className={styles.label} onClick={() => copyToClipboard(row.entry.username)}>
-                  {row.entry.username}
-                </div>
-                <span className={styles.tooltip_text}>{copiedUsername ? 'Copied!' : 'Copy username'}</span>
-              </div>
-              <div className={styles.tooltip} onClick={handleCopyPassword}>
-                <input
-                  className={styles.password_shadow}
-                  title={'Copy to clipboard'}
-                  type="password"
-                  value={'password'}
-                  readOnly
-                />
-                <span className={styles.tooltip_text}>Copy password</span>
-              </div>
+        <div className={`${styles.entry} ${unlocking? styles.unlocking: ''}`}>
+          {renderIcon(unlocking)}
+          {renderAccountInfo(row, unlocking)}
+          {!locked && (
+            <div className={styles.account_info_controls}>
+              <button className={styles.edit_btn} onClick={handleEditEntry}>
+                Edit
+              </button>
             </div>
-          </div>
-          <div className={styles.account_info_controls}>
-            <button className={styles.edit_btn} onClick={handleEditEntry}>
-              Edit
-            </button>
-          </div>
+          )}
         </div>
       )}
     </div>
