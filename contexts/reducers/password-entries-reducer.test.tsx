@@ -34,7 +34,7 @@ function entry(num: number): SafePasswordEntry {
     passwordEnc: new Uint8Array([num]),
     secretNoteEnc: new Uint8Array([num]),
     safeKey: `safeKey${num}`,
-    tags: `tag${num}`,
+    tags: [`tag${num}`],
     createdDate: 0,
     lastModifiedDate: 0,
   };

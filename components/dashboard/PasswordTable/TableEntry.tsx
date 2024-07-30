@@ -3,9 +3,9 @@ import styles from './TableEntry.module.scss';
 import Image from 'next/image';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import EntryInput from './TableEntry/EntryInput';
-import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry } from '../../../lib/trezor';
+import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry, SafePasswordEntry } from '../../../lib/trezor';
 import { usePasswordEntries, usePasswordEntriesDispatch } from '../../../contexts/use-password-entries';
-import { PasswordEntriesStatus, SafePasswordEntry } from '../../../contexts/reducers/password-entries-reducer';
+import { PasswordEntriesStatus } from '../../../contexts/reducers/password-entries-reducer';
 import { IMAGE_FILE } from '../../../lib/images';
 import DeleteIcon from '../../svg/ui/DeleteIcon';
 import DeleteModal from './TableEntry/DeleteModal';
@@ -69,7 +69,7 @@ export default function TableEntry({locked, onLockChange, onDiscardCallback, onS
       username: formData.get('username') as string,
       password: formData.get('password') as string,
       safeNote: formData.get('safeNote') as string,
-      tags: formData.get('tags') as string,
+      tags: JSON.parse(formData.get('tags') as string),
       lastModifiedDate: parseInt(formData.get('lastModifiedDate') as string),
       createdDate: parseInt(formData.get('createdDate') as string),
     };
@@ -211,9 +211,9 @@ export default function TableEntry({locked, onLockChange, onDiscardCallback, onS
   const username = clearEntry?.username ?? formData?.username ?? '';
   const password = clearEntry?.password ?? formData?.password ?? '';
   const secretNote = clearEntry?.safeNote ?? formData?.safeNote ?? '';
-  const tags = clearEntry?.tags ?? formData?.tags ?? '';
+  const tags = clearEntry?.tags ?? formData?.tags ?? [];
 
-  const renderIcon = (unlocking: boolean) => {
+  const renderRowIcon = (unlocking: boolean) => {
     const stateStyles = {
       UNLOCKING: {
         avatarClassName: styles.avatar_mini,
@@ -328,7 +328,7 @@ export default function TableEntry({locked, onLockChange, onDiscardCallback, onS
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
         <div className={`${styles.entry} ${unlocking? styles.unlocking: ''}`}>
-          {renderIcon(unlocking)}
+          {renderRowIcon(unlocking)}
           {renderAccountInfo(row, unlocking)}
           {!locked && (
             <div className={styles.account_info_controls}>
