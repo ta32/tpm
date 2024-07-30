@@ -52,6 +52,8 @@ export const SELECTABLE_TAG_ICONS: Map<string, FC<SVGProps<SVGSVGElement>>> = ne
   ['wifi', WifiIcon],
 ]);
 
+export const SELECTABLE_TAG_NAMES = Array.from(SELECTABLE_TAG_ICONS.keys());
+
 const enum IMG_PATH {
   DROPBOX = '/images/logos/dropbox/',
   UI = '/images/ui/',
