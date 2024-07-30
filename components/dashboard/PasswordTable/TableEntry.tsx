@@ -1,16 +1,19 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 import styles from './TableEntry.module.scss';
 import Image from 'next/image';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import EntryInput from './TableEntry/EntryInput';
-import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry, SafePasswordEntry } from '../../../lib/trezor';
-import { usePasswordEntries, usePasswordEntriesDispatch } from '../../../contexts/use-password-entries';
-import { PasswordEntriesStatus } from '../../../contexts/reducers/password-entries-reducer';
-import { IMAGE_FILE } from '../../../lib/images';
+import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry, SafePasswordEntry } from 'lib/trezor';
+import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
+import { PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
+import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
 import DeleteIcon from '../../svg/ui/DeleteIcon';
 import DeleteModal from './TableEntry/DeleteModal';
-import { useUser } from '../../../contexts/use-user';
-import { UserStatus } from '../../../contexts/reducers/user-reducer';
+import { useUser } from 'contexts/use-user';
+import { UserStatus } from 'contexts/reducers/user-reducer';
+import { useTagEntries } from 'contexts/use-tag-entries';
+import { getTags, TagEntry } from '../../../contexts/reducers/tag-entries-reducer';
+import Colors from '../../../styles/colors.module.scss';
 
 interface Init {
   type: 'INIT';
@@ -52,6 +55,7 @@ interface TableEntryProps {
 }
 export default function TableEntry({locked, onLockChange, onDiscardCallback, onSavedCallback, row }: TableEntryProps) {
   const [user] = useUser();
+  const tagEntries = useTagEntries();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -213,29 +217,41 @@ export default function TableEntry({locked, onLockChange, onDiscardCallback, onS
   const secretNote = clearEntry?.safeNote ?? formData?.safeNote ?? '';
   const tags = clearEntry?.tags ?? formData?.tags ?? [];
 
-  const renderRowIcon = (unlocking: boolean) => {
+
+  const firstTag = tags.length > 0 ? tags[0] : '';
+  const tag = getTags(tagEntries).find((tag) => tag.id === firstTag);
+
+  const renderLockedEntryIcon = (unlocking: boolean, tagId: string) => {
+    const tags = getTags(tagEntries);
+    const tag = tags.find((tag) => tag.id === tagId);
+    const tagIconSvg = SELECTABLE_TAG_ICONS.get(tag?.icon ?? '');
     const stateStyles = {
       UNLOCKING: {
         avatarClassName: styles.avatar_mini,
         className: styles.trezor_btn,
-        iconPath: IMAGE_FILE.TREZOR_BUTTON.path()
+        iconPath: IMAGE_FILE.TREZOR_BUTTON.path(),
+        TagIcon: undefined
       },
       DEFAULT: {
         avatarClassName: `${styles.avatar_mini} ${styles.shaded}`,
         className: '',
-        iconPath: IMAGE_FILE.TRANSPARENT_PNG.path()
+        iconPath: undefined,
+        TagIcon: tagIconSvg
       }
     };
-    const { avatarClassName, className, iconPath } = unlocking ? stateStyles.UNLOCKING : stateStyles.DEFAULT;
+    const { avatarClassName, className, iconPath, TagIcon } = unlocking ? stateStyles.UNLOCKING : stateStyles.DEFAULT;
     return (
       <div className={avatarClassName}>
-        <Image
-          className={className}
-          src={iconPath}
-          height={50}
-          width={50}
-          alt="avatar"
-        />
+        {iconPath && (
+          <Image
+            className={className}
+            src={iconPath}
+            height={50}
+            width={50}
+            alt="avatar"
+          />)
+        }
+        {TagIcon && (<TagIcon width={50} fill={Colors.white}></TagIcon>)}
       </div>
     )
   };
@@ -328,7 +344,7 @@ export default function TableEntry({locked, onLockChange, onDiscardCallback, onS
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
         <div className={`${styles.entry} ${unlocking? styles.unlocking: ''}`}>
-          {renderRowIcon(unlocking)}
+          {renderLockedEntryIcon(unlocking, row.entry.tags[0])}
           {renderAccountInfo(row, unlocking)}
           {!locked && (
             <div className={styles.account_info_controls}>
