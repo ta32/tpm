@@ -185,6 +185,9 @@ export default function TableEntry({locked, onLockChange, onDiscardCallback, onS
         key: row.entry.key,
       });
       setShowDeleteModal(false);
+      if (onLockChange) {
+        onLockChange(false);
+      }
     }
   };
 
