@@ -129,6 +129,7 @@ export default function PasswordTable({
   ]);
 
   const handleAddEntry = () => {
+    setLockEntries(true);
     setNewEntry(true);
   };
 
@@ -240,6 +241,7 @@ export default function PasswordTable({
             key={'newEntry'}
             onDiscardCallback={handleDiscardEntry}
             onSavedCallback={handleSave}
+            onLockChange={onLockChange}
           />
         }
         {entries.map((entry) => {
