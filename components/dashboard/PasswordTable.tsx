@@ -237,7 +237,8 @@ export default function PasswordTable({
         {
           <TableEntry
             locked={false}
-            row={newEntry ? { type: 'NEW_ENTRY' } : { type: 'HIDDEN' }}
+            row={{ type: 'NEW_ENTRY' }}
+            hidden={!newEntry}
             key={'newEntry'}
             onDiscardCallback={handleDiscardEntry}
             onSavedCallback={handleSave}

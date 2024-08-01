@@ -1,0 +1,112 @@
+import React, { FormEvent, useState } from 'react';
+import styles from '../TableEntry.module.scss';
+import Image from 'next/image';
+import { IMAGE_FILE } from '../../../../lib/images';
+import { IoAddCircleOutline } from 'react-icons/io5';
+import EntryInput from './EntryInput';
+import DeleteIcon from '../../../svg/ui/DeleteIcon';
+import { ClearPasswordEntry, encryptFullEntry } from '../../../../lib/trezor';
+import { PasswordEntriesStatus } from '../../../../contexts/reducers/password-entries-reducer';
+import DeleteModal from './DeleteModal';
+import { usePasswordEntriesDispatch } from '../../../../contexts/use-password-entries';
+
+interface ExpandedEntryProps {
+  entry: ClearPasswordEntry | null;
+  saving: boolean;
+  handleDiscardEntry: () => void;
+  onLockChange: (status: boolean) => void;
+  onSubmitNewEntry: (entry: ClearPasswordEntry, form: EventTarget & HTMLFormElement) => void;
+}
+export default function ExpandedEntry({ handleDiscardEntry, saving, entry, onSubmitNewEntry, onLockChange }: ExpandedEntryProps) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const passwordEntriesDispatch = usePasswordEntriesDispatch();
+
+  const handleSubmitEntry = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const newEntry: ClearPasswordEntry = {
+      key: '', // key is determined by the reducer for new entries
+      item: formData.get('item') as string,
+      title: formData.get('title') as string,
+      username: formData.get('username') as string,
+      password: formData.get('password') as string,
+      safeNote: formData.get('safeNote') as string,
+      tags: JSON.parse(formData.get('tags') as string),
+      lastModifiedDate: parseInt(formData.get('lastModifiedDate') as string),
+      createdDate: parseInt(formData.get('createdDate') as string),
+    };
+    onSubmitNewEntry(newEntry, form);
+  };
+
+  const handleRemoveEntryConfirm = () => {
+    if(entry?.key) {
+      passwordEntriesDispatch({
+        type: 'REMOVE_ENTRY',
+        key: entry?.key,
+      });
+    }
+    onLockChange(false);
+    setShowDeleteModal(false);
+  };
+
+  const handleCancelRemoveEntry = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleRemoveEntry = () => {
+    setShowDeleteModal(true);
+  };
+
+  return (
+    <>
+      {entry?.title && (
+        <DeleteModal
+          entryName={entry.title}
+          show={showDeleteModal}
+          submitCallback={handleRemoveEntryConfirm}
+          cancelCallback={handleCancelRemoveEntry}
+        />
+      )}
+      <form className={styles.entry} onSubmit={handleSubmitEntry}>
+      <div className={styles.avatar_expanded}>
+        <Image src={IMAGE_FILE.TRANSPARENT_PNG.path()} height={100} width={100} alt="avatar" />
+        <IoAddCircleOutline className={styles.icon}></IoAddCircleOutline>
+      </div>
+      <div className={styles.account_info}>
+        <EntryInput name="item" label={'Item'} placeholder={''} type={'text'} defaultValue={entry?.item ?? ''} />
+        <EntryInput name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
+        <EntryInput name="username" label={'Username'} placeholder={''} type={'text'} defaultValue={entry?.username ?? ''} />
+        <EntryInput name="password" label={'Password'} placeholder={''} type={'password'} defaultValue={entry?.password ?? ''} />
+        <EntryInput name="tags" label={'Tags'} placeholder={''} type={'tags'} defaultValue={entry?.tags ?? ''} />
+        <EntryInput
+          name="safeNote"
+          label={'Secret Note'}
+          placeholder={''}
+          type={'secret'}
+          defaultValue={entry?.safeNote ?? ''}
+        />
+        {entry?.title && (
+          <div className={styles.layout}>
+            <div className={styles.container}>
+              <label className={styles.label}>Actions</label>
+              <button className={styles.remove_button} onClick={handleRemoveEntry} type="button">
+                <DeleteIcon className={styles.delete_icon} width={15}></DeleteIcon>
+                <span>REMOVE ENTRY</span>
+              </button>
+            </div>
+          </div>)
+        }
+      </div>
+        <div className={styles.account_info_controls}>
+          <button type="submit" disabled={saving} className={styles.save_btn}>
+            {saving ? 'Saving' : 'Save'}
+          </button>
+          <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>
+            Discard
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}
