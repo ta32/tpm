@@ -6,11 +6,11 @@ import {
   encryptAppData,
   encryptFullEntry,
   getEncryptionKey,
+  SafePasswordEntry,
 } from './trezor';
 import { TextDecoder, TextEncoder } from 'util';
 import { CipheredValue } from '@trezor/connect/lib/types/api/cipherKeyValue';
 import { AppData } from './storage';
-import { SafePasswordEntry } from '../contexts/reducers/password-entries-reducer';
 
 // nodeJs polyfills for WebAPIs
 Object.assign(global, { TextDecoder, TextEncoder });
@@ -95,7 +95,7 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
     username: 'username',
     passwordEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
     secretNoteEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-    tags: 'tags',
+    tags: ['tags'],
     safeKey: 'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted',
     createdDate: 0,
     lastModifiedDate: 0,
@@ -104,6 +104,7 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
     tags: [],
     entries: [safeEntry],
     version: 1,
+    modelVersion: 1,
   };
 
   const result = await encryptAppData(appData, appDataKey.encryptionKey);
@@ -138,7 +139,7 @@ it('encrypt then decrypt result in the same value', async () => {
     username: 'username',
     password: 'password',
     safeNote: 'safeNote',
-    tags: 'tags',
+    tags: ['tags'],
     createdDate: 0,
     lastModifiedDate: 0,
   };

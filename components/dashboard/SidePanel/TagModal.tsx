@@ -22,7 +22,6 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
   const [tagIconIndex, setTagIconIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
 
-
   let error = '';
   if (tagEntries.status === TagsStatus.ERROR) {
     error = 'tag already exists';

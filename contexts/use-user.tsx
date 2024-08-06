@@ -53,8 +53,8 @@ const initialUser = {
 type UserContextType = [User, MutableRefObject<User>];
 type UserDispatchContextType = [Dispatch<UserAction>, MutableRefObject<Dispatch<UserAction>>];
 
-const UserContext = createContext<UserContextType| undefined>(undefined);
-const UserDispatchContext = createContext<UserDispatchContextType| undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserDispatchContext = createContext<UserDispatchContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, userDispatch] = useReducer(userReducer, initialUser);
@@ -67,7 +67,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [user, userDispatch]);
 
   return (
-    <UserContext.Provider value={[user, userRef ]}>
+    <UserContext.Provider value={[user, userRef]}>
       <UserDispatchContext.Provider value={[userDispatch, userDispatchRef]}>{children}</UserDispatchContext.Provider>
     </UserContext.Provider>
   );

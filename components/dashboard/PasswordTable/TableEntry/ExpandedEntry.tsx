@@ -1,14 +1,16 @@
 import React, { FormEvent, useState } from 'react';
 import styles from '../TableEntry.module.scss';
 import Image from 'next/image';
-import { IMAGE_FILE } from '../../../../lib/images';
+import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import EntryInput from './EntryInput';
-import DeleteIcon from '../../../svg/ui/DeleteIcon';
-import { ClearPasswordEntry, encryptFullEntry } from '../../../../lib/trezor';
-import { PasswordEntriesStatus } from '../../../../contexts/reducers/password-entries-reducer';
+import DeleteIcon from 'components/svg/ui/DeleteIcon';
+import { ClearPasswordEntry } from 'lib/trezor';
 import DeleteModal from './DeleteModal';
-import { usePasswordEntriesDispatch } from '../../../../contexts/use-password-entries';
+import { usePasswordEntriesDispatch } from 'contexts/use-password-entries';
+import { getTag } from 'contexts/reducers/tag-entries-reducer';
+import { useTagEntries } from 'contexts/use-tag-entries';
+import Colors from 'styles/colors.module.scss';
 
 interface ExpandedEntryProps {
   entry: ClearPasswordEntry | null;
@@ -17,7 +19,14 @@ interface ExpandedEntryProps {
   onLockChange: (status: boolean) => void;
   onSubmitNewEntry: (entry: ClearPasswordEntry, form: EventTarget & HTMLFormElement) => void;
 }
-export default function ExpandedEntry({ handleDiscardEntry, saving, entry, onSubmitNewEntry, onLockChange }: ExpandedEntryProps) {
+export default function ExpandedEntry({
+  handleDiscardEntry,
+  saving,
+  entry,
+  onSubmitNewEntry,
+  onLockChange,
+}: ExpandedEntryProps) {
+  const tagEntries = useTagEntries();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
 
@@ -40,7 +49,7 @@ export default function ExpandedEntry({ handleDiscardEntry, saving, entry, onSub
   };
 
   const handleRemoveEntryConfirm = () => {
-    if(entry?.key) {
+    if (entry?.key) {
       passwordEntriesDispatch({
         type: 'REMOVE_ENTRY',
         key: entry?.key,
@@ -58,6 +67,17 @@ export default function ExpandedEntry({ handleDiscardEntry, saving, entry, onSub
     setShowDeleteModal(true);
   };
 
+  const renderIcon = (tagId: string) => {
+    const tag = getTag(tagEntries, tagId);
+    const TagIcon = SELECTABLE_TAG_ICONS.get(tag?.icon ?? '');
+    return (
+      <div className={styles.avatar_expanded}>
+        <Image src={IMAGE_FILE.TRANSPARENT_PNG.path()} height={100} width={100} alt="avatar" />
+        {TagIcon && <TagIcon width={100} fill={Colors.white} />}
+      </div>
+    );
+  };
+
   return (
     <>
       {entry?.title && (
@@ -69,35 +89,44 @@ export default function ExpandedEntry({ handleDiscardEntry, saving, entry, onSub
         />
       )}
       <form className={styles.entry} onSubmit={handleSubmitEntry}>
-      <div className={styles.avatar_expanded}>
-        <Image src={IMAGE_FILE.TRANSPARENT_PNG.path()} height={100} width={100} alt="avatar" />
-        <IoAddCircleOutline className={styles.icon}></IoAddCircleOutline>
-      </div>
-      <div className={styles.account_info}>
-        <EntryInput name="item" label={'Item'} placeholder={''} type={'text'} defaultValue={entry?.item ?? ''} />
-        <EntryInput name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
-        <EntryInput name="username" label={'Username'} placeholder={''} type={'text'} defaultValue={entry?.username ?? ''} />
-        <EntryInput name="password" label={'Password'} placeholder={''} type={'password'} defaultValue={entry?.password ?? ''} />
-        <EntryInput name="tags" label={'Tags'} placeholder={''} type={'tags'} defaultValue={entry?.tags ?? ''} />
-        <EntryInput
-          name="safeNote"
-          label={'Secret Note'}
-          placeholder={''}
-          type={'secret'}
-          defaultValue={entry?.safeNote ?? ''}
-        />
-        {entry?.title && (
-          <div className={styles.layout}>
-            <div className={styles.container}>
-              <label className={styles.label}>Actions</label>
-              <button className={styles.remove_button} onClick={handleRemoveEntry} type="button">
-                <DeleteIcon className={styles.delete_icon} width={15}></DeleteIcon>
-                <span>REMOVE ENTRY</span>
-              </button>
+        {renderIcon(entry?.tags[0] ?? '')}
+        <div className={styles.account_info}>
+          <EntryInput name="item" label={'Item'} placeholder={''} type={'text'} defaultValue={entry?.item ?? ''} />
+          <EntryInput name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
+          <EntryInput
+            name="username"
+            label={'Username'}
+            placeholder={''}
+            type={'text'}
+            defaultValue={entry?.username ?? ''}
+          />
+          <EntryInput
+            name="password"
+            label={'Password'}
+            placeholder={''}
+            type={'password'}
+            defaultValue={entry?.password ?? ''}
+          />
+          <EntryInput name="tags" label={'Tags'} placeholder={''} type={'tags'} defaultValue={entry?.tags ?? ''} />
+          <EntryInput
+            name="safeNote"
+            label={'Secret Note'}
+            placeholder={''}
+            type={'secret'}
+            defaultValue={entry?.safeNote ?? ''}
+          />
+          {entry?.title && (
+            <div className={styles.layout}>
+              <div className={styles.container}>
+                <label className={styles.label}>Actions</label>
+                <button className={styles.remove_button} onClick={handleRemoveEntry} type="button">
+                  <DeleteIcon className={styles.delete_icon} width={15}></DeleteIcon>
+                  <span>REMOVE ENTRY</span>
+                </button>
+              </div>
             </div>
-          </div>)
-        }
-      </div>
+          )}
+        </div>
         <div className={styles.account_info_controls}>
           <button type="submit" disabled={saving} className={styles.save_btn}>
             {saving ? 'Saving' : 'Save'}

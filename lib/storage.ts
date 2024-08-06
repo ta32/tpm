@@ -1,8 +1,5 @@
 import {} from '../contexts/use-password-entries';
-import {
-  getSafePasswordEntries,
-  PasswordEntries,
-} from '../contexts/reducers/password-entries-reducer';
+import { getSafePasswordEntries, PasswordEntries } from '../contexts/reducers/password-entries-reducer';
 import { getTags, TagEntry, TagEntries } from '../contexts/reducers/tag-entries-reducer';
 import { SafePasswordEntry } from './trezor';
 

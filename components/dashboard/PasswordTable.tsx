@@ -152,7 +152,7 @@ export default function PasswordTable({
   const onLockChange = (status: boolean) => {
     // when editing an entry, lock all other entries
     setLockEntries(status);
-  }
+  };
 
   const handleUserMenuClick = (index: number) => {
     switch (index) {
@@ -246,7 +246,15 @@ export default function PasswordTable({
           />
         }
         {entries.map((entry) => {
-          return <TableEntry locked={lockEntries} row={{ type: 'VIEW_ENTRY', entry: entry }} key={entry.key} onSavedCallback={handleSave} onLockChange={onLockChange} />;
+          return (
+            <TableEntry
+              locked={lockEntries}
+              row={{ type: 'VIEW_ENTRY', entry: entry }}
+              key={entry.key}
+              onSavedCallback={handleSave}
+              onLockChange={onLockChange}
+            />
+          );
         })}
         {entries.length == 0 && (filter !== '' || selectedTag !== DEFAULT_TAGS.ALL) && (
           <div

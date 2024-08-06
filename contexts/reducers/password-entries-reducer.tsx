@@ -2,7 +2,6 @@
 import { uniqueId } from 'lib/utils';
 import { SafePasswordEntry } from '../../lib/trezor';
 
-
 export enum PasswordEntriesStatus {
   UNINITIALIZED,
   SYNCED,

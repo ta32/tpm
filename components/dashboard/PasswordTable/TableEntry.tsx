@@ -22,7 +22,7 @@ interface Error {
   type: 'ERROR';
   error: string;
 }
-type EntryState = Init | Decrypting | Decrypted  | Error;
+type EntryState = Init | Decrypting | Decrypted | Error;
 
 interface NewEntry {
   type: 'NEW_ENTRY';
@@ -39,7 +39,14 @@ interface TableEntryProps {
   onLockChange: (status: boolean) => void;
   onSavedCallback: () => void;
 }
-export default function TableEntry({hidden, locked, onLockChange, onDiscardCallback, onSavedCallback, row }: TableEntryProps) {
+export default function TableEntry({
+  hidden,
+  locked,
+  onLockChange,
+  onDiscardCallback,
+  onSavedCallback,
+  row,
+}: TableEntryProps) {
   const [user] = useUser();
   const tagEntries = useTagEntries();
   const passwordEntries = usePasswordEntries();
@@ -79,8 +86,8 @@ export default function TableEntry({hidden, locked, onLockChange, onDiscardCallb
         })
         .catch((err) => {
           setEntryState({ type: 'ERROR', error: 'Error encrypting entry' });
-        }).finally(() => {
-      });
+        })
+        .finally(() => {});
     } else {
       setEntryState({
         type: 'ERROR',
@@ -108,18 +115,18 @@ export default function TableEntry({hidden, locked, onLockChange, onDiscardCallb
       decryptFullEntry(safeEntry)
         .then((clearEntry) => {
           if (clearEntry != null) {
-            setEntryState({ type: 'DECRYPTED'});
+            setEntryState({ type: 'DECRYPTED' });
             setClearEntry(clearEntry);
           } else {
             if (onLockChange) {
               onLockChange(false);
             }
-            setEntryState({type: 'INIT'});
+            setEntryState({ type: 'INIT' });
           }
         })
         .catch((err) => {
           setEntryState({ type: 'ERROR', error: err });
-      });
+        });
     }
     return; // Unreachable, edit is only possible when mode is VIEW_ENTRY
   };
@@ -158,19 +165,32 @@ export default function TableEntry({hidden, locked, onLockChange, onDiscardCallb
       });
   };
 
-  const expanded = !hidden &&
-    row.type === 'NEW_ENTRY' ||
+  const expanded =
+    (!hidden && row.type === 'NEW_ENTRY') ||
     (row.type === 'VIEW_ENTRY' && (entryState.type === 'DECRYPTED' || clearEntry));
   const unlocking = entryState.type === 'DECRYPTING' && user.status === UserStatus.TREZOR_REQ_CONFIRMATION;
 
   return (
-    <div className={`${styles.card} ${unlocking ? styles.unlocking: ''}`}>
+    <div className={`${styles.card} ${unlocking ? styles.unlocking : ''}`}>
       {expanded && (
-        <ExpandedEntry entry={clearEntry} saving={saving} handleDiscardEntry={handleDiscardEntry} onSubmitNewEntry={onSubmitNewEntry} onLockChange={onLockChange} />
+        <ExpandedEntry
+          entry={clearEntry}
+          saving={saving}
+          handleDiscardEntry={handleDiscardEntry}
+          onSubmitNewEntry={onSubmitNewEntry}
+          onLockChange={onLockChange}
+        />
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
-        <div className={`${styles.entry} ${unlocking? styles.unlocking: ''}`}>
-          <ClosedEntry unlocking={unlocking} locked={locked} entry={row.entry} copyToClipboard={copyToClipboard} handleCopyPassword={handleCopyPassword} handleEditEntry={handleEditEntry}></ClosedEntry>
+        <div className={`${styles.entry} ${unlocking ? styles.unlocking : ''}`}>
+          <ClosedEntry
+            unlocking={unlocking}
+            locked={locked}
+            entry={row.entry}
+            copyToClipboard={copyToClipboard}
+            handleCopyPassword={handleCopyPassword}
+            handleEditEntry={handleEditEntry}
+          ></ClosedEntry>
         </div>
       )}
     </div>

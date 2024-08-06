@@ -30,7 +30,7 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
 
 export default function Home() {
   const router = useRouter();
-  const [user, userRef ] = useUser();
+  const [user, userRef] = useUser();
   const [userDispatch, userDispatchRef] = useUserDispatch();
   const [loading, setLoading] = useState(false);
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
@@ -68,37 +68,37 @@ export default function Home() {
   useEffect(() => {
     const transportEventCb = (event: TransportEventMessage) => {};
     const uiEventCb = (event: UiEventMessage) => {
-        const user = userRef.current;
-        const userDispatch = userDispatchRef.current;
-        if (event.type === UI.REQUEST_PIN) {
-          userDispatch({ type: 'SHOW_PIN_DIALOG' });
-        } else if (event.type === UI.REQUEST_BUTTON) {
-          userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
-        } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
-          userDispatch({ type: 'CONFIRMATION_ENTERED' });
-        } else {
-          console.error('Unknown UI event', event);
-        }
+      const user = userRef.current;
+      const userDispatch = userDispatchRef.current;
+      if (event.type === UI.REQUEST_PIN) {
+        userDispatch({ type: 'SHOW_PIN_DIALOG' });
+      } else if (event.type === UI.REQUEST_BUTTON) {
+        userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
+      } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
+        userDispatch({ type: 'CONFIRMATION_ENTERED' });
+      } else {
+        console.error('Unknown UI event', event);
+      }
     };
     const updateDevice = (event: DeviceEventMessage) => {
-        const userDispatch = userDispatchRef.current;
-        if (event.type === DEVICE.CONNECT) {
-          getDevices()
-            .then((device) => {
-              if (device !== null) {
-                userDispatch({ type: 'ADD_DEVICE', device: device });
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-              return;
-            });
-        } else if (event.type === DEVICE.CONNECT_UNACQUIRED) {
-          userDispatch({ type: 'ADD_DEVICE', device: null });
-        }
-        if (event.type === DEVICE.DISCONNECT) {
-          userDispatch({ type: 'REMOVE_DEVICE' });
-        }
+      const userDispatch = userDispatchRef.current;
+      if (event.type === DEVICE.CONNECT) {
+        getDevices()
+          .then((device) => {
+            if (device !== null) {
+              userDispatch({ type: 'ADD_DEVICE', device: device });
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            return;
+          });
+      } else if (event.type === DEVICE.CONNECT_UNACQUIRED) {
+        userDispatch({ type: 'ADD_DEVICE', device: null });
+      }
+      if (event.type === DEVICE.DISCONNECT) {
+        userDispatch({ type: 'REMOVE_DEVICE' });
+      }
     };
     setTrezorEventHandlers(updateDevice, transportEventCb, uiEventCb);
   }, [userDispatchRef, userRef]);

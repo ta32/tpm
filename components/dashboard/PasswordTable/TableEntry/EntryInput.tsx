@@ -29,7 +29,7 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
 
   const getSelectedValues = (inputValue: string | string[] | null): string[] => {
     return Array.isArray(inputValue) ? inputValue : [''];
-  }
+  };
 
   const passwordInputType = showSecret ? 'text' : 'password';
 
@@ -42,7 +42,12 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
       <div className={styles.container}>
         <label className={styles.label}>{label}</label>
         {type === 'tags' && (
-          <MultiSelect name={name} className={styles.input} selectedValues={getSelectedValues(inputValue)} items={tags} />
+          <MultiSelect
+            name={name}
+            className={styles.input}
+            selectedValues={getSelectedValues(inputValue)}
+            items={tags}
+          />
         )}
         {type != 'tags' && (
           <input

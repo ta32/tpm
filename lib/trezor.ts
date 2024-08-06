@@ -57,10 +57,7 @@ export interface ClearPasswordEntry {
   lastModifiedDate: number;
 }
 
-export async function initTrezor(
-  appUrl: string,
-  trustedHost: boolean,
-) {
+export async function initTrezor(appUrl: string, trustedHost: boolean) {
   await TrezorConnect.init({
     transportReconnect: true,
     debug: false,
