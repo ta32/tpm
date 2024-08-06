@@ -3,7 +3,7 @@ import Colors from '../../../styles/colors.module.scss';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useTagEntries } from '../../../contexts/use-tag-entries';
 import { getTagTitle, TagsStatus } from '../../../contexts/reducers/tag-entries-reducer';
-import { SELECTABLE_TAG_ICONS } from '../../../lib/images';
+import { SELECTABLE_TAG_ICONS, SELECTABLE_TAG_NAMES } from '../../../lib/images';
 
 interface Tag {
   title: string;
@@ -22,8 +22,6 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
   const [tagIconIndex, setTagIconIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
 
-  const tagIconNamesArray = Array.from(SELECTABLE_TAG_ICONS.keys());
-
   let error = '';
   if (tagEntries.status === TagsStatus.ERROR) {
     error = 'tag already exists';
@@ -33,14 +31,14 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
     if (!showControls) {
       setShowControls(true);
     }
-    setTagIconIndex((tagIconIndex + tagIconNamesArray.length - 1) % tagIconNamesArray.length);
+    setTagIconIndex((tagIconIndex + SELECTABLE_TAG_NAMES.length - 1) % SELECTABLE_TAG_NAMES.length);
   };
 
   const handleRightClick = () => {
     if (!showControls) {
       setShowControls(true);
     }
-    setTagIconIndex((tagIconIndex + 1) % tagIconNamesArray.length);
+    setTagIconIndex((tagIconIndex + 1) % SELECTABLE_TAG_NAMES.length);
   };
 
   const handleClose = () => {
@@ -59,7 +57,7 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const tagIcon = tagIconNamesArray[tagIconIndex];
+    const tagIcon = SELECTABLE_TAG_NAMES[tagIconIndex];
     const form = e.currentTarget;
     const formData = new FormData(form);
     const tagTitle = formData.get('title') as string;
@@ -67,7 +65,7 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
     onSubmit(newTag);
   };
 
-  const tagIcon = tagIconNamesArray[tagIconIndex];
+  const tagIcon = SELECTABLE_TAG_NAMES[tagIconIndex];
   const showControlsClass = showControls || mode === 'REMOVE' ? '' : Styles.hidden;
   const modalClass = mode !== 'CLOSED' ? Styles.modal_fade_in : Styles.modal_fade_out;
   const modalBackdropClass = mode !== 'CLOSED' ? Styles.modal_backdrop : Styles.modal_backdrop_inactive;
@@ -94,7 +92,7 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
   const tagTitle = tagId && getTagTitle(tagEntries, tagId);
   const chevronVisibility = mode === 'ADD' || mode === 'EDIT' ? '' : Styles.none;
 
-  const tagIconSvg = SELECTABLE_TAG_ICONS.get(tagIconNamesArray[tagIconIndex]);
+  const tagIconSvg = SELECTABLE_TAG_ICONS.get(SELECTABLE_TAG_NAMES[tagIconIndex]);
   return (
     // TODO: refactor to use a modal component
     <>

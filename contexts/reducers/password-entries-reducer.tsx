@@ -1,18 +1,7 @@
 // MODEL
 import { uniqueId } from 'lib/utils';
+import { SafePasswordEntry } from '../../lib/trezor';
 
-export interface SafePasswordEntry {
-  key: string;
-  item: string;
-  title: string;
-  username: string;
-  passwordEnc: Uint8Array;
-  secretNoteEnc: Uint8Array;
-  safeKey: string;
-  tags: string;
-  createdDate: number;
-  lastModifiedDate: number;
-}
 export enum PasswordEntriesStatus {
   UNINITIALIZED,
   SYNCED,

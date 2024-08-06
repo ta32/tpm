@@ -1,15 +1,15 @@
 import {} from '../contexts/use-password-entries';
-import {
-  getSafePasswordEntries,
-  PasswordEntries,
-  SafePasswordEntry,
-} from '../contexts/reducers/password-entries-reducer';
+import { getSafePasswordEntries, PasswordEntries } from '../contexts/reducers/password-entries-reducer';
 import { getTags, TagEntry, TagEntries } from '../contexts/reducers/tag-entries-reducer';
+import { SafePasswordEntry } from './trezor';
+
+const MODEL_VERSION = 1;
 
 export interface AppData {
   entries: SafePasswordEntry[];
   version: number;
   tags: TagEntry[];
+  modelVersion: number;
 }
 
 export function fromState(passwordState: PasswordEntries, tagState: TagEntries, newVersion: number): AppData {
@@ -19,6 +19,7 @@ export function fromState(passwordState: PasswordEntries, tagState: TagEntries, 
     entries: entries,
     version: newVersion,
     tags: tags,
+    modelVersion: MODEL_VERSION,
   };
 }
 
@@ -40,7 +41,7 @@ export function deserializeObject<T>(data: ArrayBuffer): T {
   return deserializeWithTypedArrays(json);
 }
 
-export function deserializeWithTypedArrays<T>(data: string): T {
+function deserializeWithTypedArrays<T>(data: string): T {
   return JSON.parse(data, (key, value) => {
     if (value && value.type === 'Uint8Array') {
       return new Uint8Array(value.data);

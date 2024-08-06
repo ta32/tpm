@@ -5,16 +5,17 @@ import { useTagEntries } from 'contexts/use-tag-entries';
 import { getTags } from 'contexts/reducers/tag-entries-reducer';
 import generatePassword from 'lib/password';
 
+type DefaultTypes = string | string[] | null;
 interface EntryInputProps {
   label: string;
   name: string;
   placeholder: string;
-  defaultValue: string | null;
+  defaultValue: DefaultTypes;
   type: 'text' | 'password' | 'secret' | 'tags';
 }
 export default function EntryInput({ label, name, placeholder, defaultValue, type }: EntryInputProps) {
   const tagEntries = useTagEntries();
-  const [inputValue, setInputValue] = useState<string | null>(defaultValue);
+  const [inputValue, setInputValue] = useState<DefaultTypes>(defaultValue);
   const [showSecret, setShowSecret] = useState(false);
 
   const handleToggleShowPassword = () => {
@@ -26,8 +27,12 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
     setInputValue(password);
   };
 
+  const getSelectedValues = (inputValue: string | string[] | null): string[] => {
+    return Array.isArray(inputValue) ? inputValue : [''];
+  };
+
   const passwordInputType = showSecret ? 'text' : 'password';
-  const selectedValues = defaultValue ? defaultValue.split(' ') : undefined;
+
   const tags = getTags(tagEntries)
     .filter((tag) => tag.id != '0')
     .map((tag) => ({ label: tag.title, value: tag.id }));
@@ -37,7 +42,12 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
       <div className={styles.container}>
         <label className={styles.label}>{label}</label>
         {type === 'tags' && (
-          <MultiSelect name={name} className={styles.input} selectedValues={selectedValues} items={tags} />
+          <MultiSelect
+            name={name}
+            className={styles.input}
+            selectedValues={getSelectedValues(inputValue)}
+            items={tags}
+          />
         )}
         {type != 'tags' && (
           <input

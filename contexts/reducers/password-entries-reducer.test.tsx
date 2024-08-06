@@ -6,12 +6,12 @@ import {
   passwordEntriesReducer,
   PasswordEntriesStatus,
   RemoveEntry,
-  SafePasswordEntry,
   Sync,
   UpdateEntry,
   UploadEntries,
 } from './password-entries-reducer';
 import { uniqueId } from 'lib/utils';
+import { SafePasswordEntry } from 'lib/trezor';
 
 jest.mock('lib/utils');
 const mUniqueId = jest.mocked(uniqueId);
@@ -34,7 +34,7 @@ function entry(num: number): SafePasswordEntry {
     passwordEnc: new Uint8Array([num]),
     secretNoteEnc: new Uint8Array([num]),
     safeKey: `safeKey${num}`,
-    tags: `tag${num}`,
+    tags: [`tag${num}`],
     createdDate: 0,
     lastModifiedDate: 0,
   };

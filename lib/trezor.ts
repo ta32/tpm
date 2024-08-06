@@ -8,7 +8,6 @@ import TrezorConnect, {
 import { hexFromUint8Array, uint8ArrayFromHex } from './buffer';
 
 import { AppData, deserializeObject, serializeObject } from './storage';
-import { SafePasswordEntry } from '../contexts/reducers/password-entries-reducer';
 import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport';
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
@@ -30,12 +29,22 @@ export interface TrezorDevice {
   masterKey: string;
   encryptionKey: Uint8Array;
 }
-
 export interface KeyPair {
   masterKey: string;
   encryptionKey: Uint8Array;
 }
-
+export interface SafePasswordEntry {
+  key: string;
+  item: string;
+  title: string;
+  username: string;
+  passwordEnc: Uint8Array;
+  secretNoteEnc: Uint8Array;
+  safeKey: string;
+  tags: string[];
+  createdDate: number;
+  lastModifiedDate: number;
+}
 export interface ClearPasswordEntry {
   key: string;
   item: string;
@@ -43,15 +52,12 @@ export interface ClearPasswordEntry {
   username: string;
   password: string;
   safeNote: string;
-  tags: string;
+  tags: string[];
   createdDate: number;
   lastModifiedDate: number;
 }
 
-export async function initTrezor(
-  appUrl: string,
-  trustedHost: boolean,
-) {
+export async function initTrezor(appUrl: string, trustedHost: boolean) {
   await TrezorConnect.init({
     transportReconnect: true,
     debug: false,

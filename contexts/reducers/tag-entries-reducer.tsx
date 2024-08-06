@@ -3,7 +3,7 @@
 import { uniqueId } from 'lib/utils';
 
 export interface TagEntries {
-  [key: string]: TagEntry | string | number;
+  [key: string]: TagEntry | string | TagsStatus;
   status: TagsStatus;
   lastError: string;
 }
@@ -178,6 +178,10 @@ export function getTags(state: TagEntries): TagEntry[] {
     }
   }
   return tags;
+}
+
+export function getTag(state: TagEntries, tagId: string): TagEntry | undefined {
+  return state[tagId] as TagEntry;
 }
 
 export function getTagTitle(state: TagEntries, tagId: string): string {

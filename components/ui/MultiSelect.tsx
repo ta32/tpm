@@ -50,11 +50,10 @@ export default function MultiSelect({ className, name, selectedValues, items }: 
   let selectableItems = items.filter(
     (item) => selected.findIndex((selectedItem) => selectedItem.value === item.value) === -1
   );
-  let selectedItemsValues = selected.map((item) => item.value).join(' ');
-
+  let selectedItemsValues = selected.map((item) => item.value);
   return (
     <div>
-      <input type="hidden" name={name} value={selectedItemsValues} />
+      <input type="hidden" name={name} value={JSON.stringify(selectedItemsValues)} />
       <div
         className={`${styles.container} ${className}`}
         onClick={(e) => handleToggleOpen(e)}

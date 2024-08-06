@@ -14,7 +14,7 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
 // Trezor bridge whitelists localhost and trezor.io domains
 const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 const TREZOR_CONNECT_CONFIG = {
-  init: false
+  init: false,
 };
 
 export default function MyApp({ Component, pageProps }: AppProps) {
