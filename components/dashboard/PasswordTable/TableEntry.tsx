@@ -153,7 +153,7 @@ export default function TableEntry({
     }
   };
 
-  const copyToClipboard = (text: string) => {
+  const handleCopyUsername = (text: string) => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
@@ -187,7 +187,7 @@ export default function TableEntry({
             unlocking={unlocking}
             locked={locked}
             entry={row.entry}
-            copyToClipboard={copyToClipboard}
+            handleCopyUsername={handleCopyUsername}
             handleCopyPassword={handleCopyPassword}
             handleEditEntry={handleEditEntry}
           ></ClosedEntry>

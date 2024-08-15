@@ -12,14 +12,14 @@ interface ClosedEntryProps {
   unlocking: boolean;
   locked: boolean;
   entry: SafePasswordEntry;
-  copyToClipboard: (text: string) => void;
+  handleCopyUsername: (text: string) => void;
   handleCopyPassword: () => void;
   handleEditEntry: () => void;
 }
 
 export default function ClosedEntry({
   entry,
-  copyToClipboard,
+  handleCopyUsername,
   handleCopyPassword,
   handleEditEntry,
   unlocking,
@@ -69,12 +69,12 @@ export default function ClosedEntry({
           <label className={styles.title}>{entry.title}</label>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
-              <div className={`${styles.label} ${styles.clickable}`} onClick={() => copyToClipboard(entry.username)}>
+              <div className={`${styles.label} ${styles.clickable}`} onClick={() => handleCopyUsername(entry.username)}>
                 {entry.username}
               </div>
             </ToolTip>
             <ToolTip text={'Copy password'} position={'bottom'}>
-              <input
+              <input onClick={handleCopyPassword}
                 className={styles.password_shadow}
                 title={'Copy to clipboard'}
                 type="password"
