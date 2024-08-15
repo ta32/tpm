@@ -1,0 +1,101 @@
+@use "styles/colors.module";
+
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltip_text {
+  text-align: center;
+  width: 110px;
+  visibility: hidden;
+  background-color: colors.$black;
+  color: colors.$white;
+  border-radius: 0.3rem;
+  position: absolute;
+  z-index: 99999;
+  padding: 0.25rem;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.tooltip .tooltip_text::after {
+  content: "";
+  position: absolute;
+  border-width: 5px;
+  border-style: solid;
+}
+
+.hidden .tooltip_text {
+  visibility: hidden !important;
+  opacity: 0;
+}
+
+.active .tooltip_text {
+  visibility: visible !important;
+  opacity: 1;
+}
+
+.tooltip:hover .tooltip_text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Tooltip positioned at the bottom */
+.tooltip_bottom .tooltip_text {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.25rem;
+}
+
+.tooltip_bottom .tooltip_text::after {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: transparent transparent colors.$black transparent;
+}
+
+/* Tooltip positioned at the top */
+.tooltip_top .tooltip_text {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.25rem;
+}
+
+.tooltip_top .tooltip_text::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: colors.$black transparent transparent transparent;
+}
+
+/* Tooltip positioned at the right */
+.tooltip_right .tooltip_text {
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 0.25rem;
+}
+
+.tooltip_right .tooltip_text::after {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  border-color: transparent colors.$black transparent transparent;
+}
+
+/* Tooltip positioned at the left */
+.tooltip_left .tooltip_text {
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  margin-right: 0.25rem;
+}
+
+.tooltip_left .tooltip_text::after {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent colors.$black;
+}

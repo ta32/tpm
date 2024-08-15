@@ -21,6 +21,7 @@ $blue_dark_very: #1A2942;
 $blue_dark_very_much: #162338;
 
 $red: #E93C34;
+$highlight_red: rgba($red, .1);
 
 $green: #01B757;
 
@@ -44,6 +45,7 @@ $pink: #EF6088;
     blue_dark_very: $blue_dark_very;
     blue_dark_very_much: $blue_dark_very_much;
     red: $red;
+    highlight_red: $highlight_red;
     green: $green;
     pink: $pink;
 }

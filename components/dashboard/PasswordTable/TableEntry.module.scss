@@ -33,16 +33,18 @@ $account_info_controls_margin: 2rem;
   }
 }
 
+.highlight {
+  &:hover {
+    background: colors.$highlight_bg;
+  }
+}
+
 .card {
   display: block;
   width: 100%;
   background-color: colors.$white;
   overflow: visible;
   transition: all 150ms ease-in-out;
-
-  &:hover {
-    background: rgba(colors.$grey_bg, .9);
-  }
 
   &.unlocking {
     background-color: colors.$white;
@@ -161,46 +163,6 @@ $account_info_controls_margin: 2rem;
 
     }
   }
-}
-
-.tooltip {
-  position: relative;
-}
-.tooltip .tooltip_text {
-  text-align: center;
-  width: 110px;
-  visibility: hidden;
-  background-color: colors.$black;
-  color: colors.$white;
-  border-radius: 0.3rem;
-  // tool tip position
-  position: absolute;
-  margin-top : 0.25rem;
-  // shift relative to parent element
-  top: 100%;
-  left: 50%;
-  transform: translateX(-55px);
-  z-index: 99999;
-  padding: 0.25rem;
-  opacity: 0;
-  transition: opacity 1s;
-}
-.tooltip .tooltip_text::after {
-  content: "";
-  position: absolute;
-  // arrow position
-  bottom: 100%;
-  right: 50%;
-  border-color:  transparent  transparent colors.$black transparent;
-  //
-  margin-top: -5px;
-  border-width: 5px;
-  border-style: solid;
-}
-
-.tooltip:hover .tooltip_text {
-  visibility: visible;
-  opacity: 1;
 }
 
 .icon {

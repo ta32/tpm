@@ -17,7 +17,7 @@ interface ExpandedEntryProps {
   saving: boolean;
   handleDiscardEntry: () => void;
   onLockChange: (status: boolean) => void;
-  onSubmitNewEntry: (entry: ClearPasswordEntry, form: EventTarget & HTMLFormElement) => void;
+  onSubmitNewEntry: (entry: ClearPasswordEntry, formToReset: EventTarget & HTMLFormElement) => void;
 }
 export default function ExpandedEntry({
   handleDiscardEntry,
@@ -27,6 +27,7 @@ export default function ExpandedEntry({
   onLockChange,
 }: ExpandedEntryProps) {
   const tagEntries = useTagEntries();
+  const [itemMissing, setItemMissing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
 
@@ -45,7 +46,15 @@ export default function ExpandedEntry({
       lastModifiedDate: parseInt(formData.get('lastModifiedDate') as string),
       createdDate: parseInt(formData.get('createdDate') as string),
     };
-    onSubmitNewEntry(newEntry, form);
+    if (newEntry.item == '') {
+      setItemMissing(true);
+    } else {
+      setItemMissing(false);
+      if (newEntry.title == '') {
+        newEntry.title = newEntry.item;
+      }
+      onSubmitNewEntry(newEntry, form);
+    }
   };
 
   const handleRemoveEntryConfirm = () => {
@@ -88,10 +97,18 @@ export default function ExpandedEntry({
           cancelCallback={handleCancelRemoveEntry}
         />
       )}
-      <form className={styles.entry} onSubmit={handleSubmitEntry}>
+      <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={true}>
         {renderIcon(entry?.tags[0] ?? '')}
         <div className={styles.account_info}>
-          <EntryInput name="item" label={'Item'} placeholder={''} type={'text'} defaultValue={entry?.item ?? ''} />
+          <EntryInput
+            name="item"
+            label={'Item*'}
+            placeholder={''}
+            type={'text'}
+            defaultValue={entry?.item ?? ''}
+            mandatory={true}
+            invalid={itemMissing}
+          />
           <EntryInput name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
           <EntryInput
             name="username"

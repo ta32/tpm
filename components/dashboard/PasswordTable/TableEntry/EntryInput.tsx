@@ -4,16 +4,27 @@ import MultiSelect from 'components/ui/MultiSelect';
 import { useTagEntries } from 'contexts/use-tag-entries';
 import { getTags } from 'contexts/reducers/tag-entries-reducer';
 import generatePassword from 'lib/password';
+import ToolTip from '../../../ui/ToolTip';
 
 type DefaultTypes = string | string[] | null;
 interface EntryInputProps {
   label: string;
   name: string;
   placeholder: string;
+  mandatory?: boolean;
+  invalid?: boolean;
   defaultValue: DefaultTypes;
   type: 'text' | 'password' | 'secret' | 'tags';
 }
-export default function EntryInput({ label, name, placeholder, defaultValue, type }: EntryInputProps) {
+export default function EntryInput({
+  label,
+  name,
+  placeholder,
+  defaultValue,
+  type,
+  mandatory,
+  invalid,
+}: EntryInputProps) {
   const tagEntries = useTagEntries();
   const [inputValue, setInputValue] = useState<DefaultTypes>(defaultValue);
   const [showSecret, setShowSecret] = useState(false);
@@ -37,6 +48,29 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
     .filter((tag) => tag.id != '0')
     .map((tag) => ({ label: tag.title, value: tag.id }));
 
+  const renderInput = (mandatory: boolean) => {
+    const inputElement = (
+      <input
+        autoComplete="off"
+        autoCorrect="off"
+        name={name}
+        className={`${styles.input} ${invalid ? styles.invalid : ''}`}
+        type={type == 'text' ? 'text' : passwordInputType}
+        placeholder={placeholder}
+        defaultValue={inputValue != null ? inputValue : ''}
+        required={mandatory}
+      />
+    );
+    if (mandatory) {
+      return (
+        <ToolTip text={'Item is a mandatory field'} position={'right'} mode={'manual'} active={invalid}>
+          {inputElement}
+        </ToolTip>
+      );
+    }
+    return inputElement;
+  };
+
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
@@ -49,17 +83,7 @@ export default function EntryInput({ label, name, placeholder, defaultValue, typ
             items={tags}
           />
         )}
-        {type != 'tags' && (
-          <input
-            autoComplete="off"
-            autoCorrect="off"
-            name={name}
-            className={styles.input}
-            type={type == 'text' ? 'text' : passwordInputType}
-            placeholder={placeholder}
-            defaultValue={inputValue != null ? inputValue : ''}
-          />
-        )}
+        {type != 'tags' && renderInput(mandatory ?? false)}
       </div>
       {type === 'password' && (
         <div className={styles.container_row_no_wrap}>

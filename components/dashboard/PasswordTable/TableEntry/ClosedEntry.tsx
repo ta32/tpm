@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/use-tag-entries';
 import { SafePasswordEntry } from 'lib/trezor';
+import ToolTip from '../../../ui/ToolTip';
 
 interface ClosedEntryProps {
   unlocking: boolean;
@@ -67,13 +68,12 @@ export default function ClosedEntry({
         <div className={styles.account_info}>
           <label className={styles.title}>{entry.title}</label>
           <div className={styles.credentials}>
-            <div className={styles.tooltip}>
+            <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
               <div className={`${styles.label} ${styles.clickable}`} onClick={() => copyToClipboard(entry.username)}>
                 {entry.username}
               </div>
-              <span className={styles.tooltip_text}>{copiedUsername ? 'Copied!' : 'Copy username'}</span>
-            </div>
-            <div className={styles.tooltip} onClick={handleCopyPassword}>
+            </ToolTip>
+            <ToolTip text={'Copy password'} position={'bottom'}>
               <input
                 className={styles.password_shadow}
                 title={'Copy to clipboard'}
@@ -81,14 +81,12 @@ export default function ClosedEntry({
                 value={'password'}
                 readOnly
               />
-              <span className={styles.tooltip_text}>Copy password</span>
-            </div>
+            </ToolTip>
           </div>
         </div>
       );
     }
   };
-
   return (
     <>
       {renderLockedEntryIcon(unlocking, entry.tags[0] ?? '')}

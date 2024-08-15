@@ -182,7 +182,7 @@ export default function TableEntry({
         />
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
-        <div className={`${styles.entry} ${unlocking ? styles.unlocking : ''}`}>
+        <div className={`${styles.entry} ${styles.highlight} ${unlocking ? styles.unlocking : ''}`}>
           <ClosedEntry
             unlocking={unlocking}
             locked={locked}
