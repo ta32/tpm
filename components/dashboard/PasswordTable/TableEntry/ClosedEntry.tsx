@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/use-tag-entries';
 import { SafePasswordEntry } from 'lib/trezor';
-import ToolTip from '../../../ui/ToolTip';
+import ToolTip from 'components/ui/ToolTip';
 
 interface ClosedEntryProps {
   unlocking: boolean;
