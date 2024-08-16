@@ -18,6 +18,7 @@
   transition: opacity 1s;
 }
 
+/* Style of the tooltip arrow */
 .tooltip .tooltip_text::after {
   content: "";
   position: absolute;
@@ -48,6 +49,7 @@
   margin-top: 0.25rem;
 }
 
+/* Tooltip arrow positioned at top edge of tooltip text */
 .tooltip_bottom .tooltip_text::after {
   bottom: 100%;
   left: 50%;
@@ -63,6 +65,7 @@
   margin-bottom: 0.25rem;
 }
 
+/* Tooltip arrow positioned at bottom edge of tooltip text */
 .tooltip_top .tooltip_text::after {
   top: 100%;
   left: 50%;
@@ -78,9 +81,10 @@
   margin-left: 0.25rem;
 }
 
+/* Tooltip arrow positioned at left edge of tooltip text */
 .tooltip_right .tooltip_text::after {
   top: 50%;
-  left: 0;
+  right: 100%;
   transform: translateY(-50%);
   border-color: transparent colors.$black transparent transparent;
 }
@@ -93,9 +97,10 @@
   margin-right: 0.25rem;
 }
 
+/* Tooltip arrow positioned at right edge of tooltip text */
 .tooltip_left .tooltip_text::after {
   top: 50%;
-  right: 0;
+  left: 100%;
   transform: translateY(-50%);
   border-color: transparent transparent transparent colors.$black;
 }
