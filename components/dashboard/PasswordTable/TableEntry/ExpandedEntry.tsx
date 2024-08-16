@@ -57,6 +57,10 @@ export default function ExpandedEntry({
     }
   };
 
+  const handleChange = () => {
+    setItemMissing(false);
+  };
+
   const handleRemoveEntryConfirm = () => {
     if (entry?.key) {
       passwordEntriesDispatch({
@@ -97,7 +101,7 @@ export default function ExpandedEntry({
           cancelCallback={handleCancelRemoveEntry}
         />
       )}
-      <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={true}>
+      <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={true} onChange={handleChange}>
         {renderIcon(entry?.tags[0] ?? '')}
         <div className={styles.account_info}>
           <EntryInput

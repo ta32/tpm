@@ -63,7 +63,7 @@ export default function EntryInput({
     );
     if (mandatory) {
       return (
-        <ToolTip text={'Item is a mandatory field'} position={'right'} mode={'manual'} active={invalid}>
+        <ToolTip text={'Item is mandatory'} position={'right'} mode={'manual'} active={invalid} width={'150px'}>
           {inputElement}
         </ToolTip>
       );
