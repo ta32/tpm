@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Layout.module.scss';
 import Image from 'next/image';
-import { IMAGE_FILE } from '../../lib/images';
+import { IMAGE_FILE } from 'lib/images';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

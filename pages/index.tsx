@@ -1,5 +1,3 @@
-import styles from './index.module.scss';
-import Image from 'next/image';
 import TrezorConnect, {
   DEVICE,
   DeviceEventMessage,
@@ -7,29 +5,24 @@ import TrezorConnect, {
   UI,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from '../lib/dropbox';
 import { setTrezorEventHandlers, getDevices, getEncryptionKey } from '../lib/trezor';
-import Layout from '../components/index/Layout';
-import PinDialog from '../components/index/PinDialog';
+import Home from '../components/index/Home';
 import { useUser, useUserDispatch } from '../contexts/use-user';
 import { UserStatus } from '../contexts/reducers/user-reducer';
-import { IMAGE_FILE } from '../lib/images';
 import { useRouter } from 'next/router';
-import DeviceIcon from '../components/svg/ui/DeviceIcon';
-import Colors from '../styles/colors.module.scss';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
   : 'http://localhost:3000/';
 
-export default function Home() {
+export default function Index() {
   const router = useRouter();
   const [user, userRef] = useUser();
   const [userDispatch, userDispatchRef] = useUserDispatch();
   const [loading, setLoading] = useState(false);
-  const [showLogoutUrl, setShowLogoutUrl] = useState(false);
 
   useEffect(() => {
     const locationSearch = window.location.search;
@@ -126,131 +119,17 @@ export default function Home() {
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
-  const handleShowLogoutUrl = () => {
-    setShowLogoutUrl(!showLogoutUrl);
-  };
-
   const handleLogout = () => {
     userDispatch({ type: 'LOGOUT' });
     window.sessionStorage.clear();
   };
 
-  const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
-  const renderStorageSelection = () => {
-    return (
-      <button className={styles.dropbox} onClick={handleDropBoxSignIn}>
-        <Image
-          className={styles.icon_over_button}
-          src={IMAGE_FILE.DROPBOX_BLUE.path()}
-          width={30}
-          height={30}
-          alt={'sign in with dropbox'}
-        />
-        Sign in with Dropbox
-      </button>
-    );
-  };
-  const renderTrezorPanel = () => {
-    return (
-      <div className={styles.dropbox_user}>
-        <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
-        <div className={styles.dropbox_user}>
-          <span className={styles.dropbox_user}>Signed in as</span>
-          <h3 className={styles.dropbox_user}>
-            <b>{user.dropboxAccountName}</b>
-          </h3>
-          <span className={styles.connect_trezor}>
-            <Image src={IMAGE_FILE.CONNECT_TREZOR.path()} alt={'trezor-disconnected'} width={20} height={45} />
-            <span>Connect TREZOR to continue</span>
-          </span>
-        </div>
-      </div>
-    );
-  };
-  const renderTrezorList = () => {
-    return (
-      <div className={styles.dropbox_user}>
-        <Image src={IMAGE_FILE.DROPBOX.path()} alt={'signed in as dropbox user'} width={110} height={110} />
-        <div>
-          <span>Signed in as</span>
-          <h3 onClick={handleShowLogoutUrl}>
-            <b>{user.dropboxAccountName}</b>
-          </h3>
-          {showLogoutUrl && (
-            <a onClick={handleLogout} className={styles.logout_link} href={LOGOUT_URL} target="_blank" rel="noreferrer">
-              <span>Logout and use a different account</span>
-            </a>
-          )}
-          <ul className={styles.dev_list}>
-            <li key="1">
-              <a onClick={openDevice}>
-                <span className={styles.trezor_logo} style={{ backgroundImage: `url(${trezorLogo})` }} />
-                <span className={user.device?.model == '1' ? styles.t1 : styles.t2} />
-                <span className="nav-label">{user.device?.label || ''}</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    );
-  };
-  const renderContent = () => {
-    if (loading) {
-      return <span className={styles.spinner}></span>;
-    } else {
-      switch (user.status) {
-        case UserStatus.OFFLINE:
-          return renderStorageSelection();
-        case UserStatus.ONLINE_NO_TREZOR:
-          return renderTrezorPanel();
-        case UserStatus.ONLINE_WITH_TREZOR:
-          return renderTrezorList();
-        case UserStatus.TREZOR_ACTIVATED:
-          return renderTrezorList();
-        case UserStatus.TREZOR_REQ_PIN_AUTH:
-          return <PinDialog submitCallback={enterPin}></PinDialog>;
-        case UserStatus.TREZOR_REQ_CONFIRMATION:
-          return (
-            <div className={styles.main}>
-              <div className={styles.device_logo}>
-                <DeviceIcon width={50} fill={Colors.soft_white} />
-              </div>
-              <span className={styles.desc}>Follow the instructions on your</span>
-              <span className={styles.desc}>
-                <b>{user.device?.label}</b> device
-              </span>
-            </div>
-          );
-        case UserStatus.TREZOR_UNACQUIRED_DEVICE:
-          return (
-            <div className={styles.main}>
-              <div className={styles.device_logo}>
-                <DeviceIcon width={50} fill={Colors.soft_white} />
-              </div>
-              <span className={styles.desc}>Device is used elsewhere</span>
-              <span className={styles.desc}>
-                <b>Reconnect</b> your device
-              </span>
-            </div>
-          );
-        case UserStatus.TREZOR_PIN_ENTERED:
-        case UserStatus.TREZOR_ENTERED_CONFIRMATION:
-          return (
-            <div className={styles.main}>
-              <h1>Waking up ...</h1>
-              <span className={styles.spinner}></span>
-            </div>
-          );
-        default:
-          return <> </>;
-      }
-    }
-  };
-
   return (
-    <Layout>
-      <Image src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
-      <div className={styles.grid}>{renderContent()}</div>
-    </Layout>
+    <Home loading={loading}
+          handleDropBoxSignIn={handleDropBoxSignIn}
+          handleLogout={handleLogout}
+          enterPin={enterPin}
+          openDevice={openDevice}>
+    </Home>
   );
 }
