@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import Layout from './Layout';
+import Layout from './Home/Layout';
+import PinDialog from './Home/PinDialog';
 import Image from 'next/image';
 import { IMAGE_FILE } from '../../lib/images';
 import styles from './Home.module.scss';
 import { UserStatus } from '../../contexts/reducers/user-reducer';
-import PinDialog from './PinDialog';
 import DeviceIcon from '../svg/ui/DeviceIcon';
 import Colors from '../../styles/colors.module.scss';
 import { useUser } from '../../contexts/use-user';
@@ -13,15 +13,18 @@ const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
 interface HomeProps {
   loading: boolean;
-  showLogoutUrl: boolean;
   handleDropBoxSignIn: () => void;
-  handleShowLogoutUrl: () => void;
   handleLogout: () => void;
   openDevice: () => void;
   enterPin: (pin: string) => void;
 }
-export default function Home({loading, showLogoutUrl, handleDropBoxSignIn, handleShowLogoutUrl, handleLogout, openDevice, enterPin}: HomeProps) {
+export default function Home({loading, handleDropBoxSignIn, handleLogout, openDevice, enterPin}: HomeProps) {
   const [user, userRef] = useUser();
+  const [showLogoutUrl, setShowLogoutUrl] = useState(false);
+
+  const handleShowLogoutUrl = () => {
+    setShowLogoutUrl(!showLogoutUrl);
+  };
 
   const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
   const renderStorageSelection = () => {

@@ -1,5 +1,3 @@
-import styles from './index.module.scss';
-import Image from 'next/image';
 import TrezorConnect, {
   DEVICE,
   DeviceEventMessage,
@@ -7,18 +5,13 @@ import TrezorConnect, {
   UI,
   UiEventMessage,
 } from '@trezor/connect-web';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from '../lib/dropbox';
 import { setTrezorEventHandlers, getDevices, getEncryptionKey } from '../lib/trezor';
 import Home from '../components/index/Home';
-import Layout from '../components/index/Layout';
-import PinDialog from '../components/index/PinDialog';
 import { useUser, useUserDispatch } from '../contexts/use-user';
 import { UserStatus } from '../contexts/reducers/user-reducer';
-import { IMAGE_FILE } from '../lib/images';
 import { useRouter } from 'next/router';
-import DeviceIcon from '../components/svg/ui/DeviceIcon';
-import Colors from '../styles/colors.module.scss';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
@@ -30,7 +23,6 @@ export default function Index() {
   const [user, userRef] = useUser();
   const [userDispatch, userDispatchRef] = useUserDispatch();
   const [loading, setLoading] = useState(false);
-  const [showLogoutUrl, setShowLogoutUrl] = useState(false);
 
   useEffect(() => {
     const locationSearch = window.location.search;
@@ -126,9 +118,7 @@ export default function Index() {
     userDispatch({ type: 'DEVICE_PIN_ENTERED' });
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
-  const handleShowLogoutUrl = () => {
-    setShowLogoutUrl(!showLogoutUrl);
-  };
+
   const handleLogout = () => {
     userDispatch({ type: 'LOGOUT' });
     window.sessionStorage.clear();
@@ -136,9 +126,7 @@ export default function Index() {
 
   return (
     <Home loading={loading}
-          showLogoutUrl={showLogoutUrl}
           handleDropBoxSignIn={handleDropBoxSignIn}
-          handleShowLogoutUrl={handleShowLogoutUrl}
           handleLogout={handleLogout}
           enterPin={enterPin}
           openDevice={openDevice}>
