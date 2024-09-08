@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Layout from './Home/Layout';
-import PinDialog from './Home/PinDialog';
+import PinDialog from 'components/ui/PinDialog';
 import Image from 'next/image';
 import { IMAGE_FILE } from '../../lib/images';
 import styles from './Home.module.scss';

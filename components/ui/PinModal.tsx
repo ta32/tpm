@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from './Modal';
-import PinDialog from '../index/PinDialog';
+import PinDialog from './PinDialog';
 
 interface PinDialogProps {
   show: boolean;
