@@ -1,5 +1,5 @@
 @use "styles/animations";
-@use "../styles/colors.module";
+@use "styles/colors.module";
 
 @mixin flex-center {
   display: flex;
@@ -27,8 +27,8 @@
 }
 
 .desc {
- color: colors.$soft_white;
- font-size: 2.1em;
+  color: colors.$soft_white;
+  font-size: 2.1em;
 }
 
 .icon_over_button {
@@ -128,15 +128,15 @@
 }
 
 .spinner {
-    margin: 10px auto;
-    width: 50px;
-    height: 50px;
-    border: 5px solid colors.$white;
-    border-right-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    vertical-align: middle;
-    animation: rotate 1s infinite linear;
+  margin: 10px auto;
+  width: 50px;
+  height: 50px;
+  border: 5px solid colors.$white;
+  border-right-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  animation: rotate 1s infinite linear;
 }
 
 .dev_list {
