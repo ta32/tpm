@@ -1,35 +1,60 @@
 import { Dropbox, DropboxAuth, DropboxResponse, files } from 'dropbox';
 import { appFileName } from './appfile';
 import { readBlob } from './utils';
-import { User } from '../contexts/reducers/user-reducer';
 
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 
-export function hasRedirectedFromAuth() {
-  return window.location.search.includes('code=');
+export function hasRedirectedFromAuth(locationSearch: string): boolean {
+  return locationSearch.includes('code=');
 }
 
-export async function connectDropbox(redirectUri: string, codeVerifier: string): Promise<Dropbox> {
+interface AppFile {
+  data: Uint8Array | undefined;
+  rev: string;
+  initialized: boolean;
+}
+
+interface DropboxConnection {
+  dbc: Dropbox;
+  name: string;
+}
+
+export async function connectDropbox(redirectUri: string, codeVerifier: string, locationSearch: string): Promise<DropboxConnection> {
   const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
+  const code = getAuthCodeFromUrl(locationSearch);
   dbxAuth.setCodeVerifier(codeVerifier);
-  let response: DropboxResponse<any> = await dbxAuth.getAccessTokenFromCode(redirectUri, getAuthCodeFromUrl());
+  let response: DropboxResponse<any> = await dbxAuth.getAccessTokenFromCode(redirectUri, code);
   if (response.result.access_token) {
     dbxAuth.setAccessToken(response.result.access_token);
     // console.log("token expires in: ", response.result.expires_in);
-    return new Dropbox({ auth: dbxAuth });
+    const dbc = new Dropbox({ auth: dbxAuth });
+    const account = await dbc.usersGetCurrentAccount();
+    return { dbc, name: account.result.name.display_name };
   }
   throw new Error('No access token');
 }
 
-export async function readAppFile(
-  masterPublicKey: string,
-  dbc: Dropbox
-): Promise<{
-  data: Uint8Array | undefined;
-  rev: string;
-  initialized: boolean;
-}> {
+export async function getAuthUrl(appUrl: string): Promise<{authUrl: string, codeVerifier: string}> {
+  const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
+  try {
+    const authUrlObj = await dbxAuth.getAuthenticationUrl(appUrl,
+      undefined,
+      'code',
+      'offline',
+      undefined,
+      undefined,
+      true);
+    const codeVerifier = dbxAuth.getCodeVerifier();
+    window.sessionStorage.setItem('codeVerifier', codeVerifier);
+    const authUrl = authUrlObj.toString();
+    return { authUrl, codeVerifier };
+  } catch (error) {
+    throw new Error('Could not get authentication URL');
+  }
+}
+
+export async function readAppFile(masterPublicKey: string, dbc: Dropbox): Promise<AppFile> {
   const fileName = await appFileName(masterPublicKey);
   const files = await listFiles(dbc);
   const fileExists = files.includes(fileName);
@@ -97,7 +122,7 @@ async function listFiles(dbc: Dropbox): Promise<string[]> {
   return [];
 }
 
-function getAuthCodeFromUrl(): string {
-  const params = new URLSearchParams(window.location.search);
+function getAuthCodeFromUrl(locationSearch: string): string {
+  const params = new URLSearchParams(locationSearch);
   return params.get('code')?.toString() || '';
 }

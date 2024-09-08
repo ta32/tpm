@@ -8,9 +8,8 @@ import TrezorConnect, {
   UiEventMessage,
 } from '@trezor/connect-web';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DropboxAuth, DropboxResponse, users } from 'dropbox';
-import { connectDropbox, hasRedirectedFromAuth } from '../lib/dropbox';
-import { setTrezorEventHandlers, getDevices, getEncryptionKey, initTrezor } from '../lib/trezor';
+import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from '../lib/dropbox';
+import { setTrezorEventHandlers, getDevices, getEncryptionKey } from '../lib/trezor';
 import Layout from '../components/index/Layout';
 import PinDialog from '../components/index/PinDialog';
 import { useUser, useUserDispatch } from '../contexts/use-user';
@@ -20,9 +19,6 @@ import { useRouter } from 'next/router';
 import DeviceIcon from '../components/svg/ui/DeviceIcon';
 import Colors from '../styles/colors.module.scss';
 
-// App key from dropbox app console. This is not secret.
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
-const STORAGE = 'tpmDropboxToken';
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
@@ -36,31 +32,21 @@ export default function Home() {
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
 
   useEffect(() => {
+    const locationSearch = window.location.search;
     let codeVerifier = window.sessionStorage.getItem('codeVerifier');
-    if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth() && codeVerifier !== null) {
+    if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth(locationSearch) && codeVerifier !== null) {
       setLoading(true);
-      connectDropbox(APP_URL, codeVerifier)
-        .then((dbc) => {
-          dbc
-            .usersGetCurrentAccount()
-            .then((dropBoxUser: DropboxResponse<users.FullAccount>) => {
-              setLoading(false);
-              let name = dropBoxUser.result.name.display_name;
-              userDispatch({
-                type: 'DROPBOX_USER_LOGGED_IN',
-                userName: name,
-                dbc,
-              });
-            })
-            .catch((error) => {
-              // TODO: handle error could not get current user account
-              console.error(error);
-            });
-        })
-        .catch((error) => {
-          // TODO: handle error
-          window.sessionStorage.clear();
+      connectDropbox(APP_URL, codeVerifier, locationSearch)
+        .then(({ dbc, name }) => {
+          setLoading(false);
+          userDispatch({
+            type: 'DROPBOX_USER_LOGGED_IN',
+            userName: name,
+            dbc,
+          });
+        }).catch((error) => {
           console.error(error);
+          window.sessionStorage.clear();
         });
     }
   }, [router, user, userDispatch]);
@@ -127,18 +113,13 @@ export default function Home() {
       console.error('APP_URI is undefined');
       return;
     }
-    // TODO this auth logic shouldn't be here
-    const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
-    dbxAuth
-      .getAuthenticationUrl(APP_URL, undefined, 'code', 'offline', undefined, undefined, true)
-      .then((authUrl) => {
-        window.sessionStorage.clear();
-        window.sessionStorage.setItem('codeVerifier', dbxAuth.getCodeVerifier());
-        window.location.href = authUrl as string;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    getAuthUrl(APP_URL).then(({authUrl, codeVerifier}) => {
+      window.sessionStorage.clear();
+      window.sessionStorage.setItem('codeVerifier', codeVerifier);
+      window.location.href = authUrl as string;
+    }).catch((error) => {
+      console.error(error);
+    });
   };
   const enterPin = (pin: string) => {
     userDispatch({ type: 'DEVICE_PIN_ENTERED' });
