@@ -19,6 +19,7 @@
     "react-icons": "^4.8.0"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@next/bundle-analyzer": "^13.4.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",

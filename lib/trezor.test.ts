@@ -1,3 +1,4 @@
+import { it, expect } from '@jest/globals';
 import TrezorConnect, { Success } from '@trezor/connect-web';
 import {
   ClearPasswordEntry,
