@@ -1,4 +1,4 @@
-import { describe } from '@jest/globals';
+import { describe, expect } from '@jest/globals';
 import {
   AddEntry,
   getSafePasswordEntries,
