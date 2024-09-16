@@ -140,7 +140,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
 
   return (
     <Layout>
-      <Image src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
+      <Image unoptimized={true} src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
       <div className={styles.grid}>{renderContent()}</div>
     </Layout>
   );
