@@ -1,4 +1,4 @@
-import { describe } from '@jest/globals';
+import { it, expect } from '@jest/globals';
 import { TextDecoder, TextEncoder } from 'util';
 import { deserializeObject, serializeObject } from './storage';
 

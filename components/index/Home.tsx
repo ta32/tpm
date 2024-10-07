@@ -29,7 +29,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
   const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
   const renderStorageSelection = () => {
     return (
-      <button className={styles.dropbox} onClick={handleDropBoxSignIn}>
+      <button className={styles.dropbox} onClick={handleDropBoxSignIn} data-cy="storage-login">
         <Image
           className={styles.icon_over_button}
           src={IMAGE_FILE.DROPBOX_BLUE.path()}
@@ -48,7 +48,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
         <div className={styles.dropbox_user}>
           <span className={styles.dropbox_user}>Signed in as</span>
           <h3 className={styles.dropbox_user}>
-            <b>{user.dropboxAccountName}</b>
+            <b data-cy={"dropbox-account-name"}>{user.dropboxAccountName}</b>
           </h3>
           <span className={styles.connect_trezor}>
             <Image src={IMAGE_FILE.CONNECT_TREZOR.path()} alt={'trezor-disconnected'} width={20} height={45} />
@@ -87,7 +87,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
   };
   const renderContent = () => {
     if (loading) {
-      return <span className={styles.spinner}></span>;
+      return <span data-cy={'home-page-spinner'} className={styles.spinner}></span>;
     } else {
       switch (user.status) {
         case UserStatus.OFFLINE:
@@ -140,7 +140,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
 
   return (
     <Layout>
-      <Image src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
+      <Image unoptimized={true} src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
       <div className={styles.grid}>{renderContent()}</div>
     </Layout>
   );

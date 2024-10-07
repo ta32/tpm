@@ -5,6 +5,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "cypress:open": "cypress open",
     "prettier": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore",
     "test": "jest --watch"
   },
@@ -18,11 +19,13 @@
     "react-icons": "^4.8.0"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@next/bundle-analyzer": "^13.4.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/node": "17.0.4",
     "@types/react": "17.0.38",
+    "cypress": "^13.14.2",
     "eslint": "8.57.0",
     "eslint-config-next": "13.5.6",
     "eslint-config-prettier": "9.1.0",

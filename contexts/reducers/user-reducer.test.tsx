@@ -1,4 +1,4 @@
-import { describe } from '@jest/globals';
+import { describe, expect } from '@jest/globals';
 import { ActivatedTmpOnDevice, AddDevice, DropboxUserLoggedIn, User, userReducer, UserStatus } from './user-reducer';
 import { Dropbox } from 'dropbox';
 import { TrezorDevice } from '../../lib/trezor';

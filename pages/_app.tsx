@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import '../styles/globals.css';
+import 'styles/globals.css';
 import { AppProps } from 'next/app';
 import { UserProvider } from '../contexts/use-user';
 import { PasswordEntriesProvider } from '../contexts/use-password-entries';

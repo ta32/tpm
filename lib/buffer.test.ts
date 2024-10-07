@@ -1,3 +1,4 @@
+import { it, expect } from '@jest/globals';
 import { hexFromUint8Array } from './buffer';
 
 it('should convert to hex', () => {

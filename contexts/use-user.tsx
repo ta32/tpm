@@ -3,7 +3,7 @@ import { User, UserAction, userReducer, UserStatus } from './reducers/user-reduc
 import { Dropbox } from 'dropbox';
 export { type User } from './reducers/user-reducer';
 
-const initialUser = {
+const defaultInitialUser = {
   status: UserStatus.OFFLINE,
   device: null,
   dropboxAccountName: '',
@@ -56,7 +56,7 @@ type UserDispatchContextType = [Dispatch<UserAction>, MutableRefObject<Dispatch<
 const UserContext = createContext<UserContextType | undefined>(undefined);
 const UserDispatchContext = createContext<UserDispatchContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
+export function UserProvider({ children, initialUser = defaultInitialUser }: { children: React.ReactNode, initialUser?: User }) {
   const [user, userDispatch] = useReducer(userReducer, initialUser);
   const userRef = useRef(user);
   const userDispatchRef = useRef(userDispatch);
