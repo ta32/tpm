@@ -29,7 +29,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
   const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
   const renderStorageSelection = () => {
     return (
-      <button className={styles.dropbox} onClick={handleDropBoxSignIn}>
+      <button className={styles.dropbox} onClick={handleDropBoxSignIn} data-cy="storage-login">
         <Image
           className={styles.icon_over_button}
           src={IMAGE_FILE.DROPBOX_BLUE.path()}
