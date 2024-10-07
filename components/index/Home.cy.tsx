@@ -1,13 +1,47 @@
 /// <reference types="cypress" />
 import { Inter } from "next/font/google";
-import React from 'react';
+import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef } from 'react';
 import Home from './Home'
-import { UserProvider } from 'contexts/use-user';
+import { User, UserProvider, useUser, useUserDispatch } from 'contexts/use-user';
 import { IMAGE_FILE } from 'lib/images';
 import { Dropbox } from 'dropbox';
-import { UserStatus } from '../../contexts/reducers/user-reducer';
+import { UserAction, UserStatus } from '../../contexts/reducers/user-reducer';
 
 const inter = Inter({ subsets: ['latin'] });
+
+interface HomePageWrapperProps {
+  children: React.ReactNode;
+  initialUser?: User;
+  onStorageLogin?: () => UserAction;
+}
+function HomePageWrapper(props: HomePageWrapperProps) {
+  return (
+    <div className={inter.className} style={{margin: 0}}>
+      <UserProvider initialUser={props.initialUser}>
+        <HomePageController {...props}>
+          {props.children}
+        </HomePageController>
+      </UserProvider>
+    </div>
+  )
+}
+function HomePageController({children, initialUser, onStorageLogin}: HomePageWrapperProps) {
+  const [user, userRef] = useUser();
+  const [userDispatch, userDispatchRef] = useUserDispatch();
+  const styleHide: CSSProperties = {visibility: 'hidden'};
+  return (
+    <>
+      {children}
+      <button style={styleHide} data-cy="invoke-user-dispatch-onStorageLogin" onClick={() => {
+        if (onStorageLogin) {
+          userDispatch(onStorageLogin());
+        } else
+          console.error('onStorageLogin is not defined');
+       }}
+      />
+    </>
+  )
+}
 
 describe('<Home />', () => {
   beforeEach(() => {
@@ -31,33 +65,43 @@ describe('<Home />', () => {
       dropboxSignInClicked = true;
     };
     cy.mount(
-      <div className={inter.className} style={{margin: 0}}>
-        <UserProvider>
-          <Home loading={false} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={handleDropBoxSignIn}/>
-        </UserProvider>
-      </div>
+      <HomePageWrapper>
+        <Home loading={false} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={handleDropBoxSignIn}/>
+      </HomePageWrapper>
     )
     cy.get('[data-cy=storage-login]').click().then(() => {
       expect(dropboxSignInClicked).to.be.true;
     });
   })
 
-  it('after OAUTH redirect and sign in the dropbox user is shown', () => {
-    const userAfterSignIn = {
-      status: UserStatus.ONLINE_NO_TREZOR,
-      device: null,
-      dropboxAccountName: 'ta32mock',
-      dbc: new Dropbox(),
-      errorMsg: '',
-    }
+  it('after OAUTH while signing in to the storage account, the user sees the spinner', () => {
     cy.viewport(1920,1080);
     const voidFunc = () => {};
     cy.mount(
-      <div className={inter.className} style={{margin: 0}}>
-        <UserProvider initialUser={userAfterSignIn}>
-          <Home loading={false} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
-        </UserProvider>
-      </div>
+      <HomePageWrapper>
+        <Home loading={true} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
+      </HomePageWrapper>
     )
+    cy.get('[data-cy=home-page-spinner]').should('exist');
+  });
+
+  it('after OAUTH redirect and sign in to the storage account, the dropbox user is shown', () => {
+    cy.viewport(1920,1080);
+    const voidFunc = () => {};
+    const onStorageLogin = () => {
+      return { type: 'DROPBOX_USER_LOGGED_IN', userName: 'ta32mock', dbc: new Dropbox() } as UserAction;
+    }
+    // act
+    cy.mount(
+      <HomePageWrapper onStorageLogin={onStorageLogin}>
+        <Home loading={false} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
+      </HomePageWrapper>
+    )
+    cy.get('[data-cy=invoke-user-dispatch-onStorageLogin]').click({ force: true })
+
+    // assert
+    cy.get('[data-cy=dropbox-account-name]').should('have.text', 'ta32mock');
   });
 })
+
+

@@ -48,7 +48,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
         <div className={styles.dropbox_user}>
           <span className={styles.dropbox_user}>Signed in as</span>
           <h3 className={styles.dropbox_user}>
-            <b>{user.dropboxAccountName}</b>
+            <b data-cy={"dropbox-account-name"}>{user.dropboxAccountName}</b>
           </h3>
           <span className={styles.connect_trezor}>
             <Image src={IMAGE_FILE.CONNECT_TREZOR.path()} alt={'trezor-disconnected'} width={20} height={45} />
@@ -87,7 +87,7 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
   };
   const renderContent = () => {
     if (loading) {
-      return <span className={styles.spinner}></span>;
+      return <span data-cy={'home-page-spinner'} className={styles.spinner}></span>;
     } else {
       switch (user.status) {
         case UserStatus.OFFLINE:
