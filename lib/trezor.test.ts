@@ -81,12 +81,12 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
   // the key is used to encrypt and decrypt the app data
   const appDataKey = await getEncryptionKey('path');
   expect(appDataKey).toBeDefined();
-  expect(appDataKey?.encryptionKey).toBeDefined();
+  expect(appDataKey?.userAppDataEncryptionKey).toBeDefined();
   // array with 170 32 elements
   const expectedKey = new Uint8Array(32);
   expectedKey.fill(170); // hex value aa is 170
-  expect(appDataKey?.encryptionKey).toEqual(new Uint8Array(expectedKey));
-  if (appDataKey === undefined || appDataKey?.encryptionKey === undefined) {
+  expect(appDataKey?.userAppDataEncryptionKey).toEqual(new Uint8Array(expectedKey));
+  if (appDataKey === undefined || appDataKey?.userAppDataEncryptionKey === undefined) {
     return;
   }
   const safeEntry: SafePasswordEntry = {
@@ -108,7 +108,7 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
     modelVersion: 1,
   };
 
-  const result = await encryptAppData(appData, appDataKey.encryptionKey);
+  const result = await encryptAppData(appData, appDataKey.userAppDataEncryptionKey);
   expect(result).toBeDefined();
   if (result === undefined) {
     return;
@@ -117,7 +117,7 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
   // must be called after encryptAppData
   mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
 
-  const decryptedAppData = await decryptAppData(result, appDataKey.encryptionKey);
+  const decryptedAppData = await decryptAppData(result, appDataKey.userAppDataEncryptionKey);
   expect(decryptedAppData).toBeDefined();
   if (decryptedAppData === undefined) {
     return;

@@ -38,8 +38,8 @@ export default function Dashboard() {
             selectedTag={selectedTag}
             dbc={user.dbc}
             accountName={user.dropboxAccountName}
-            masterPublicKey={user.device.masterKey}
-            appDataEncryptionKey={user.device.encryptionKey}
+            masterPublicKey={user.device.appDataSeed}
+            appDataEncryptionKey={user.device.appDataEncryptionKey}
           />
         )}
         <StatusModal />

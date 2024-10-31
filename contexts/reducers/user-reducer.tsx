@@ -1,5 +1,5 @@
 // MODEL
-import { TrezorDevice, KeyPair } from '../../lib/trezor';
+import { TrezorDevice, AppDataKeys } from '../../lib/trezor';
 import { Dropbox } from 'dropbox';
 
 export enum UserStatus {
@@ -50,7 +50,7 @@ export interface DevicePinEntered {
 }
 export interface ActivatedTmpOnDevice {
   type: 'ACTIVATED_TMP_ON_DEVICE';
-  keyPair: KeyPair;
+  keyPair: AppDataKeys;
 }
 
 export type UserAction =
@@ -123,8 +123,8 @@ export function userReducer(state: User, action: UserAction): User {
       if (state.device !== null) {
         const device: TrezorDevice = {
           ...state.device,
-          masterKey: action.keyPair.masterKey,
-          encryptionKey: action.keyPair.encryptionKey,
+          appDataSeed: action.keyPair.userAppDataSeed512Bit,
+          appDataEncryptionKey: action.keyPair.userAppDataEncryptionKey,
         };
         return {
           ...state,

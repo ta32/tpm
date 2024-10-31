@@ -16,6 +16,7 @@ const PATH = [(SLIP_16_PATH | BIP_44_COIN_TYPE_BTC) >>> 0, 0];
 const DEFAULT_NONCE =
   '2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee';
 const DEFAULT_KEY_PHRASE = 'Activate Temp Password Manager?';
+const LEGACY_KEY_PHRASE = 'Activate TREZOR Password Manager?';
 
 // AES-256-GCM
 const IV_SIZE = 12;
@@ -26,12 +27,13 @@ export interface TrezorDevice {
   model: string;
   deviceId: string;
   path: string;
-  masterKey: string;
-  encryptionKey: Uint8Array;
+  appDataSeed: string;
+  appDataEncryptionKey: Uint8Array;
 }
-export interface KeyPair {
-  masterKey: string;
-  encryptionKey: Uint8Array;
+// TODO rename this to something else
+export interface AppDataKeys {
+  userAppDataSeed512Bit: string;
+  userAppDataEncryptionKey: Uint8Array;
 }
 export interface SafePasswordEntry {
   key: string;
@@ -98,8 +100,8 @@ export async function getDevices(): Promise<TrezorDevice | null> {
   if (result.success) {
     let { unlocked, label, model, device_id } = result.payload;
     return {
-      encryptionKey: new Uint8Array(),
-      masterKey: '',
+      appDataEncryptionKey: new Uint8Array(),
+      appDataSeed: '',
       path: '',
       label: label ?? '',
       model: model ?? '1',
@@ -109,7 +111,7 @@ export async function getDevices(): Promise<TrezorDevice | null> {
   return null;
 }
 
-export async function getEncryptionKey(devicePath: string): Promise<KeyPair | null> {
+export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys | null> {
   const result = await TrezorConnect.cipherKeyValue({
     device: {
       path: devicePath,
@@ -126,8 +128,8 @@ export async function getEncryptionKey(devicePath: string): Promise<KeyPair | nu
   if (result.success) {
     const tmp = result.payload.value;
     return {
-      masterKey: result.payload.value, // assumes master key is 128 bytes long
-      encryptionKey: uint8ArrayFromHex(tmp.substring(tmp.length / 2, tmp.length)),
+      userAppDataSeed512Bit: result.payload.value,
+      userAppDataEncryptionKey: uint8ArrayFromHex(tmp.substring(tmp.length / 2, tmp.length)),
     };
   }
   return null;
