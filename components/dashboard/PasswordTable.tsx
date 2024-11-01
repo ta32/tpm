@@ -17,6 +17,7 @@ import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
 import { useRouter } from 'next/router';
+import ImportPasswordsModal from './ImportPasswordsModal';
 
 interface PasswordTableProps {
   selectedTag: string;
@@ -46,6 +47,7 @@ export default function PasswordTable({
   const [rev, setRev] = useState('');
   const [lockEntries, setLockEntries] = useState(false);
   const [newEntry, setNewEntry] = useState(false);
+  const [importPassword, setImportPassword] = useState(false);
   const [filter, setFilter] = useState('');
   const [sortType, setSortType] = useState(SortType.TITLE);
 
@@ -154,10 +156,17 @@ export default function PasswordTable({
     setLockEntries(status);
   };
 
+  const onCancelImportPassword = () => {
+    setImportPassword(false);
+  };
+
   const handleUserMenuClick = (index: number) => {
     switch (index) {
       case 0:
         router.push('/').catch((err) => console.error(err));
+        break;
+      case 1:
+        setImportPassword(true);
         break;
     }
   };
@@ -184,6 +193,7 @@ export default function PasswordTable({
   });
   return (
     <div className={styles.container}>
+      <ImportPasswordsModal show={importPassword} onCanceled={onCancelImportPassword}></ImportPasswordsModal>
       <div className={styles.start_bar}>
         <div className={styles.col1}>
           <button onClick={handleAddEntry} className={styles.add_btn}>
@@ -197,6 +207,7 @@ export default function PasswordTable({
           <DropdownMenu
             xOffset={-20}
             yOffset={20}
+            itemWidth={'200px'}
             isSelectable={true}
             initSelectedKey={0}
             button={
@@ -213,6 +224,7 @@ export default function PasswordTable({
           <DropdownMenu
             xOffset={-20}
             yOffset={20}
+            itemWidth={'200px'}
             isSelectable={false}
             onClickCallback={handleUserMenuClick}
             button={
@@ -230,6 +242,7 @@ export default function PasswordTable({
             }
           >
             <div className={styles.dropdown_button}>Switch user</div>
+            <div className={styles.dropdown_button}>Import passwords</div>
           </DropdownMenu>
         </div>
       </div>

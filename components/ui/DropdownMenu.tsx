@@ -3,6 +3,7 @@ import styles from './DropdownMenu.module.scss';
 
 interface DropdownMenuProps {
   button: ReactElement;
+  itemWidth?: string;
   children: React.ReactElement[] | React.ReactElement;
   xOffset: number;
   yOffset: number;
@@ -13,6 +14,7 @@ interface DropdownMenuProps {
 
 export default function DropdownMenu({
   button,
+  itemWidth,
   children,
   xOffset,
   yOffset,
@@ -57,6 +59,7 @@ export default function DropdownMenu({
             return (
               <li className={isActive} key={index}>
                 <div
+                  style={{ width: itemWidth}}
                   key={index}
                   onClick={() => {
                     handleMenuClick(index);
