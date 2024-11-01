@@ -15,7 +15,6 @@ const SLIP_16_PATH = 10016;
 const PATH = [(SLIP_16_PATH | BIP_44_COIN_TYPE_BTC) >>> 0, 0];
 const DEFAULT_NONCE =
   '2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee';
-const DEFAULT_KEY_PHRASE = 'Activate TREZOR Password Manager?';
 
 // AES-256-GCM
 const IV_SIZE = 12;
@@ -119,7 +118,7 @@ export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys 
     override: true,
     useEmptyPassphrase: true,
     path: PATH,
-    key: DEFAULT_KEY_PHRASE,
+    key: getAppDataKey(),
     value: DEFAULT_NONCE,
     encrypt: true,
     askOnEncrypt: true,
@@ -157,7 +156,7 @@ export async function encryptFullEntry(entry: ClearPasswordEntry): Promise<SafeP
   );
   let response = await TrezorConnect.cipherKeyValue({
     path: PATH,
-    key: `Unlock ${entry.title} for username ${entry.username}?`,
+    key: getEntryKey(entry.title, entry.username),
     value: hexFromUint8Array(new Uint8Array(await crypto.subtle.exportKey('raw', passKey))),
     askOnEncrypt: false,
     askOnDecrypt: true,
@@ -187,7 +186,7 @@ export async function decryptFullEntry(entry: SafePasswordEntry, legacyMode: boo
   const entryUnlockKey = entry.safeKey;
   const response = await TrezorConnect.cipherKeyValue({
     path: PATH,
-    key: `Unlock ${entry.title} for user ${entry.username}?`,
+    key: getEntryKey(entry.title, entry.username),
     value: entryUnlockKey,
     encrypt: false,
     askOnEncrypt: false,
@@ -263,4 +262,15 @@ function prepareForDecryption(cipherText: Uint8Array, legacyMode: boolean): { iv
     const cipherTextArray = cipherText.slice(IV_SIZE, cipherText.byteLength);
     return { iv, cipherTextArray };
   }
+}
+
+function getEntryKey(tile: string, username: string): string {
+  // Entries must be decrypted with the same key that was used to encrypt them.
+  return `Unlock ${tile} for user ${username}?`;
+}
+
+function getAppDataKey(): string {
+  // Entries must be decrypted with the same key that was used to encrypt them.
+  // Using the same key as the legacy Trezor Password Manager for backward compatibility
+  return 'Activate TREZOR Password Manager?'
 }
