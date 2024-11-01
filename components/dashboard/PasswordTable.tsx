@@ -63,7 +63,7 @@ export default function PasswordTable({
               console.error('Could not read app data');
               return;
             }
-            decryptAppData(result.data, appDataEncryptionKey)
+            decryptAppData(result.data, appDataEncryptionKey, false)
               .then((appData) => {
                 if (appData === undefined) {
                   // TODO: handle error

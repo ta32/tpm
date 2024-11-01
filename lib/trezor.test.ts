@@ -117,7 +117,7 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
   // must be called after encryptAppData
   mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
 
-  const decryptedAppData = await decryptAppData(result, appDataKey.userAppDataEncryptionKey);
+  const decryptedAppData = await decryptAppData(result, appDataKey.userAppDataEncryptionKey, false);
   expect(decryptedAppData).toBeDefined();
   if (decryptedAppData === undefined) {
     return;
@@ -157,7 +157,7 @@ it('encrypt then decrypt result in the same value', async () => {
   // must be called after encryptAppData
   mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
 
-  const decrypted = await decryptFullEntry(result);
+  const decrypted = await decryptFullEntry(result, false);
   expect(decrypted).toBeDefined();
   expect(decrypted?.key).toBe(clearPasswordEntry.key);
   expect(decrypted?.title).toBe(clearPasswordEntry.title);

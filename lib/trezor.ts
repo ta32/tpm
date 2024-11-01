@@ -15,12 +15,12 @@ const SLIP_16_PATH = 10016;
 const PATH = [(SLIP_16_PATH | BIP_44_COIN_TYPE_BTC) >>> 0, 0];
 const DEFAULT_NONCE =
   '2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee2d650551248d792eabf628f451200d7f51cb63e46aadcbb1038aacb05e8c8aee';
-const DEFAULT_KEY_PHRASE = 'Activate Temp Password Manager?';
-const LEGACY_KEY_PHRASE = 'Activate TREZOR Password Manager?';
+const DEFAULT_KEY_PHRASE = 'Activate TREZOR Password Manager?';
 
 // AES-256-GCM
 const IV_SIZE = 12;
 const KEY_SIZE_BITS = 256;
+const AUTH_SIZE = 128 / 8;
 
 export interface TrezorDevice {
   label: string;
@@ -140,9 +140,9 @@ export async function encryptAppData(appData: AppData, key: Uint8Array): Promise
   return encryptWithKey(passKey, serializeObject(appData));
 }
 
-export async function decryptAppData(appDataCipherText: Uint8Array, key: Uint8Array): Promise<AppData | undefined> {
+export async function decryptAppData(appDataCipherText: Uint8Array, key: Uint8Array, legacyMode: boolean): Promise<AppData | undefined> {
   const passKey = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
-  const result = await decryptWithKey(passKey, appDataCipherText);
+  const result = await decryptWithKey(passKey, appDataCipherText, legacyMode);
   return deserializeObject(result);
 }
 
@@ -183,11 +183,11 @@ export async function encryptFullEntry(entry: ClearPasswordEntry): Promise<SafeP
   return undefined;
 }
 
-export async function decryptFullEntry(entry: SafePasswordEntry): Promise<ClearPasswordEntry | undefined> {
+export async function decryptFullEntry(entry: SafePasswordEntry, legacyMode: boolean): Promise<ClearPasswordEntry | undefined> {
   const entryUnlockKey = entry.safeKey;
   const response = await TrezorConnect.cipherKeyValue({
     path: PATH,
-    key: `Unlock ${entry.title} for username ${entry.username}?`,
+    key: `Unlock ${entry.title} for user ${entry.username}?`,
     value: entryUnlockKey,
     encrypt: false,
     askOnEncrypt: false,
@@ -199,8 +199,8 @@ export async function decryptFullEntry(entry: SafePasswordEntry): Promise<ClearP
       'decrypt',
     ]);
     const dec = new TextDecoder();
-    const passwordClear = dec.decode(await decryptWithKey(passKey, entry.passwordEnc));
-    const safeNoteClear = dec.decode(await decryptWithKey(passKey, entry.secretNoteEnc));
+    const passwordClear = dec.decode(await decryptWithKey(passKey, entry.passwordEnc, legacyMode));
+    const safeNoteClear = dec.decode(await decryptWithKey(passKey, entry.secretNoteEnc, legacyMode));
     return {
       key: entry.key,
       item: entry.item,
@@ -236,11 +236,8 @@ async function encryptWithKey(key: CryptoKey, data: Uint8Array): Promise<Uint8Ar
   return cipherTextWithIv;
 }
 
-async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array): Promise<ArrayBuffer> {
-  // CipherText is prepended with the IV
-  const iv = cipherText.slice(0, IV_SIZE);
-  const cipherTextArray = cipherText.slice(IV_SIZE, cipherText.byteLength);
-  // The iv value is the same as that used for encryption
+async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array, legacyMode: boolean): Promise<ArrayBuffer> {
+  const { iv, cipherTextArray} = prepareForDecryption(cipherText, legacyMode);
   return await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
@@ -249,4 +246,21 @@ async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array): Promise<A
     key,
     cipherTextArray
   );
+}
+
+function prepareForDecryption(cipherText: Uint8Array, legacyMode: boolean): { iv: Uint8Array, cipherTextArray: Uint8Array} {
+  // CipherText is prepended with the IV
+  const iv = cipherText.slice(0, IV_SIZE);
+  if (legacyMode) {
+    // The auth tag is appended to the end of the cipherText when encrypted using the Trezor Password Manager (legacy mode)
+    const authTag = cipherText.slice(IV_SIZE, IV_SIZE + AUTH_SIZE);
+    const cipherTextArrayOnly = cipherText.slice(IV_SIZE + AUTH_SIZE, cipherText.byteLength);
+    const cipherTextWithAuthTagAtEnd = new Uint8Array(cipherTextArrayOnly.byteLength + authTag.byteLength);
+    cipherTextWithAuthTagAtEnd.set(cipherTextArrayOnly, 0);
+    cipherTextWithAuthTagAtEnd.set(authTag, cipherTextArrayOnly.byteLength);
+    return { iv, cipherTextArray: cipherTextWithAuthTagAtEnd };
+  } else {
+    const cipherTextArray = cipherText.slice(IV_SIZE, cipherText.byteLength);
+    return { iv, cipherTextArray };
+  }
 }
