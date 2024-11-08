@@ -52,6 +52,24 @@ export const SELECTABLE_TAG_ICONS: Map<string, FC<SVGProps<SVGSVGElement>>> = ne
   ['wifi', WifiIcon],
 ]);
 
+export const FROM_TREZOR_ICON_KEY_TO_TAG_NAME: Map<string, string> = new Map([
+  ['person', 'account_circle'],
+  ['social-bitcoin', 'bitcoin'],
+  ['star', 'grade'],
+  ['flag', 'label_important'],
+  ['heart', 'favorite'],
+  ['settings', 'build'],
+  ['email', 'alternate_email'],
+  ['cloud', 'cloud'],
+  ['alert-circled', 'notification_important'],
+  ['person-stalker', 'group'],
+  ['android-cart', 'shopping_cart'],
+  ['image', 'images_mode'],
+  ['card', 'credit_card'],
+  ['earth', 'language'],
+  ['wifi', 'wifi'],
+]);
+
 export const SELECTABLE_TAG_NAMES = Array.from(SELECTABLE_TAG_ICONS.keys());
 
 const enum IMG_PATH {

@@ -38,6 +38,7 @@ export interface SafePasswordEntry {
   key: string;
   item: string;
   title: string;
+  metaTitle?: string;
   username: string;
   passwordEnc: Uint8Array;
   secretNoteEnc: Uint8Array;
