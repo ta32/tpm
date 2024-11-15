@@ -54,6 +54,7 @@ export default function ClosedEntry({
     );
   };
   const renderAccountInfo = (entry: SafePasswordEntry, unlocking: boolean) => {
+    const title = entry.metaTitle ?? entry.title;
     if (unlocking) {
       return (
         <div className={styles.account_info}>
@@ -66,7 +67,7 @@ export default function ClosedEntry({
     } else {
       return (
         <div className={styles.account_info}>
-          <label className={styles.title}>{entry.title}</label>
+          <label className={styles.title}>{title}</label>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
               <div className={`${styles.label} ${styles.clickable}`} onClick={() => handleCopyUsername(entry.username)}>

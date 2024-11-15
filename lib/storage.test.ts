@@ -11,7 +11,7 @@ const SOCIAL_DEFAULT_TAG_ID = "1a";
 const INITIAL_TAGS = [
   {
     id: "0a",
-    title: "All",
+    title: "ALL",
     icon: "ALL"
   },
   {

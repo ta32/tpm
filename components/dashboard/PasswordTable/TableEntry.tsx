@@ -112,7 +112,7 @@ export default function TableEntry({
       }
       setEntryState({ type: 'DECRYPTING' });
       const safeEntry = row.entry;
-      decryptFullEntry(safeEntry, false)
+      decryptFullEntry(safeEntry, safeEntry?.legacyMode || false)
         .then((clearEntry) => {
           if (clearEntry != null) {
             setEntryState({ type: 'DECRYPTED' });

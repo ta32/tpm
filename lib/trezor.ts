@@ -7,7 +7,7 @@ import TrezorConnect, {
 } from '@trezor/connect-web';
 import { hexFromUint8Array, uint8ArrayFromHex } from './buffer';
 
-import { AppData, deserializeObject, serializeObject } from './storage';
+import { AppData, deserializeObject, serializeObject, TrezorAppData } from './storage';
 import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport';
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
@@ -46,6 +46,7 @@ export interface SafePasswordEntry {
   tags: string[];
   createdDate: number;
   lastModifiedDate: number;
+  legacyMode?: boolean;
 }
 export interface ClearPasswordEntry {
   key: string;
@@ -136,13 +137,17 @@ export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys 
 }
 
 export async function encryptAppData(appData: AppData, key: Uint8Array): Promise<Uint8Array> {
-  const passKey = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
+  const passKey = await importAesGcmKey(key)
   return encryptWithKey(passKey, serializeObject(appData));
 }
 
-export async function decryptAppData(appDataCipherText: Uint8Array, key: Uint8Array, legacyMode: boolean): Promise<AppData | undefined> {
-  const passKey = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
-  const result = await decryptWithKey(passKey, appDataCipherText, legacyMode);
+export async function decryptAppData(appDataCipherText: Uint8Array, key: Uint8Array): Promise<AppData | undefined> {
+  const result = await decryptWithKey(await importAesGcmKey(key), appDataCipherText, false);
+  return deserializeObject(result);
+}
+
+export async function decryptTrezorAppData(appDataCipherText: Uint8Array, key: Uint8Array): Promise<TrezorAppData | undefined> {
+  const result = await decryptWithKey(await importAesGcmKey(key), appDataCipherText, true);
   return deserializeObject(result);
 }
 
@@ -178,6 +183,7 @@ export async function encryptFullEntry(entry: ClearPasswordEntry): Promise<SafeP
       tags: entry.tags,
       createdDate: entry.createdDate,
       lastModifiedDate: entry.lastModifiedDate,
+      legacyMode: false,
     };
   }
   return undefined;
@@ -194,10 +200,7 @@ export async function decryptFullEntry(entry: SafePasswordEntry, legacyMode: boo
     askOnDecrypt: true,
   });
   if (response.success) {
-    const passKey = await crypto.subtle.importKey('raw', uint8ArrayFromHex(response.payload.value), 'AES-GCM', false, [
-      'encrypt',
-      'decrypt',
-    ]);
+    const passKey = await importAesGcmKey(uint8ArrayFromHex(response.payload.value));
     const dec = new TextDecoder();
     const passwordClear = dec.decode(await decryptWithKey(passKey, entry.passwordEnc, legacyMode));
     const safeNoteClear = dec.decode(await decryptWithKey(passKey, entry.secretNoteEnc, legacyMode));
@@ -206,8 +209,8 @@ export async function decryptFullEntry(entry: SafePasswordEntry, legacyMode: boo
       item: entry.item,
       title: entry.title,
       username: entry.username,
-      password: passwordClear,
-      safeNote: safeNoteClear,
+      password: legacyMode? trimDoubleQuotes(passwordClear) : passwordClear,
+      safeNote: legacyMode? trimDoubleQuotes(safeNoteClear) : safeNoteClear,
       tags: entry.tags,
       createdDate: entry.createdDate,
       lastModifiedDate: entry.lastModifiedDate,
@@ -246,6 +249,14 @@ async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array, legacyMode
     key,
     cipherTextArray
   );
+}
+
+async function importAesGcmKey (key: Uint8Array) {
+  return await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
+}
+
+function trimDoubleQuotes(str: string): string {
+  return str.replace(/^"(.*)"$/, '$1');
 }
 
 function prepareForDecryption(cipherText: Uint8Array, legacyMode: boolean): { iv: Uint8Array, cipherTextArray: Uint8Array} {

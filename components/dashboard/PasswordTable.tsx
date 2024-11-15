@@ -65,7 +65,7 @@ export default function PasswordTable({
               console.error('Could not read app data');
               return;
             }
-            decryptAppData(result.data, appDataEncryptionKey, false)
+            decryptAppData(result.data, appDataEncryptionKey)
               .then((appData) => {
                 if (appData === undefined) {
                   // TODO: handle error
@@ -174,7 +174,8 @@ export default function PasswordTable({
   let entries = getSafePasswordEntries(passwordEntries);
   if (filter !== '') {
     entries = entries.filter((entry) => {
-      return entry.title.includes(filter);
+      const title = entry.metaTitle ?? entry.title;
+      return title.includes(filter);
     });
   }
   if (selectedTag !== '' && selectedTag !== DEFAULT_TAGS.ALL) {
@@ -193,7 +194,7 @@ export default function PasswordTable({
   });
   return (
     <div className={styles.container}>
-      <ImportPasswordsModal show={importPassword} onCanceled={onCancelImportPassword}></ImportPasswordsModal>
+      <ImportPasswordsModal appDataEncryptionKey={appDataEncryptionKey} show={importPassword} onCanceled={onCancelImportPassword}/>
       <div className={styles.start_bar}>
         <div className={styles.col1}>
           <button onClick={handleAddEntry} className={styles.add_btn}>

@@ -68,7 +68,7 @@ export function mergeAppData(appData: AppData, newData: TrezorAppData, getUnique
   for (const key in newData.tags) {
     const tag = newData.tags[key];
     const existingTag = appData.tags.find((t) => t.title === tag.title);
-    if (!existingTag) {
+    if (!existingTag && tag.title !== 'All') {
       const newIconName: string = FROM_TREZOR_ICON_KEY_TO_TAG_NAME.get(tag.icon) || TAG_SOCIAL;
       const newId = getUniqueId();
       tags.push({
@@ -96,12 +96,14 @@ export function mergeAppData(appData: AppData, newData: TrezorAppData, getUnique
         const tag = allTags.find((t) => t.title === newData?.tags[tagId]?.title || '');
         return tag ? tag.id : '';
       }),
+      legacyMode: true,
       createdDate: Date.now(),
       lastModifiedDate: Date.now(),
     }
     if (!existingEntry) {
       passwordEntries.push(newEntry);
     } else {
+      newEntry.metaTitle = 'conflict-' + newEntry.title;
       conflicts.push(newEntry);
     }
   }

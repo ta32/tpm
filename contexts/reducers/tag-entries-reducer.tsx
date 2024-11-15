@@ -28,6 +28,12 @@ export interface AddTag {
   title: string;
   icon: string;
 }
+
+export interface BulkAddTags {
+  type: 'BULK_ADD_TAGS';
+  tags: TagEntry[];
+}
+
 export interface RemoveTag {
   type: 'REMOVE_TAG';
   tagId: string;
@@ -50,7 +56,7 @@ export interface ClearError {
   type: 'CLEAR_ERROR';
 }
 
-export type TagsAction = AddTag | RemoveTag | UpdateTag | UploadedTags | SyncTags | ClearError;
+export type TagsAction = AddTag | BulkAddTags | RemoveTag | UpdateTag | UploadedTags | SyncTags | ClearError;
 
 export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
   switch (action.type) {
@@ -163,6 +169,23 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
     }
     case 'CLEAR_ERROR': {
       return { ...state, status: TagsStatus.SYNCED, lastError: '' };
+    }
+    case 'BULK_ADD_TAGS': {
+      const newEntries = { ...state };
+      for (const tag of action.tags) {
+        const tagId = uniqueId();
+        if (titleExists(state, tag.title)) {
+          return {
+            ...state,
+            status: TagsStatus.ERROR,
+            lastError: 'Cannot add duplicate tag',
+          };
+        }
+        newEntries[tagId] = { title: tag.title, icon: tag.icon, id: tagId };
+      }
+      newEntries.status = TagsStatus.SAVE_REQUIRED;
+      newEntries.lastError = '';
+      return newEntries;
     }
     default:
       return state;
