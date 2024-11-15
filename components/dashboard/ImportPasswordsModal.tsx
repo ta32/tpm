@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import Modal from '../ui/Modal';
 import styles from './ImportPasswordsModal.module.scss';
-import { decryptAppData, decryptTrezorAppData } from '../../lib/trezor';
+import { decryptAppData, decryptTrezorAppData, SafePasswordEntry } from '../../lib/trezor';
 import { fromState, mergeAppData } from '../../lib/storage';
 import { useTagEntries, useTagEntriesDispatch } from '../../contexts/use-tag-entries';
 import { usePasswordEntries, usePasswordEntriesDispatch } from '../../contexts/use-password-entries';
 import Colors from 'styles/colors.module.scss';
 import FolderIcon from 'components/svg/ui/FolderIcon';
-import DoneIcon from '../svg/ui/DoneIcon';
+import { TagEntry } from '../../contexts/reducers/tag-entries-reducer';
+
+interface ImportedData {
+  tags: TagEntry[];
+  passwordEntries: SafePasswordEntry[];
+  conflicts: SafePasswordEntry[];
+}
+
 
 interface ImportPasswordsModalProps {
   show: boolean;
@@ -15,10 +22,13 @@ interface ImportPasswordsModalProps {
   onCanceled: () => void;
 }
 
+
 export default function ImportPasswordsModal({show, onCanceled, appDataEncryptionKey}: ImportPasswordsModalProps) {
   const [dropped, setDropped] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [requestConfirmation, setRequestConfirmation] = useState(false);
+  const [importedData, setImportedData] = useState<ImportedData|undefined>(undefined);
   const [file, setFile] = useState<File|undefined>(undefined);
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
@@ -28,7 +38,6 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
     event.preventDefault();
     setDragging(true);
   };
-
   const handleDragLeave = () => {
     setDragging(false);
   };
@@ -44,6 +53,9 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
   };
 
   const handleCancel = () => {
+    setRequestConfirmation(false);
+    setImportedData(undefined);
+    setLoading(false);
     setDropped(false);
     setFile(undefined);
     onCanceled();
@@ -61,11 +73,8 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
             const newTags = result.tags;
             const newEntries = result.passwordEntries;
             const conflictEntries = result.conflicts;
-            const allEntries = newEntries.concat(conflictEntries);
-            tagEntriesDispatch({type: 'BULK_ADD_TAGS', tags: newTags});
-            passwordEntriesDispatch({type: 'BULK_ADD_ENTRIES', entries: allEntries});
-            setLoading(false);
-            onCanceled();
+            setImportedData({tags: newTags, passwordEntries: newEntries, conflicts: conflictEntries});
+            setRequestConfirmation(true);
           } else {
             setLoading(false);
           }
@@ -73,7 +82,20 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
       });
     }
   }
-  const importDisabled = file === undefined || loading;
+  const handleSave = () => {
+    if(importedData) {
+      const passwordEntries = importedData.passwordEntries;
+      const conflicts = importedData.conflicts;
+      const allEntries = passwordEntries.concat(conflicts);
+      tagEntriesDispatch({type: 'BULK_ADD_TAGS', tags: importedData.tags});
+      passwordEntriesDispatch({type: 'BULK_ADD_ENTRIES', entries: allEntries});
+      setRequestConfirmation(false);
+      setDropped(false);
+      setFile(undefined);
+      setLoading(false);
+      onCanceled();
+    }
+  }
   const renderDropzoneContent = (dropped: boolean) => {
     if (dropped) {
       return (
@@ -86,6 +108,59 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
       return <p>Drag and drop your file here</p>;
     }
   };
+
+  const renderDropzone = (dropped: boolean) => {
+    return(
+      <div>
+        <p>You can only import trezor data if it was encrypted with the current device.</p>
+        <div
+          className={`${styles.dropzone} ${dragging ? styles.dragging : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          {renderDropzoneContent(dropped)}
+        </div>
+      </div>
+    );
+  };
+
+  const renderConfirmationWindow = () => {
+    const conflicts = importedData?.conflicts != undefined && importedData?.conflicts.length > 0;
+    return (
+      <div className={styles.import_confirmation}>
+        {!conflicts && (
+          <p>Imported data contains {importedData?.tags.length} new tags and
+            new {importedData?.passwordEntries.length} entries</p>
+        )}
+        {conflicts && (
+          <div>
+            <p>Imported data contains {importedData?.tags.length} new tags and
+              new {importedData?.passwordEntries.length} entries</p>
+            <strong>There are {importedData.conflicts.length} entries with the same title</strong>
+            <p>If you import these entries they will be pre-fixed with <strong>&#39;conflict&#39;</strong> so you can manually resolve
+              the entries to keep</p>
+            {renderConflictsList(importedData.conflicts)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderConflictsList = (conflicts: SafePasswordEntry[]) => {
+    return (
+      <div className={styles.conflicts_list}>
+        {conflicts.map((entry, index) => (
+          <p key={index}>
+            <strong>Entry {entry.title}</strong> with user <strong>{entry.username}</strong>
+          </p>
+        ))}
+      </div>
+    );
+  };
+
+  const importDisabled = file === undefined || loading;
+  const showDropzone = !requestConfirmation;
   return (
     <Modal
       show={show}
@@ -99,19 +174,25 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
     >
       <div className={styles.container}>
         <span className={styles.heading}>Import Trezor password manager data</span>
-        <p>You can only import trezor data if it was encrypted with the current device.</p>
-        <div
-          className={`${styles.dropzone} ${dragging ? styles.dragging : ''}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          {renderDropzoneContent(dropped)}
-        </div>
+        {showDropzone && (
+          renderDropzone(dropped)
+        )}
+        {requestConfirmation && (
+          renderConfirmationWindow()
+        )}
         <div className={styles.controls}>
-          <button className={importDisabled? styles.blank : styles.green} disabled={importDisabled} type="button" onClick={handleImport}>
-            Load
-          </button>
+          {requestConfirmation && (
+            <button className={styles.green} type="button"
+                    onClick={handleSave}>
+              Save
+            </button>
+          )}
+          {!requestConfirmation && (
+            <button className={importDisabled ? styles.blank : styles.green} disabled={importDisabled} type="button"
+                    onClick={handleImport}>
+              Load
+            </button>
+          )}
           <button className={styles.red} type="button" onClick={handleCancel}>
             Cancel
           </button>
