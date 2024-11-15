@@ -5,6 +5,9 @@ import { decryptAppData, decryptTrezorAppData } from '../../lib/trezor';
 import { fromState, mergeAppData } from '../../lib/storage';
 import { useTagEntries, useTagEntriesDispatch } from '../../contexts/use-tag-entries';
 import { usePasswordEntries, usePasswordEntriesDispatch } from '../../contexts/use-password-entries';
+import Colors from 'styles/colors.module.scss';
+import FolderIcon from 'components/svg/ui/FolderIcon';
+import DoneIcon from '../svg/ui/DoneIcon';
 
 interface ImportPasswordsModalProps {
   show: boolean;
@@ -13,6 +16,7 @@ interface ImportPasswordsModalProps {
 }
 
 export default function ImportPasswordsModal({show, onCanceled, appDataEncryptionKey}: ImportPasswordsModalProps) {
+  const [dropped, setDropped] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File|undefined>(undefined);
@@ -30,12 +34,19 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
   };
 
   const handleDrop = (event: React.DragEvent) => {
+    setDropped(true);
     event.preventDefault();
     setDragging(false);
     const droppedFiles = Array.from(event.dataTransfer.files);
     if (droppedFiles.length > 0) {
       setFile(droppedFiles[0]);
     }
+  };
+
+  const handleCancel = () => {
+    setDropped(false);
+    setFile(undefined);
+    onCanceled();
   };
 
   const handleImport = () => {
@@ -63,6 +74,18 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
     }
   }
   const importDisabled = file === undefined || loading;
+  const renderDropzoneContent = (dropped: boolean) => {
+    if (dropped) {
+      return (
+        <div className={styles.dropped_content}>
+          <FolderIcon fill={Colors.black} height={100} className={styles.icon} />
+          <p>App file dropped</p>
+        </div>
+      );
+    } else {
+      return <p>Drag and drop your file here</p>;
+    }
+  };
   return (
     <Modal
       show={show}
@@ -83,13 +106,13 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <p>Drag and drop your file here, or click to select files</p>
+          {renderDropzoneContent(dropped)}
         </div>
         <div className={styles.controls}>
           <button className={importDisabled? styles.blank : styles.green} disabled={importDisabled} type="button" onClick={handleImport}>
-            Import
+            Load
           </button>
-          <button className={styles.red} type="button" onClick={onCanceled}>
+          <button className={styles.red} type="button" onClick={handleCancel}>
             Cancel
           </button>
         </div>
