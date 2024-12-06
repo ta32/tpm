@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Modal from '../ui/Modal';
 import styles from './ImportPasswordsModal.module.scss';
-import { decryptAppData, decryptTrezorAppData, SafePasswordEntry } from '../../lib/trezor';
-import { fromState, mergeAppData } from '../../lib/storage';
-import { useTagEntries, useTagEntriesDispatch } from '../../contexts/use-tag-entries';
-import { usePasswordEntries, usePasswordEntriesDispatch } from '../../contexts/use-password-entries';
+import { decryptTrezorAppData, SafePasswordEntry } from 'lib/trezor';
+import { fromState, mergeAppData } from 'lib/storage';
+import { useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
+import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
 import Colors from 'styles/colors.module.scss';
 import FolderIcon from 'components/svg/ui/FolderIcon';
-import { TagEntry } from '../../contexts/reducers/tag-entries-reducer';
+import { TagEntry } from 'contexts/reducers/tag-entries-reducer';
 
 interface ImportedData {
   tags: TagEntry[];
@@ -27,6 +27,8 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
   const [dropped, setDropped] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [importFailed, setImportFailed] = useState(false);
+
   const [requestConfirmation, setRequestConfirmation] = useState(false);
   const [importedData, setImportedData] = useState<ImportedData|undefined>(undefined);
   const [file, setFile] = useState<File|undefined>(undefined);
@@ -58,6 +60,7 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
     setLoading(false);
     setDropped(false);
     setFile(undefined);
+    setImportFailed(false);
     onCanceled();
   };
 
@@ -78,6 +81,10 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
           } else {
             setLoading(false);
           }
+        }).catch(() => {
+          setImportFailed(true);
+          setRequestConfirmation(false);
+          setLoading(false);
         });
       });
     }
@@ -160,7 +167,10 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
   };
 
   const importDisabled = file === undefined || loading;
-  const showDropzone = !requestConfirmation;
+  const showDropzone = !requestConfirmation && !importFailed;
+
+  const title = importFailed ? 'Import of passwords failed': 'Import Trezor password manager data';
+
   return (
     <Modal
       show={show}
@@ -173,7 +183,10 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
       }}
     >
       <div className={styles.container}>
-        <span className={styles.heading}>Import Trezor password manager data</span>
+        <span className={styles.heading}>{title}</span>
+        {importFailed && (
+          <p className={styles.content}>You can only import trezor password manager app data encrypted with the same seed</p>
+        )}
         {showDropzone && (
           renderDropzone(dropped)
         )}
@@ -187,7 +200,7 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
               Save
             </button>
           )}
-          {!requestConfirmation && (
+          {!requestConfirmation && !importFailed && (
             <button className={importDisabled ? styles.blank : styles.green} disabled={importDisabled} type="button"
                     onClick={handleImport}>
               Load
