@@ -62,6 +62,7 @@ export default function Index() {
     const updateDevice = (event: DeviceEventMessage) => {
       const userDispatch = userDispatchRef.current;
       if (event.type === DEVICE.CONNECT) {
+        // TODO refactor - might not be require the call to get features (in getDevices)
         getDevices()
           .then((device) => {
             if (device !== null) {

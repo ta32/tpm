@@ -7,7 +7,7 @@ import styles from './loader_modal.module.scss';
 import Image from 'next/image';
 import ProgressModal from '../ui/ProgressModal';
 
-// Maybe this component should be removed?
+// TODO Maybe this component should be removed?
 
 export default function StatusModal() {
   const tagEntries = useTagEntries();

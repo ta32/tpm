@@ -3,8 +3,8 @@ import { TagEntries, TagsAction, tagsReducer, TagsStatus } from './reducers/tag-
 import { TAG_ALL, TAG_BITCOIN, TAG_SOCIAL } from '../lib/images';
 
 const ALL_ID = '0';
-const BITCOIN_ID = '1';
-const SOCIAL_ID = '2';
+const SOCIAL_ID = '1';
+const BITCOIN_ID = '2';
 export const enum DEFAULT_TAGS {
   ALL = ALL_ID,
   BITCOIN = BITCOIN_ID,
@@ -16,15 +16,15 @@ const initialTageEntries: TagEntries = {
     title: 'ALL',
     icon: TAG_ALL,
   },
+  [SOCIAL_ID]: {
+    id: SOCIAL_ID,
+    title: 'Social',
+    icon: TAG_SOCIAL,
+  },
   [BITCOIN_ID]: {
     id: BITCOIN_ID,
     title: 'Bitcoin',
     icon: TAG_BITCOIN,
-  },
-  [SOCIAL_ID]: {
-    id: SOCIAL_ID,
-    title: 'Social Media',
-    icon: TAG_SOCIAL,
   },
   status: TagsStatus.UNINITIALIZED,
   lastError: '',

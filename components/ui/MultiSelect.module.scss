@@ -7,7 +7,8 @@ $item_height_rem: 1.5rem;
 }
 
 .container {
-  background-color: colors.$white;
+  background-color: colors.$grey_bg;
+  color: colors.$black_font;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

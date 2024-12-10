@@ -112,7 +112,7 @@ export default function TableEntry({
       }
       setEntryState({ type: 'DECRYPTING' });
       const safeEntry = row.entry;
-      decryptFullEntry(safeEntry)
+      decryptFullEntry(safeEntry, safeEntry?.legacyMode || false)
         .then((clearEntry) => {
           if (clearEntry != null) {
             setEntryState({ type: 'DECRYPTED' });
@@ -135,7 +135,7 @@ export default function TableEntry({
     if (row.type === 'VIEW_ENTRY') {
       setEntryState({ type: 'DECRYPTING' });
       const safeEntry = row.entry;
-      decryptFullEntry(safeEntry)
+      decryptFullEntry(safeEntry, false)
         .then((clearEntry) => {
           if (clearEntry != null) {
             navigator.clipboard.writeText(clearEntry.password).then(() => {

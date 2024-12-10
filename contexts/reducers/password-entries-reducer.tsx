@@ -25,6 +25,10 @@ export interface AddEntry {
   type: 'ADD_ENTRY';
   entry: SafePasswordEntry;
 }
+export interface BulkAddEntries {
+  type: 'BULK_ADD_ENTRIES';
+  entries: SafePasswordEntry[];
+}
 export interface RemoveEntry {
   type: 'REMOVE_ENTRY';
   key: string;
@@ -39,7 +43,7 @@ export interface UploadEntries {
   version_uploaded: number;
 }
 
-export type PasswordEntriesAction = Sync | AddEntry | RemoveEntry | UpdateEntry | UploadEntries;
+export type PasswordEntriesAction = Sync | AddEntry | BulkAddEntries | RemoveEntry | UpdateEntry | UploadEntries;
 
 export function passwordEntriesReducer(state: PasswordEntries, action: PasswordEntriesAction): PasswordEntries {
   switch (action.type) {
@@ -139,6 +143,21 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
         version: action.version_uploaded,
         status: PasswordEntriesStatus.SAVED,
       };
+    }
+    case 'BULK_ADD_ENTRIES': {
+      if (state.status !== PasswordEntriesStatus.SYNCED) {
+        return {
+          ...state,
+          status: PasswordEntriesStatus.ERROR,
+          lastError: 'Cannot add entries to un-synced state',
+        };
+      }
+      let new_entries: PasswordEntries = { ...state };
+      for (const entry of action.entries) {
+        let nextKey = uniqueId();
+        new_entries[nextKey] = { ...entry, key: nextKey };
+      }
+      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
   }
 }

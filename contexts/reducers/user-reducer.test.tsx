@@ -16,6 +16,7 @@ describe('User state transitions that results in the dashboard component being r
   const mockDropbox = new Dropbox();
 
   test('User state transitions that results in the dashboard component being rendered', () => {
+    // TODO break this into separate tests
     const dropBoxUserLoggedIn: DropboxUserLoggedIn = {
       type: 'DROPBOX_USER_LOGGED_IN',
       userName: 'test',
@@ -29,8 +30,8 @@ describe('User state transitions that results in the dashboard component being r
       model: 'test',
       deviceId: 'test',
       path: 'test',
-      masterKey: '',
-      encryptionKey: new Uint8Array(),
+      appDataSeed: '',
+      appDataEncryptionKey: new Uint8Array(),
     };
 
     const addDevice: AddDevice = {
@@ -45,8 +46,8 @@ describe('User state transitions that results in the dashboard component being r
     const activateDevice: ActivatedTmpOnDevice = {
       type: 'ACTIVATED_TMP_ON_DEVICE',
       keyPair: {
-        masterKey: 'test',
-        encryptionKey: new Uint8Array(),
+        userAppDataSeed512Bit: 'test',
+        userAppDataEncryptionKey: new Uint8Array(),
       },
     };
 
@@ -58,8 +59,8 @@ describe('User state transitions that results in the dashboard component being r
         model: 'test',
         deviceId: 'test',
         path: 'test',
-        masterKey: 'test',
-        encryptionKey: new Uint8Array(),
+        appDataSeed: 'test',
+        appDataEncryptionKey: new Uint8Array(),
       },
       dropboxAccountName: 'test',
       dbc: new Dropbox(),
