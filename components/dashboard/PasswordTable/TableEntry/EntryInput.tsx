@@ -5,6 +5,9 @@ import { useTagEntries } from 'contexts/use-tag-entries';
 import { getTags } from 'contexts/reducers/tag-entries-reducer';
 import generatePassword from 'lib/password';
 import ToolTip from '../../../ui/ToolTip';
+import VisibilityIcon from 'components/svg/ui/VisibilityIcon';
+import RefreshIcon from 'components/svg/ui/RefreshIcon';
+import Colors from 'styles/colors.module.scss';
 
 type DefaultTypes = string | string[] | null;
 interface EntryInputProps {
@@ -57,8 +60,9 @@ export default function EntryInput({
         className={`${styles.input} ${invalid ? styles.invalid : ''}`}
         type={type == 'text' ? 'text' : passwordInputType}
         placeholder={placeholder}
-        defaultValue={inputValue != null ? inputValue : ''}
+        value={inputValue != null ? inputValue : ''}
         required={mandatory}
+        onChange={(e) => setInputValue(e.target.value)}
       />
     );
     if (mandatory) {
@@ -88,16 +92,16 @@ export default function EntryInput({
       {type === 'password' && (
         <div className={styles.container_row_no_wrap}>
           <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
-            +
+            <VisibilityIcon fill={Colors.black} />
           </button>
           <button type={'button'} className={styles.control_btn} onClick={handleGeneratePassword}>
-            #
+            <RefreshIcon fill={Colors.black} />
           </button>
         </div>
       )}
       {type === 'secret' && (
         <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
-          #
+          <VisibilityIcon fill={Colors.black} />
         </button>
       )}
     </div>

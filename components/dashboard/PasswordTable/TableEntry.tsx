@@ -76,6 +76,7 @@ export default function TableEntry({
               });
             }
           }
+          setClearEntry(null);
           setEntryState({ type: 'INIT' });
           setSaving(false);
           form.reset();

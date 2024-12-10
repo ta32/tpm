@@ -6,7 +6,7 @@ import { IMAGE_FILE } from '../../lib/images';
 import styles from './Home.module.scss';
 import { UserStatus } from '../../contexts/reducers/user-reducer';
 import DeviceIcon from '../svg/ui/DeviceIcon';
-import Colors from '../../styles/colors.module.scss';
+import Colors from 'styles/colors.module.scss';
 import { useUser } from '../../contexts/use-user';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
