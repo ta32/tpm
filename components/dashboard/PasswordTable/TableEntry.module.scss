@@ -84,6 +84,7 @@ $account_info_controls_margin: 2rem;
 
     .account_info_controls {
       margin-left: auto;
+      margin-right: auto;
       display: flex;
       flex-direction: row;
       align-items: flex-start;
@@ -201,8 +202,8 @@ $account_info_controls_margin: 2rem;
   margin-top: $account_info_controls_margin;
   margin-right: 1rem;
   background-color: rgb(colors.$white,1);
-  border: 1px solid colors.$grey_font;
-  color: colors.$grey_font;
+  border: 1px solid colors.$black;
+  color: colors.$black;
   border-radius: 3px;
   width: 6rem;
   height: 2.5rem;

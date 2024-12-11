@@ -1,5 +1,7 @@
 @use "styles/colors.module";
 
+$tooltip_margin: 0.5rem;
+
 .tooltip {
   position: relative;
 }
@@ -45,7 +47,7 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 0.25rem;
+  margin-top: $tooltip_margin;
 }
 
 /* Tooltip arrow positioned at top edge of tooltip text */
@@ -61,7 +63,7 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-bottom: 0.25rem;
+  margin-bottom: $tooltip_margin;
 }
 
 /* Tooltip arrow positioned at bottom edge of tooltip text */
@@ -77,7 +79,7 @@
   top: 50%;
   left: 100%;
   transform: translateY(-50%);
-  margin-left: 0.25rem;
+  margin-left: $tooltip_margin;
 }
 
 /* Tooltip arrow positioned at left edge of tooltip text */
@@ -93,7 +95,7 @@
   top: 50%;
   right: 100%;
   transform: translateY(-50%);
-  margin-right: 0.25rem;
+  margin-right: $tooltip_margin;
 }
 
 /* Tooltip arrow positioned at right edge of tooltip text */
