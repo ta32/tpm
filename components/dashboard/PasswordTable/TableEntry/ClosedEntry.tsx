@@ -7,8 +7,8 @@ import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/use-tag-entries';
 import { ClearPasswordEntry, decryptFullEntry, SafePasswordEntry } from 'lib/trezor';
 import ToolTip from 'components/ui/ToolTip';
-import { useUser } from '../../../../contexts/use-user';
-import { UserStatus } from '../../../../contexts/reducers/user-reducer';
+import { useUser } from 'contexts/use-user';
+import { UserStatus } from 'contexts/reducers/user-reducer';
 
 enum STATUS {
   DECRYPTING_ENTRY,
