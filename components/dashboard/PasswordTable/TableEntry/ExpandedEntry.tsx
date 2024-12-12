@@ -6,7 +6,7 @@ import { IoAddCircleOutline } from 'react-icons/io5';
 import EntryInput from './ExpandedEntry/EntryInput';
 import DeleteIcon from 'components/svg/ui/DeleteIcon';
 import { ClearPasswordEntry } from 'lib/trezor';
-import DeleteModal from './DeleteModal';
+import DeleteModal from './ExpandedEntry/DeleteModal';
 import { usePasswordEntriesDispatch } from 'contexts/use-password-entries';
 import { getTag } from 'contexts/reducers/tag-entries-reducer';
 import { useTagEntries } from 'contexts/use-tag-entries';
@@ -108,7 +108,7 @@ export default function ExpandedEntry({
         <div className={styles.account_info}>
           <EntryInput
             name="item"
-            label={'Item*'}
+            label={'Item/URL *'}
             placeholder={''}
             type={'text'}
             defaultValue={entry?.item ?? ''}

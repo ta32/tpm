@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../EntryInput.module.scss';
+import styles from './EntryInput.module.scss';
 import MultiSelect from 'components/ui/MultiSelect';
 import { useTagEntries } from 'contexts/use-tag-entries';
 import { getTags } from 'contexts/reducers/tag-entries-reducer';
@@ -96,12 +96,12 @@ export default function EntryInput({
       </div>
       {type === 'password' && (
         <div className={styles.container_row_no_wrap}>
-          <ToolTip text={"Show password"} position={'bottom'} width={'150px'}>
+          <ToolTip text={"Show password"} position={'top'} width={'150px'}>
             <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
               <VisibilityIcon fill={Colors.black} />
             </button>
           </ToolTip>
-          <ToolTip text={"Generate password"} position={'bottom'} width={'150px'}>
+          <ToolTip text={"Generate password"} position={'top'} width={'150px'}>
             <button type={'button'} className={styles.control_btn} onClick={handleGeneratePassword}>
               <RefreshIcon fill={Colors.black} />
             </button>

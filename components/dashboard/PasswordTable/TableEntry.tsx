@@ -1,28 +1,10 @@
 import React, { useState } from 'react';
 import styles from './TableEntry.module.scss';
-import { ClearPasswordEntry, decryptFullEntry, encryptFullEntry, SafePasswordEntry } from 'lib/trezor';
+import { ClearPasswordEntry, encryptFullEntry, SafePasswordEntry } from 'lib/trezor';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
 import { PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
-import { useUser } from 'contexts/use-user';
-import { UserStatus } from 'contexts/reducers/user-reducer';
-import { useTagEntries } from 'contexts/use-tag-entries';
 import ClosedEntry from './TableEntry/ClosedEntry';
 import ExpandedEntry from './TableEntry/ExpandedEntry';
-
-interface Init {
-  type: 'INIT';
-}
-interface Decrypting {
-  type: 'DECRYPTING';
-}
-interface Decrypted {
-  type: 'DECRYPTED';
-}
-interface Error {
-  type: 'ERROR';
-  error: string;
-}
-type EntryState = Init | Decrypting | Decrypted | Error;
 
 interface NewEntry {
   type: 'NEW_ENTRY';
@@ -47,14 +29,10 @@ export default function TableEntry({
   onSavedCallback,
   row,
 }: TableEntryProps) {
-  const [user] = useUser();
-  const tagEntries = useTagEntries();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [clearEntry, setClearEntry] = useState<ClearPasswordEntry | null>(null);
-  const [entryState, setEntryState] = useState<EntryState>({ type: 'INIT' });
   const [saving, setSaving] = useState(false);
-  const [copiedUsername, setCopiedUsername] = useState(false);
 
   const onSubmitNewEntry = (newEntry: ClearPasswordEntry, form: EventTarget & HTMLFormElement) => {
     setSaving(true);
@@ -77,7 +55,6 @@ export default function TableEntry({
             }
           }
           setClearEntry(null);
-          setEntryState({ type: 'INIT' });
           setSaving(false);
           form.reset();
           onSavedCallback();
@@ -86,18 +63,14 @@ export default function TableEntry({
           }
         })
         .catch((err) => {
-          setEntryState({ type: 'ERROR', error: 'Error encrypting entry' });
+          console.error('Failed to encrypt entry');
         })
         .finally(() => {});
     } else {
-      setEntryState({
-        type: 'ERROR',
-        error: 'Password entries are not synced yet',
-      });
+      console.error('Password entries not synced failed to save entry');
     }
   };
   const handleDiscardEntry = () => {
-    setEntryState({ type: 'INIT' });
     setClearEntry(null);
     if (onDiscardCallback) {
       onDiscardCallback();
@@ -106,73 +79,17 @@ export default function TableEntry({
       onLockChange(false);
     }
   };
-  const handleEditEntry = () => {
-    if (row.type === 'VIEW_ENTRY') {
-      if (onLockChange) {
-        onLockChange(true);
-      }
-      setEntryState({ type: 'DECRYPTING' });
-      const safeEntry = row.entry;
-      decryptFullEntry(safeEntry, safeEntry?.legacyMode || false)
-        .then((clearEntry) => {
-          if (clearEntry != null) {
-            setEntryState({ type: 'DECRYPTED' });
-            setClearEntry(clearEntry);
-          } else {
-            if (onLockChange) {
-              onLockChange(false);
-            }
-            setEntryState({ type: 'INIT' });
-          }
-        })
-        .catch((err) => {
-          setEntryState({ type: 'ERROR', error: err });
-        });
-    }
-    return; // Unreachable, edit is only possible when mode is VIEW_ENTRY
-  };
 
-  const handleCopyPassword = () => {
-    if (row.type === 'VIEW_ENTRY') {
-      setEntryState({ type: 'DECRYPTING' });
-      const safeEntry = row.entry;
-      decryptFullEntry(safeEntry, false)
-        .then((clearEntry) => {
-          if (clearEntry != null) {
-            navigator.clipboard.writeText(clearEntry.password).then(() => {
-              setTimeout(() => {
-                navigator.clipboard.writeText('').catch(() => {
-                  console.error('Failed to clear clipboard');
-                });
-              }, 10000);
-            });
-          }
-        })
-        .catch((err) => {
-          setEntryState({ type: 'ERROR', error: err });
-        });
-    }
-  };
-
-  const handleCopyUsername = (text: string) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        setCopiedUsername(true);
-        setTimeout(() => setCopiedUsername(false), 2000);
-      })
-      .catch((err) => {
-        console.error('Failed to copy to clipboard', err);
-      });
+  const onOpenEntry = (clearEntry: ClearPasswordEntry) => {
+    setClearEntry(clearEntry);
   };
 
   const expanded =
     (!hidden && row.type === 'NEW_ENTRY') ||
-    (row.type === 'VIEW_ENTRY' && (entryState.type === 'DECRYPTED' || clearEntry));
-  const unlocking = entryState.type === 'DECRYPTING' && user.status === UserStatus.TREZOR_REQ_CONFIRMATION;
+    (row.type === 'VIEW_ENTRY' && clearEntry);
 
   return (
-    <div className={`${styles.card} ${unlocking ? styles.unlocking : ''}`}>
+    <div className={`${styles.card}`}>
       {expanded && (
         <ExpandedEntry
           entry={clearEntry}
@@ -183,15 +100,13 @@ export default function TableEntry({
         />
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
-        <div className={`${styles.entry} ${styles.highlight} ${unlocking ? styles.unlocking : ''}`}>
+        <div className={`${styles.entry} ${styles.highlight}`}>
           <ClosedEntry
-            unlocking={unlocking}
+            onLockChange={onLockChange}
             locked={locked}
             entry={row.entry}
-            handleCopyUsername={handleCopyUsername}
-            handleCopyPassword={handleCopyPassword}
-            handleEditEntry={handleEditEntry}
-          ></ClosedEntry>
+            onOpenEntry={onOpenEntry}
+          />
         </div>
       )}
     </div>

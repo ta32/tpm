@@ -59,19 +59,11 @@ $account_info_controls_margin: 2rem;
 
     &:hover {
       .password_shadow {
+        color: colors.$black;
         visibility: visible !important;
       }
       .edit_btn {
         visibility: visible !important;
-      }
-    }
-
-    &.unlocking {
-      .password_shadow {
-        visibility: hidden !important;
-      }
-      .edit_btn {
-        visibility: hidden !important;
       }
     }
 

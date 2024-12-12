@@ -159,7 +159,7 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
       <div className={styles.conflicts_list}>
         {conflicts.map((entry, index) => (
           <p key={index}>
-            <strong>Entry {entry.title}</strong> with user <strong>{entry.username}</strong>
+            <strong>Duplicate {entry.title}</strong> with user <strong>{entry.username}</strong>
           </p>
         ))}
       </div>
