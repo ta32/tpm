@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import SidePanel from './DashboardContent/SidePanel';
-import PasswordTable from './DashboardContent/PasswordTable';
-import StatusModal from './DashboardContent/StatusModal';
+import SidePanel from './PasswordManager/SidePanel';
+import PasswordTable from './PasswordManager/PasswordTable';
+import StatusModal from './PasswordManager/StatusModal';
 import PinModal from 'components/ui/PinModal';
-import styles from './DashboardContent.module.scss';
+import styles from './PasswordManager.module.scss';
 import { UserStatus } from 'contexts/reducers/user-reducer';
 import { useUser, useUserDispatch } from 'contexts/use-user';
 import TrezorConnect, { UI } from '@trezor/connect-web';
 
 
-export default function DashboardContent() {
+export default function PasswordManager() {
   const [user] = useUser();
   const [userDispatch] = useUserDispatch();
   const [selectedTag, setSelectedTag] = useState<string>('');

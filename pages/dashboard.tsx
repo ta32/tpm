@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useUser } from 'contexts/use-user';
 import { UserStatus } from 'contexts/reducers/user-reducer';
 import { useRouter } from 'next/router';
-import DashboardContent from 'components/dashboard/DashboardContent';
+import PasswordManager from 'components/dashboard/PasswordManager';
 
 export default function Dashboard() {
   const [user] = useUser();
@@ -15,6 +15,6 @@ export default function Dashboard() {
   }, [user.status, router]);
 
   return (
-    <DashboardContent />
+    <PasswordManager />
   );
 }
