@@ -4,7 +4,7 @@ import MultiSelect from 'components/ui/MultiSelect';
 import { useTagEntries } from 'contexts/use-tag-entries';
 import { getTags } from 'contexts/reducers/tag-entries-reducer';
 import generatePassword from 'lib/password';
-import ToolTip from '../../../../ui/ToolTip';
+import ToolTip from '../../../../../ui/ToolTip';
 import VisibilityIcon from 'components/svg/ui/VisibilityIcon';
 import RefreshIcon from 'components/svg/ui/RefreshIcon';
 import Colors from 'styles/colors.module.scss';
