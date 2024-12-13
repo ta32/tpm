@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './PasswordTable.module.scss';
-import Colors from '../../styles/colors.module.scss';
+import Colors from 'styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
 import TableEntry from './PasswordTable/TableEntry';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
@@ -12,7 +12,7 @@ import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers
 import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
 import { TagsStatus } from 'contexts/reducers/tag-entries-reducer';
 import { Dropbox } from 'dropbox';
-import DropdownMenu from '../ui/DropdownMenu';
+import DropdownMenu from 'components/ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';

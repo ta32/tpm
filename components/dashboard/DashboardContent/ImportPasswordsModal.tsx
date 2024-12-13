@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Modal from '../ui/Modal';
+import Modal from 'components/ui/Modal';
 import styles from './ImportPasswordsModal.module.scss';
 import { decryptTrezorAppData, SafePasswordEntry } from 'lib/trezor';
 import { fromState, mergeAppData } from 'lib/storage';

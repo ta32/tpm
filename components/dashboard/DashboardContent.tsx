@@ -3,7 +3,7 @@ import SidePanel from './DashboardContent/SidePanel';
 import PasswordTable from './DashboardContent/PasswordTable';
 import StatusModal from './DashboardContent/StatusModal';
 import PinModal from 'components/ui/PinModal';
-import styles from './DashboardContent.module.css';
+import styles from './DashboardContent.module.scss';
 import { UserStatus } from 'contexts/reducers/user-reducer';
 import { useUser, useUserDispatch } from 'contexts/use-user';
 import TrezorConnect, { UI } from '@trezor/connect-web';
