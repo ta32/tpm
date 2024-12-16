@@ -16,8 +16,8 @@ import DropdownMenu from 'components/ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
-import { useRouter } from 'next/router';
 import ImportPasswordsModal from './ImportPasswordsModal';
+import { Routes, useLocation } from '../../../contexts/use-location';
 
 interface PasswordTableProps {
   selectedTag: string;
@@ -39,7 +39,7 @@ export default function PasswordTable({
   accountName,
   selectedTag,
 }: PasswordTableProps) {
-  const router = useRouter();
+  const [_, setLocation] = useLocation();
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
@@ -163,7 +163,7 @@ export default function PasswordTable({
   const handleUserMenuClick = (index: number) => {
     switch (index) {
       case 0:
-        router.push('/').catch((err) => console.error(err));
+        setLocation(Routes.HOME);
         break;
       case 1:
         setImportPassword(true);

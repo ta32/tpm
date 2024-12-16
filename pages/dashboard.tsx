@@ -3,16 +3,19 @@ import { useUser } from 'contexts/use-user';
 import { UserStatus } from 'contexts/reducers/user-reducer';
 import { useRouter } from 'next/router';
 import PasswordManager from 'components/dashboard/PasswordManager';
+import { Routes, useLocation } from '../contexts/use-location';
 
 export default function Dashboard() {
+  const [location] = useLocation();
   const [user] = useUser();
   const router = useRouter();
 
+  // Navigation
   useEffect(() => {
-    if (user.status === UserStatus.OFFLINE) {
-      router.push('/').catch((error) => console.error('Failed to navigate to the root page:', error));
+    if (user.status === UserStatus.OFFLINE || location === Routes.HOME) {
+      router.push('/').catch((error) => console.error('Failed to navigate to the home page:', error));
     }
-  }, [user.status, router]);
+  }, [user.status, router, location]);
 
   return (
     <PasswordManager />

@@ -7,6 +7,7 @@ import { TagEntriesProvider } from '../contexts/use-tag-entries';
 import { useEffect } from 'react';
 
 import { initTrezor, trezorDispose } from '../lib/trezor';
+import { LocationContext, LocationProvider, Routes } from '../contexts/use-location';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
@@ -53,13 +54,15 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#317EFB" />
       </Head>
-      <UserProvider>
-        <TagEntriesProvider>
-          <PasswordEntriesProvider>
-            <Component {...pageProps} />
-          </PasswordEntriesProvider>
-        </TagEntriesProvider>
-      </UserProvider>
+      <LocationProvider>
+        <UserProvider>
+          <TagEntriesProvider>
+            <PasswordEntriesProvider>
+              <Component {...pageProps} />
+            </PasswordEntriesProvider>
+          </TagEntriesProvider>
+        </UserProvider>
+      </LocationProvider>
     </>
   );
 }
