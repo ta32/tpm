@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from './PasswordTable.module.scss';
 import Colors from 'styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
 import TableEntry from './PasswordTable/TableEntry';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
-import { readAppFile, saveAppFile } from 'lib/dropbox';
 import { fromState } from 'lib/storage';
 import { appFileName } from 'lib/appfile';
 import { decryptAppData, encryptAppData } from 'lib/trezor';
@@ -18,6 +17,7 @@ import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
 import ImportPasswordsModal from './ImportPasswordsModal';
 import { Routes, useLocation } from 'contexts/location.context';
+import { DependenciesContext } from 'contexts/deps.context';
 
 interface PasswordTableProps {
   selectedTag: string;
@@ -39,6 +39,8 @@ export default function PasswordTable({
   accountName,
   selectedTag,
 }: PasswordTableProps) {
+  const { dropbox } = useContext(DependenciesContext);
+  const { readAppFile, saveAppFile } = dropbox();
   const [_, setLocation] = useLocation();
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
@@ -50,7 +52,6 @@ export default function PasswordTable({
   const [importPassword, setImportPassword] = useState(false);
   const [filter, setFilter] = useState('');
   const [sortType, setSortType] = useState(SortType.TITLE);
-
   const passwordSyncStatus = passwordEntries.status;
 
   useEffect(() => {

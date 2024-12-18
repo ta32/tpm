@@ -5,6 +5,23 @@ import { readBlob } from './utils';
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 
+export interface DropboxMethods {
+  hasRedirectedFromAuth: typeof hasRedirectedFromAuth;
+  connectDropbox: typeof connectDropbox;
+  getAuthUrl: typeof getAuthUrl;
+  readAppFile: typeof readAppFile;
+  saveAppFile: typeof saveAppFile;
+}
+export const dropboxFactory  = () : DropboxMethods => {
+  return {
+    hasRedirectedFromAuth,
+    connectDropbox,
+    getAuthUrl,
+    readAppFile,
+    saveAppFile,
+  }
+}
+
 export function hasRedirectedFromAuth(locationSearch: string): boolean {
   return locationSearch.includes('code=');
 }
@@ -108,6 +125,8 @@ export async function saveAppFile(dbc: Dropbox, data: Uint8Array, appFileName: s
       throw new Error(e);
     });
 }
+
+
 
 async function listFiles(dbc: Dropbox): Promise<string[]> {
   let response = await dbc.filesListFolder({ path: '' });

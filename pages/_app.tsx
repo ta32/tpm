@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 
 import { initTrezor, trezorDispose } from 'lib/trezor';
 import { LocationProvider } from 'contexts/location.context';
+import { defaultDeps, DependenciesContext } from 'contexts/deps.context';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
@@ -54,15 +55,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#317EFB" />
       </Head>
-      <LocationProvider>
-        <UserProvider>
-          <TagEntriesProvider>
-            <PasswordEntriesProvider>
-              <Component {...pageProps} />
-            </PasswordEntriesProvider>
-          </TagEntriesProvider>
-        </UserProvider>
-      </LocationProvider>
+      <DependenciesContext.Provider value={defaultDeps}>
+        <LocationProvider>
+          <UserProvider>
+            <TagEntriesProvider>
+              <PasswordEntriesProvider>
+                <Component {...pageProps} />
+              </PasswordEntriesProvider>
+            </TagEntriesProvider>
+          </UserProvider>
+        </LocationProvider>
+      </DependenciesContext.Provider>
     </>
   );
 }
