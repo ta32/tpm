@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styles from './TableEntry.module.scss';
 import { ClearPasswordEntry, encryptFullEntry, SafePasswordEntry } from 'lib/trezor';
-import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
-import { PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
+import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
+import { PasswordEntriesStatus } from 'contexts/reducers/password-entries.reducer';
 import ClosedEntry from './TableEntry/ClosedEntry';
 import ExpandedEntry from './TableEntry/ExpandedEntry';
 

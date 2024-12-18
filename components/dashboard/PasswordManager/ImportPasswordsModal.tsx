@@ -3,11 +3,11 @@ import Modal from 'components/ui/Modal';
 import styles from './ImportPasswordsModal.module.scss';
 import { decryptTrezorAppData, SafePasswordEntry } from 'lib/trezor';
 import { fromState, mergeAppData } from 'lib/storage';
-import { useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
-import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
+import { useTagEntries, useTagEntriesDispatch } from 'contexts/tag-entries.context';
+import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import Colors from 'styles/colors.module.scss';
 import FolderIcon from 'components/svg/ui/FolderIcon';
-import { TagEntry } from 'contexts/reducers/tag-entries-reducer';
+import { TagEntry } from 'contexts/reducers/tag-entries.reducer';
 
 interface ImportedData {
   tags: TagEntry[];

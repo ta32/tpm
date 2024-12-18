@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { getTag } from 'contexts/reducers/tag-entries-reducer';
+import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
 import styles from '../TableEntry.module.scss';
 import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
-import { useTagEntries } from 'contexts/use-tag-entries';
+import { useTagEntries } from 'contexts/tag-entries.context';
 import { ClearPasswordEntry, decryptFullEntry, SafePasswordEntry } from 'lib/trezor';
 import ToolTip from 'components/ui/ToolTip';
-import { useUser } from 'contexts/use-user';
-import { UserStatus } from 'contexts/reducers/user-reducer';
+import { useUser } from 'contexts/user.context';
+import { UserStatus } from 'contexts/reducers/user.reducer';
 
 enum STATUS {
   DECRYPTING_ENTRY,

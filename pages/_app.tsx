@@ -1,13 +1,13 @@
 import Head from 'next/head';
 import 'styles/globals.css';
 import { AppProps } from 'next/app';
-import { UserProvider } from '../contexts/use-user';
-import { PasswordEntriesProvider } from '../contexts/use-password-entries';
-import { TagEntriesProvider } from '../contexts/use-tag-entries';
+import { UserProvider } from 'contexts/user.context';
+import { PasswordEntriesProvider } from 'contexts/password-entries.context';
+import { TagEntriesProvider } from 'contexts/tag-entries.context';
 import { useEffect } from 'react';
 
-import { initTrezor, trezorDispose } from '../lib/trezor';
-import { LocationContext, LocationProvider, Routes } from '../contexts/use-location';
+import { initTrezor, trezorDispose } from 'lib/trezor';
+import { LocationProvider } from 'contexts/location.context';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`

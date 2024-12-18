@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useTagEntries } from 'contexts/use-tag-entries';
-import { usePasswordEntries } from 'contexts/use-password-entries';
-import { PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
-import { TagsStatus } from 'contexts/reducers/tag-entries-reducer';
+import { useTagEntries } from 'contexts/tag-entries.context';
+import { usePasswordEntries } from 'contexts/password-entries.context';
+import { PasswordEntriesStatus } from 'contexts/reducers/password-entries.reducer';
+import { TagsStatus } from 'contexts/reducers/tag-entries.reducer';
 import ProgressModal from 'components/ui/ProgressModal';
 
 // TODO Maybe this component should be removed?

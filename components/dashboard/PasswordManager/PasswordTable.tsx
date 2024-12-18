@@ -3,21 +3,21 @@ import styles from './PasswordTable.module.scss';
 import Colors from 'styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
 import TableEntry from './PasswordTable/TableEntry';
-import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
+import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { readAppFile, saveAppFile } from 'lib/dropbox';
 import { fromState } from 'lib/storage';
 import { appFileName } from 'lib/appfile';
 import { decryptAppData, encryptAppData } from 'lib/trezor';
-import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
-import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
-import { TagsStatus } from 'contexts/reducers/tag-entries-reducer';
+import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers/password-entries.reducer';
+import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/tag-entries.context';
+import { TagsStatus } from 'contexts/reducers/tag-entries.reducer';
 import { Dropbox } from 'dropbox';
 import DropdownMenu from 'components/ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
 import ImportPasswordsModal from './ImportPasswordsModal';
-import { Routes, useLocation } from '../../../contexts/use-location';
+import { Routes, useLocation } from 'contexts/location.context';
 
 interface PasswordTableProps {
   selectedTag: string;

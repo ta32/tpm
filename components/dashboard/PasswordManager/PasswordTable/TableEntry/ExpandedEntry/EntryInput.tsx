@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styles from './EntryInput.module.scss';
 import MultiSelect from 'components/ui/MultiSelect';
-import { useTagEntries } from 'contexts/use-tag-entries';
-import { getTags } from 'contexts/reducers/tag-entries-reducer';
+import { useTagEntries } from 'contexts/tag-entries.context';
+import { getTags } from 'contexts/reducers/tag-entries.reducer';
 import generatePassword from 'lib/password';
 import ToolTip from '../../../../../ui/ToolTip';
 import VisibilityIcon from 'components/svg/ui/VisibilityIcon';

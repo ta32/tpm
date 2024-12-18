@@ -9,10 +9,10 @@ import { useEffect, useState } from 'react';
 import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from '../lib/dropbox';
 import { getDevices, getEncryptionKey, setTrezorEventHandlers } from '../lib/trezor';
 import Home from '../components/index/Home';
-import { useUser, useUserDispatch } from '../contexts/use-user';
-import { UserStatus } from '../contexts/reducers/user-reducer';
+import { useUser, useUserDispatch } from '../contexts/user.context';
+import { UserStatus } from '../contexts/reducers/user.reducer';
 import { useRouter } from 'next/router';
-import { Routes, useLocation } from '../contexts/use-location';
+import { Routes, useLocation } from '../contexts/location.context';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL

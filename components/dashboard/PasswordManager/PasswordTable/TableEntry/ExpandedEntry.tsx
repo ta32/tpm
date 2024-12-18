@@ -7,9 +7,9 @@ import EntryInput from './ExpandedEntry/EntryInput';
 import DeleteIcon from 'components/svg/ui/DeleteIcon';
 import { ClearPasswordEntry } from 'lib/trezor';
 import DeleteModal from './ExpandedEntry/DeleteModal';
-import { usePasswordEntriesDispatch } from 'contexts/use-password-entries';
-import { getTag } from 'contexts/reducers/tag-entries-reducer';
-import { useTagEntries } from 'contexts/use-tag-entries';
+import { usePasswordEntriesDispatch } from 'contexts/password-entries.context';
+import { getTag } from 'contexts/reducers/tag-entries.reducer';
+import { useTagEntries } from 'contexts/tag-entries.context';
 import Colors from 'styles/colors.module.scss';
 
 interface ExpandedEntryProps {

@@ -4,7 +4,7 @@ import Colors from 'styles/colors.module.scss';
 import { SELECTABLE_TAG_ICONS } from 'lib/images';
 import AllIcon from 'components/svg/tags/AllIcon';
 import MoreIcon from 'components/svg/ui/MoreIcon';
-import { DEFAULT_TAGS } from 'contexts/use-tag-entries';
+import { DEFAULT_TAGS } from 'contexts/tag-entries.context';
 
 interface TagProps {
   id: string;

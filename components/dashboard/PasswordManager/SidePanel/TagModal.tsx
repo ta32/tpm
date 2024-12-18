@@ -1,8 +1,8 @@
 import Styles from './TagModal.module.scss';
 import Colors from 'styles/colors.module.scss';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { useTagEntries } from 'contexts/use-tag-entries';
-import { getTagTitle, TagsStatus } from 'contexts/reducers/tag-entries-reducer';
+import { useTagEntries } from 'contexts/tag-entries.context';
+import { getTagTitle, TagsStatus } from 'contexts/reducers/tag-entries.reducer';
 import { SELECTABLE_TAG_ICONS, SELECTABLE_TAG_NAMES } from 'lib/images';
 
 interface Tag {

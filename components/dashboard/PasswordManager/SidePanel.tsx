@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import styles from './SidePanel.module.scss';
-import { useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
+import { useTagEntries, useTagEntriesDispatch } from 'contexts/tag-entries.context';
 import TagModal from './SidePanel/TagModal';
-import { getTags, TagEntry, TagsStatus } from 'contexts/reducers/tag-entries-reducer';
+import { getTags, TagEntry, TagsStatus } from 'contexts/reducers/tag-entries.reducer';
 import Tag from './SidePanel/Tag';
 import { IMAGE_FILE } from 'lib/images';
 

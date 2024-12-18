@@ -4,8 +4,8 @@ import PasswordTable from './PasswordManager/PasswordTable';
 import StatusModal from './PasswordManager/StatusModal';
 import PinModal from 'components/ui/PinModal';
 import styles from './PasswordManager.module.scss';
-import { UserStatus } from 'contexts/reducers/user-reducer';
-import { useUser, useUserDispatch } from 'contexts/use-user';
+import { UserStatus } from 'contexts/reducers/user.reducer';
+import { useUser, useUserDispatch } from 'contexts/user.context';
 import TrezorConnect, { UI } from '@trezor/connect-web';
 
 

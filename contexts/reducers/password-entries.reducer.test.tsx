@@ -9,7 +9,7 @@ import {
   Sync,
   UpdateEntry,
   UploadEntries,
-} from './password-entries-reducer';
+} from './password-entries.reducer';
 import { uniqueId } from 'lib/utils';
 import { SafePasswordEntry } from 'lib/trezor';
 
