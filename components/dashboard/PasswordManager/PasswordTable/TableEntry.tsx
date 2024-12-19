@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styles from './TableEntry.module.scss';
-import { ClearPasswordEntry, encryptFullEntry, SafePasswordEntry } from 'lib/trezor';
+import { ClearPasswordEntry, SafePasswordEntry } from 'lib/trezor';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { PasswordEntriesStatus } from 'contexts/reducers/password-entries.reducer';
 import ClosedEntry from './TableEntry/ClosedEntry';
 import ExpandedEntry from './TableEntry/ExpandedEntry';
+import { DependenciesContext } from 'contexts/deps.context';
 
 interface NewEntry {
   type: 'NEW_ENTRY';
@@ -29,6 +30,8 @@ export default function TableEntry({
   onSavedCallback,
   row,
 }: TableEntryProps) {
+  const { trezor } = useContext(DependenciesContext);
+  const { encryptFullEntry } = trezor();
   const passwordEntries = usePasswordEntries();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const [clearEntry, setClearEntry] = useState<ClearPasswordEntry | null>(null);

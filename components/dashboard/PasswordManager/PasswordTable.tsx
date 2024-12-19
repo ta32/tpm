@@ -6,7 +6,6 @@ import TableEntry from './PasswordTable/TableEntry';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { fromState } from 'lib/storage';
 import { appFileName } from 'lib/appfile';
-import { decryptAppData, encryptAppData } from 'lib/trezor';
 import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers/password-entries.reducer';
 import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/tag-entries.context';
 import { TagsStatus } from 'contexts/reducers/tag-entries.reducer';
@@ -39,8 +38,9 @@ export default function PasswordTable({
   accountName,
   selectedTag,
 }: PasswordTableProps) {
-  const { dropbox } = useContext(DependenciesContext);
+  const { dropbox, trezor } = useContext(DependenciesContext);
   const { readAppFile, saveAppFile } = dropbox();
+  const { decryptAppData, encryptAppData } = trezor();
   const [_, setLocation] = useLocation();
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();

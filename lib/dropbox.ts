@@ -5,14 +5,14 @@ import { readBlob } from './utils';
 // App key from dropbox app console. This is not secret.
 const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 
-export interface DropboxMethods {
+export interface DropboxService {
   hasRedirectedFromAuth: typeof hasRedirectedFromAuth;
   connectDropbox: typeof connectDropbox;
   getAuthUrl: typeof getAuthUrl;
   readAppFile: typeof readAppFile;
   saveAppFile: typeof saveAppFile;
 }
-export const dropboxFactory  = () : DropboxMethods => {
+export const dropboxServiceFactory  = () : DropboxService => {
   return {
     hasRedirectedFromAuth,
     connectDropbox,
