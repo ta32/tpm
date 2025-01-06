@@ -1,6 +1,6 @@
-import Head from 'next/head';
+'use client';
+import React from 'react';
 import 'styles/globals.css';
-import { AppProps } from 'next/app';
 import { UserProvider } from 'contexts/user.context';
 import { PasswordEntriesProvider } from 'contexts/password-entries.context';
 import { TagEntriesProvider } from 'contexts/tag-entries.context';
@@ -19,7 +19,14 @@ const TREZOR_CONNECT_CONFIG = {
   init: false,
 };
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function RootLayout({
+  // Layouts must accept a children prop.
+  // This will be populated with nested layouts or pages
+  children,
+}: {
+  children: React.ReactNode
+}) {
+
   useEffect(() => {
     if (!TREZOR_CONNECT_CONFIG.init) {
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
@@ -39,33 +46,36 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       });
     };
   }, []);
-  return (
-    <>
-      <Head>
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=2,user-scalable=yes"
-        />
-        <meta name="description" content="Description" />
-        <meta name="keywords" content="Keywords" />
-        <title>Temporary Password Manager</title>
 
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#317EFB" />
-      </Head>
+  return (
+    <html lang="en">
+    <head>
+      <meta charSet="utf-8" />
+      <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+      <meta
+        name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=2,user-scalable=yes"
+      />
+      <meta name="description" content="Description" />
+      <meta name="keywords" content="Keywords" />
+      <title>Temporary Password Manager</title>
+
+      <link rel="manifest" href="/manifest.json" />
+      <meta name="theme-color" content="#317EFB" />
+    </head>
+    <body>
       <DependenciesContext.Provider value={defaultDeps}>
         <LocationProvider>
           <UserProvider>
             <TagEntriesProvider>
               <PasswordEntriesProvider>
-                <Component {...pageProps} />
+                {children}
               </PasswordEntriesProvider>
             </TagEntriesProvider>
           </UserProvider>
         </LocationProvider>
       </DependenciesContext.Provider>
-    </>
-  );
+    </body>
+    </html>
+  )
 }
