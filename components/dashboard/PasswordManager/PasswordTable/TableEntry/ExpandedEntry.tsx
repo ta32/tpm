@@ -3,13 +3,13 @@ import styles from '../TableEntry.module.scss';
 import Image from 'next/image';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
 import { IoAddCircleOutline } from 'react-icons/io5';
-import EntryInput from './EntryInput';
+import EntryInput from './ExpandedEntry/EntryInput';
 import DeleteIcon from 'components/svg/ui/DeleteIcon';
 import { ClearPasswordEntry } from 'lib/trezor';
-import DeleteModal from './DeleteModal';
-import { usePasswordEntriesDispatch } from 'contexts/use-password-entries';
-import { getTag } from 'contexts/reducers/tag-entries-reducer';
-import { useTagEntries } from 'contexts/use-tag-entries';
+import DeleteModal from './ExpandedEntry/DeleteModal';
+import { usePasswordEntriesDispatch } from 'contexts/password-entries.context';
+import { getTag } from 'contexts/reducers/tag-entries.reducer';
+import { useTagEntries } from 'contexts/tag-entries.context';
 import Colors from 'styles/colors.module.scss';
 
 interface ExpandedEntryProps {
@@ -26,6 +26,7 @@ export default function ExpandedEntry({
   onSubmitNewEntry,
   onLockChange,
 }: ExpandedEntryProps) {
+  const [changed, setChanged] = useState(false);
   const tagEntries = useTagEntries();
   const [itemMissing, setItemMissing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -58,6 +59,7 @@ export default function ExpandedEntry({
   };
 
   const handleChange = () => {
+    setChanged(true);
     setItemMissing(false);
   };
 
@@ -106,7 +108,7 @@ export default function ExpandedEntry({
         <div className={styles.account_info}>
           <EntryInput
             name="item"
-            label={'Item*'}
+            label={'Item/URL *'}
             placeholder={''}
             type={'text'}
             defaultValue={entry?.item ?? ''}
@@ -126,6 +128,7 @@ export default function ExpandedEntry({
             label={'Password'}
             placeholder={''}
             type={'password'}
+            onChanged={handleChange}
             defaultValue={entry?.password ?? ''}
           />
           <EntryInput name="tags" label={'Tags'} placeholder={''} type={'tags'} defaultValue={entry?.tags ?? ''} />
@@ -148,14 +151,23 @@ export default function ExpandedEntry({
             </div>
           )}
         </div>
-        <div className={styles.account_info_controls}>
-          <button type="submit" disabled={saving} className={styles.save_btn}>
-            {saving ? 'Saving' : 'Save'}
-          </button>
-          <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>
-            Discard
-          </button>
-        </div>
+        {changed && (
+          <div className={styles.account_info_controls}>
+            <button type="submit" disabled={saving} className={styles.save_btn}>
+              {saving ? 'Saving' : 'Save'}
+            </button>
+            <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>
+              Discard
+            </button>
+          </div>
+        )}
+        {!changed && (
+          <div className={styles.account_info_controls}>
+            <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>
+              Close
+            </button>
+          </div>
+        )}
       </form>
     </>
   );

@@ -9,7 +9,7 @@ import {
   tagsReducer,
   TagsStatus,
   UpdateTag,
-} from './tag-entries-reducer';
+} from './tag-entries.reducer';
 
 const INITIAL_TAGS = {
   all: {

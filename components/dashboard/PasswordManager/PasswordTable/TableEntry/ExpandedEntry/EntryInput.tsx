@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import styles from './EntryInput.module.scss';
 import MultiSelect from 'components/ui/MultiSelect';
-import { useTagEntries } from 'contexts/use-tag-entries';
-import { getTags } from 'contexts/reducers/tag-entries-reducer';
+import { useTagEntries } from 'contexts/tag-entries.context';
+import { getTags } from 'contexts/reducers/tag-entries.reducer';
 import generatePassword from 'lib/password';
-import ToolTip from '../../../ui/ToolTip';
+import ToolTip from '../../../../../ui/ToolTip';
+import VisibilityIcon from 'components/svg/ui/VisibilityIcon';
+import RefreshIcon from 'components/svg/ui/RefreshIcon';
+import Colors from 'styles/colors.module.scss';
 
 type DefaultTypes = string | string[] | null;
 interface EntryInputProps {
@@ -14,6 +17,7 @@ interface EntryInputProps {
   mandatory?: boolean;
   invalid?: boolean;
   defaultValue: DefaultTypes;
+  onChanged?: () => void;
   type: 'text' | 'password' | 'secret' | 'tags';
 }
 export default function EntryInput({
@@ -24,6 +28,7 @@ export default function EntryInput({
   type,
   mandatory,
   invalid,
+  onChanged,
 }: EntryInputProps) {
   const tagEntries = useTagEntries();
   const [inputValue, setInputValue] = useState<DefaultTypes>(defaultValue);
@@ -34,6 +39,9 @@ export default function EntryInput({
   };
 
   const handleGeneratePassword = () => {
+    if (onChanged) {
+      onChanged();
+    }
     const password = generatePassword(16);
     setInputValue(password);
   };
@@ -57,8 +65,9 @@ export default function EntryInput({
         className={`${styles.input} ${invalid ? styles.invalid : ''}`}
         type={type == 'text' ? 'text' : passwordInputType}
         placeholder={placeholder}
-        defaultValue={inputValue != null ? inputValue : ''}
+        value={inputValue != null ? inputValue : ''}
         required={mandatory}
+        onChange={(e) => setInputValue(e.target.value)}
       />
     );
     if (mandatory) {
@@ -87,17 +96,21 @@ export default function EntryInput({
       </div>
       {type === 'password' && (
         <div className={styles.container_row_no_wrap}>
-          <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
-            +
-          </button>
-          <button type={'button'} className={styles.control_btn} onClick={handleGeneratePassword}>
-            #
-          </button>
+          <ToolTip text={"Show password"} position={'top'} width={'150px'}>
+            <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
+              <VisibilityIcon fill={Colors.black} />
+            </button>
+          </ToolTip>
+          <ToolTip text={"Generate password"} position={'top'} width={'150px'}>
+            <button type={'button'} className={styles.control_btn} onClick={handleGeneratePassword}>
+              <RefreshIcon fill={Colors.black} />
+            </button>
+          </ToolTip>
         </div>
       )}
       {type === 'secret' && (
         <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
-          #
+          <VisibilityIcon fill={Colors.black} />
         </button>
       )}
     </div>

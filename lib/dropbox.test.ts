@@ -8,13 +8,14 @@ jest.mock('./appfile');
 const mAppFileName = jest.mocked(appFileName);
 
 jest.mock('dropbox');
-const mDbxAuth = jest.mocked(DropboxAuth);
 const mDropbox = jest.mocked(Dropbox);
 
+// need to module mock internal function due to jsdom limitation
+// see lib/utils.ts for more info
 jest.mock('./utils');
 const mReadBlob = jest.mocked(readBlob);
 
-it('app reads password entries file in app folder once device has been connected', async () => {
+it('readAppFile reads password entries file in dropbox app folder once device has been connected based on master public key', async () => {
   const data = new Uint8Array([1, 2, 3]);
   mReadBlob.mockResolvedValue(data);
   const APP_FILE_NAME = 'unique_file_name_per_hw_account.pswd';
@@ -55,8 +56,9 @@ it('app reads password entries file in app folder once device has been connected
 
   // sut
   const dropbox = new Dropbox({ auth: new DropboxAuth({ clientId: '123' }) });
-  const entries = await readAppFile('', dropbox);
+  const entries = await readAppFile('pk-used-as-seed-transforms-to-value-of-const-APP_FILE_NAME', dropbox);
 
   expect(entries.data).toStrictEqual(data);
+  // do not increment the rev after reading the file it is managed by dropbox
   expect(entries.rev).toStrictEqual('must_use_this_rev_when_updating_file_rev_1');
 });

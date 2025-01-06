@@ -60,6 +60,32 @@ export interface ClearPasswordEntry {
   lastModifiedDate: number;
 }
 
+export interface TrezorService {
+  encryptAppData: typeof encryptAppData;
+  decryptAppData: typeof decryptAppData;
+  decryptTrezorAppData: typeof decryptTrezorAppData;
+  encryptFullEntry: typeof encryptFullEntry;
+  decryptFullEntry: typeof decryptFullEntry;
+  getDevices: typeof getDevices;
+  getEncryptionKey: typeof getEncryptionKey;
+  initTrezor: typeof initTrezor;
+  setTrezorEventHandlers: typeof setTrezorEventHandlers;
+}
+
+export const trezorServiceFactory = (): TrezorService => {
+  return {
+    encryptAppData,
+    decryptAppData,
+    decryptTrezorAppData,
+    encryptFullEntry,
+    decryptFullEntry,
+    getDevices,
+    getEncryptionKey,
+    initTrezor,
+    setTrezorEventHandlers,
+  };
+}
+
 export async function initTrezor(appUrl: string, trustedHost: boolean) {
   await TrezorConnect.init({
     transportReconnect: true,

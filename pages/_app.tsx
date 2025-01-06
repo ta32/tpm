@@ -1,12 +1,14 @@
 import Head from 'next/head';
 import 'styles/globals.css';
 import { AppProps } from 'next/app';
-import { UserProvider } from '../contexts/use-user';
-import { PasswordEntriesProvider } from '../contexts/use-password-entries';
-import { TagEntriesProvider } from '../contexts/use-tag-entries';
+import { UserProvider } from 'contexts/user.context';
+import { PasswordEntriesProvider } from 'contexts/password-entries.context';
+import { TagEntriesProvider } from 'contexts/tag-entries.context';
 import { useEffect } from 'react';
 
-import { initTrezor, trezorDispose } from '../lib/trezor';
+import { initTrezor, trezorDispose } from 'lib/trezor';
+import { LocationProvider } from 'contexts/location.context';
+import { defaultDeps, DependenciesContext } from 'contexts/deps.context';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
@@ -53,13 +55,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#317EFB" />
       </Head>
-      <UserProvider>
-        <TagEntriesProvider>
-          <PasswordEntriesProvider>
-            <Component {...pageProps} />
-          </PasswordEntriesProvider>
-        </TagEntriesProvider>
-      </UserProvider>
+      <DependenciesContext.Provider value={defaultDeps}>
+        <LocationProvider>
+          <UserProvider>
+            <TagEntriesProvider>
+              <PasswordEntriesProvider>
+                <Component {...pageProps} />
+              </PasswordEntriesProvider>
+            </TagEntriesProvider>
+          </UserProvider>
+        </LocationProvider>
+      </DependenciesContext.Provider>
     </>
   );
 }

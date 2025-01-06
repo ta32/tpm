@@ -1,5 +1,5 @@
 // MODEL
-import { TrezorDevice, AppDataKeys } from '../../lib/trezor';
+import { TrezorDevice, AppDataKeys } from 'lib/trezor';
 import { Dropbox } from 'dropbox';
 
 export enum UserStatus {

@@ -20,9 +20,11 @@ export default function ToolTip({ text, position, children, mode, active, width 
   const activeClass = mode === 'manual' ? (active ? styles.active : styles.hidden) : '';
   const className = `${styles.tooltip} ${activeClass} ${tooltip_type[position]}`;
   return (
-    <div className={className}>
-      {children}
-      <span style={{ width: widthStyle }} className={styles.tooltip_text}>{text}</span>
+    <div>
+      <div className={className}>
+        {children}
+        <span style={{ width: widthStyle }} className={styles.tooltip_text}>{text}</span>
+      </div>
     </div>
   );
 }

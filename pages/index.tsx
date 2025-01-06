@@ -6,12 +6,13 @@ import TrezorConnect, {
   UiEventMessage,
 } from '@trezor/connect-web';
 import { useEffect, useState } from 'react';
-import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from '../lib/dropbox';
-import { setTrezorEventHandlers, getDevices, getEncryptionKey } from '../lib/trezor';
-import Home from '../components/index/Home';
-import { useUser, useUserDispatch } from '../contexts/use-user';
-import { UserStatus } from '../contexts/reducers/user-reducer';
+import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from 'lib/dropbox';
+import { getDevices, getEncryptionKey, setTrezorEventHandlers } from 'lib/trezor';
+import Home from 'components/index/Home';
+import { useUser, useUserDispatch } from 'contexts/user.context';
+import { UserStatus } from 'contexts/reducers/user.reducer';
 import { useRouter } from 'next/router';
+import { Routes, useLocation } from 'contexts/location.context';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
@@ -20,9 +21,16 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
 
 export default function Index() {
   const router = useRouter();
+  const [location, setLocation] = useLocation();
   const [user, userRef] = useUser();
   const [userDispatch, userDispatchRef] = useUserDispatch();
   const [loading, setLoading] = useState(false);
+  // Navigation
+  useEffect(() => {
+    if (location === Routes.DASHBOARD) {
+      router.push('/dashboard').catch((error) => console.error('Failed to navigate to the dashboard:', error));
+    }
+  }, [location, router]);
 
   useEffect(() => {
     const locationSearch = window.location.search;
@@ -42,7 +50,7 @@ export default function Index() {
           window.sessionStorage.clear();
         });
     }
-  }, [router, user, userDispatch]);
+  }, [user, userDispatch]);
 
   useEffect(() => {
     const transportEventCb = (event: TransportEventMessage) => {};
@@ -83,11 +91,6 @@ export default function Index() {
     setTrezorEventHandlers(updateDevice, transportEventCb, uiEventCb);
   }, [userDispatchRef, userRef]);
 
-  const loadDashboard = () => {
-    setLoading(true);
-    router.push('/dashboard').catch((err) => console.error(err));
-  };
-
   const openDevice = () => {
     if (user.device === null) {
       console.error('wallet is not initialized');
@@ -96,7 +99,8 @@ export default function Index() {
     getEncryptionKey(user.device.path).then((keyPair) => {
       if (keyPair !== null) {
         userDispatch({ type: 'ACTIVATED_TMP_ON_DEVICE', keyPair });
-        loadDashboard();
+        setLoading(true);
+        setLocation(Routes.DASHBOARD);
       } else {
         // TODO: handle error -- user decided not to activate error or pin was wrong
       }

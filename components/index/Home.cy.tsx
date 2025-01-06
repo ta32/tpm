@@ -1,11 +1,11 @@
 /// <reference types="cypress" />
 import { Inter } from "next/font/google";
-import React, { CSSProperties, forwardRef, Ref, useImperativeHandle, useRef } from 'react';
+import React, { CSSProperties} from 'react';
 import Home from './Home'
-import { User, UserProvider, useUser, useUserDispatch } from 'contexts/use-user';
+import { User, UserProvider, useUser, useUserDispatch } from 'contexts/user.context';
 import { IMAGE_FILE } from 'lib/images';
 import { Dropbox } from 'dropbox';
-import { UserAction, UserStatus } from '../../contexts/reducers/user-reducer';
+import { UserAction } from '../../contexts/reducers/user.reducer';
 
 const inter = Inter({ subsets: ['latin'] });
 

@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from './PasswordTable.module.scss';
-import Colors from '../../styles/colors.module.scss';
+import Colors from 'styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
 import TableEntry from './PasswordTable/TableEntry';
-import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/use-password-entries';
-import { readAppFile, saveAppFile } from 'lib/dropbox';
+import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { fromState } from 'lib/storage';
 import { appFileName } from 'lib/appfile';
-import { decryptAppData, encryptAppData } from 'lib/trezor';
-import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers/password-entries-reducer';
-import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/use-tag-entries';
-import { TagsStatus } from 'contexts/reducers/tag-entries-reducer';
+import { getSafePasswordEntries, PasswordEntriesStatus } from 'contexts/reducers/password-entries.reducer';
+import { DEFAULT_TAGS, useTagEntries, useTagEntriesDispatch } from 'contexts/tag-entries.context';
+import { TagsStatus } from 'contexts/reducers/tag-entries.reducer';
 import { Dropbox } from 'dropbox';
-import DropdownMenu from '../ui/DropdownMenu';
+import DropdownMenu from 'components/ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
-import { useRouter } from 'next/router';
 import ImportPasswordsModal from './ImportPasswordsModal';
+import { Routes, useLocation } from 'contexts/location.context';
+import { DependenciesContext } from 'contexts/deps.context';
 
 interface PasswordTableProps {
   selectedTag: string;
@@ -39,7 +38,10 @@ export default function PasswordTable({
   accountName,
   selectedTag,
 }: PasswordTableProps) {
-  const router = useRouter();
+  const { dropbox, trezor } = useContext(DependenciesContext);
+  const { readAppFile, saveAppFile } = dropbox();
+  const { decryptAppData, encryptAppData } = trezor();
+  const [_, setLocation] = useLocation();
   const tagEntries = useTagEntries();
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntries = usePasswordEntries();
@@ -50,7 +52,6 @@ export default function PasswordTable({
   const [importPassword, setImportPassword] = useState(false);
   const [filter, setFilter] = useState('');
   const [sortType, setSortType] = useState(SortType.TITLE);
-
   const passwordSyncStatus = passwordEntries.status;
 
   useEffect(() => {
@@ -163,7 +164,7 @@ export default function PasswordTable({
   const handleUserMenuClick = (index: number) => {
     switch (index) {
       case 0:
-        router.push('/').catch((err) => console.error(err));
+        setLocation(Routes.HOME);
         break;
       case 1:
         setImportPassword(true);

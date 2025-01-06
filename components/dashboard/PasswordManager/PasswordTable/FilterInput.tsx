@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import styles from './FilterInput.module.scss';
-import CloseIcon from '../../svg/ui/CloseIcon';
-import colors from '../../../styles/colors.module.scss';
+import CloseIcon from '../../../svg/ui/CloseIcon';
+import colors from '../../../../styles/colors.module.scss';
 
 interface FilterInputProps {
   placeholder: string;
