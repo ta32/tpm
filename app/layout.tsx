@@ -66,7 +66,7 @@ export default function RootLayout({
       <meta name="keywords" content="Keywords" />
       <title>Temporary Password Manager</title>
 
-      <link rel="manifest" href="/manifest.json" />
+      <link rel="manifest" href="/app/manifest.json" />
       <meta name="theme-color" content="#317EFB" />
     </head>
     <body>
