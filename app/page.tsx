@@ -65,7 +65,7 @@ export default function App() {
       } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
         userDispatch({ type: 'CONFIRMATION_ENTERED' });
       } else {
-        console.error('Unknown UI event', event);
+        console.warn('Unknown UI event', event);
       }
     };
     const updateDevice = (event: DeviceEventMessage) => {
