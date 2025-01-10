@@ -9,7 +9,7 @@ import TrezorConnect, {
 import { useEffect, useState } from 'react';
 import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from 'lib/dropbox';
 import { getDevices, getEncryptionKey, setTrezorEventHandlers } from 'lib/trezor';
-import Home from 'components/index/Home';
+import Home from 'components/app/Home';
 import { useUser, useUserDispatch } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
 import { useRouter } from 'next/navigation';
@@ -20,7 +20,7 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
   : 'http://localhost:3000/';
 
-export default function Index() {
+export default function App() {
   const router = useRouter();
   const [location, setLocation] = useLocation();
   const [user, userRef] = useUser();

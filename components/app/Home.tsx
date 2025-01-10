@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import Layout from './Home/Layout';
 import PinDialog from 'components/ui/PinDialog';
+import DeviceIcon from 'components/svg/ui/DeviceIcon';
 import Image from 'next/image';
-import { IMAGE_FILE } from '../../lib/images';
+import { IMAGE_FILE } from 'lib/images';
 import styles from './Home.module.scss';
-import { UserStatus } from '../../contexts/reducers/user.reducer';
-import DeviceIcon from '../svg/ui/DeviceIcon';
+import { UserStatus } from 'contexts/reducers/user.reducer';
 import Colors from 'styles/colors.module.scss';
-import { useUser } from '../../contexts/user.context';
+import { useUser } from 'contexts/user.context';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
