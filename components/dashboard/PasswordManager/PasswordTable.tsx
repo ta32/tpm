@@ -93,7 +93,7 @@ export default function PasswordTable({
           console.log(e);
         });
     }
-  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordSyncStatus, tagEntriesDispatch, passwordEntriesDispatch]);
+  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordSyncStatus, tagEntriesDispatch, passwordEntriesDispatch, readAppFile, decryptAppData]);
 
   useEffect(() => {
     const pushData =
@@ -120,16 +120,7 @@ export default function PasswordTable({
         });
       });
     }
-  }, [
-    appDataEncryptionKey,
-    dbc,
-    masterPublicKey,
-    passwordEntries,
-    rev,
-    tagEntries,
-    tagEntriesDispatch,
-    passwordEntriesDispatch,
-  ]);
+  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordEntries, rev, tagEntries, tagEntriesDispatch, passwordEntriesDispatch, encryptAppData, saveAppFile]);
 
   const handleAddEntry = () => {
     setLockEntries(true);

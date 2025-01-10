@@ -90,11 +90,16 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
         }
         return { ...new_entries };
       }
-      // internal error - e.g. neighbor trying to dispatch sync action at the same time as another component
+      if (state.status === PasswordEntriesStatus.SYNCED) {
+        return {
+          ...state
+        }
+      }
+      // internal error
       return {
         ...state,
         status: PasswordEntriesStatus.ERROR,
-        lastError: 'Synced called in state: ' + state.status + ' action version is: ' + action.version,
+        lastError: 'Synced called when state is: ' + state.status + ' action version is: ' + action.version + ' state version is: ' + state.version,
       };
     }
     case 'ADD_ENTRY': {
