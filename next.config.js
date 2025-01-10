@@ -1,31 +1,28 @@
-/** @type {import('next').NextConfig} */
-const withPWA = require('next-pwa')({
-  dest: 'public'
-})
+/**
+ * @type {import('next').NextConfig}
+ */
 const path = require('path');
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
-module.exports = withBundleAnalyzer(
-  withPWA({
-    // config
-    reactStrictMode: true,
-    i18n: {
-      locales: ['en-US', 'es-ES'],
-      defaultLocale: 'en-US',
-    },
-    webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-      // Custom SVG loader configuration
-      config.module.rules.push({
-        test: /\.svg$/,
-        include: [path.resolve(__dirname, './assets/tags'), path.resolve(__dirname, './assets/ui')],
-        use: [{
-          loader: path.resolve(__dirname, './components/svg/svg-path-reader.js'),
-        }],
-      });
-      return config;
-    },
-  }
-))
+const nextConfig = {
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Custom SVG loader configuration
+    config.module.rules.push({
+      test: /\.svg$/,
+      include: [path.resolve(__dirname, './assets/tags'), path.resolve(__dirname, './assets/ui')],
+      use: [{
+        loader: path.resolve(__dirname, './components/svg/svg-path-reader.js'),
+      }],
+    });
+    return config;
+  },
+}
+
+module.exports = withBundleAnalyzer(nextConfig);
