@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import 'styles/globals.css';
+import { Inter } from 'next/font/google';
 import { UserProvider } from 'contexts/user.context';
 import { PasswordEntriesProvider } from 'contexts/password-entries.context';
 import { TagEntriesProvider } from 'contexts/tag-entries.context';
@@ -18,6 +19,11 @@ const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 const TREZOR_CONNECT_CONFIG = {
   init: false,
 };
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -48,7 +54,7 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="en">
+    <html lang="en" className={inter.className}>
     <head>
       <meta charSet="utf-8" />
       <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
