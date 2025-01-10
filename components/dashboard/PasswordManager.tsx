@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import SidePanel from './PasswordManager/SidePanel';
 import PasswordTable from './PasswordManager/PasswordTable';

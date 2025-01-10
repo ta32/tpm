@@ -1,3 +1,4 @@
+'use client';
 import TrezorConnect, {
   DEVICE,
   DeviceEventMessage,
@@ -8,10 +9,10 @@ import TrezorConnect, {
 import { useEffect, useState } from 'react';
 import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from 'lib/dropbox';
 import { getDevices, getEncryptionKey, setTrezorEventHandlers } from 'lib/trezor';
-import Home from 'components/index/Home';
+import Home from 'components/app/Home';
 import { useUser, useUserDispatch } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Routes, useLocation } from 'contexts/location.context';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
@@ -19,7 +20,7 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
   : 'http://localhost:3000/';
 
-export default function Index() {
+export default function App() {
   const router = useRouter();
   const [location, setLocation] = useLocation();
   const [user, userRef] = useUser();
@@ -28,7 +29,7 @@ export default function Index() {
   // Navigation
   useEffect(() => {
     if (location === Routes.DASHBOARD) {
-      router.push('/dashboard').catch((error) => console.error('Failed to navigate to the dashboard:', error));
+      router.push('/dashboard');
     }
   }, [location, router]);
 
@@ -46,9 +47,9 @@ export default function Index() {
             dbc,
           });
         }).catch((error) => {
-          console.error(error);
-          window.sessionStorage.clear();
-        });
+        console.error(error);
+        window.sessionStorage.clear();
+      });
     }
   }, [user, userDispatch]);
 
