@@ -1,6 +1,7 @@
 # Temporary Password Manager
 
-PWA app replacement for the Trezor Password Manager
+PWA app replacement for the Trezor Password Manager.
+
 This branch contains a prototype of the app that is an offline-first PWA app (code not served from a server).
 The app still needs network access to sync with Dropbox, although I do plan to have an option to sync with a local file.
 
@@ -44,4 +45,4 @@ npx serve out
 
 I would really like to figure out how to create offline-first web apps where a user could download a package from GitHub, verify it, and install it locally. Because the code for your app is installed on your machine you are no longer vulnerable to phishing attacks, or MITM attacks like you would when navigating to a traditional DApp website. 
 
-Users can also download the source code build and run it locally to install the app.
+Users can also download the source code, build and run it locally to install the app.
