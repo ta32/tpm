@@ -1,34 +1,47 @@
 # Temporary Password Manager
 
-This example uses [`next-pwa`](https://github.com/shadowwalker/next-pwa) to create a progressive web app (PWA) powered by [Workbox](https://developers.google.com/web/tools/workbox/).
+PWA app replacement for the Trezor Password Manager
+This branch contains a prototype of the app that is an offline-first PWA app (code not served from a server).
+The app still needs network access to sync with Dropbox, although I do plan to have an option to sync with a local file.
+
+**Note:** You will need to create your own Dropbox OAuth account and update the required configuration as described below to use this app.
+
+You will need to create a ```.env.local``` file in the root directory
+
+with the following content
+
+```text
+NEXT_PUBLIC_REDIRECT_URI=http://localhost:3000/
+NEXT_PUBLIC_CLIENT_ID=XXXX-CREATE-YOUR-OWN-APP-AND-GET-CLIENT-ID-HERE-XXXX
+```
 
 ## About this Project
 
 * A free and open-source password manager
 
-* password manager that protects all your passwords **without** a master password
+* Password manager that protects all your passwords **without** a master password
 
-* password manager where the encrypted passwords is synced online using a storage account you control
+## Build and Install
 
-These requirements were met by the Trezor Password Manager (TPM), but was sadly deprecated.
-This project aims to re-build this Chrome extension as a PWA-WebAPP, but with better offline support 
-and a more trustless way for users to install the app.
+Checkout the project and run the following commands:
 
-see Wiki for more information: https://github.com/ta32/tpm/wiki
+### Install pre-requisites
+- Node.js
+- npx serve: ```npm install -g serve``` installs it globally
 
-## Build and Install locally
+### Build and install PWA
 
- TODO: add instructions
-
-
-### Running on non-localhost origin
-
-Starting the dev server with TLS
 ```shell
-next dev --experimental-https
+npm install
+npm run build
+npx serve out
+# open the browser and navigate to http://localhost:3000 and install the PWA app
 ```
-Edit the host file to point a domain e.g. tmp.local to 127.0.0.1
-Then run the server with TLS support. This allows the app to be tested
-with an Origin URL that is not localhost, by connecting to https://tmp.local:3000
 
-Without TLS CORS policy of chrome will block the app making requests to the Trezor Bridge
+## Todo
+
+- [ ] Determine how to make an installer to automate the installation process for all platforms.
+
+I would really like to figure out how to create offline-first web apps where a user could download a package from GitHub, verify it, and install it locally. Because the code for your app is installed on your machine you are no longer vulnerable to phishing attacks, or MITM attacks like you would when navigating to a traditional DApp website. 
+
+Users can also download the source code build and run it locally to install the app.
