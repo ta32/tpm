@@ -36,7 +36,6 @@ next-env.d.ts
 
 # next-pwa
 /public/precache.*.*.js
-/public/sw.js
 /public/workbox-*.js
 /public/worker-*.js
 /public/fallback-*.js
@@ -44,8 +43,8 @@ next-env.d.ts
 /public/sw.js.map
 /public/workbox-*.js.map
 /public/worker-*.js.map
-/public/fallback-*.js
 .idea
 analyze
 
 certificates
+public/resource-list.json

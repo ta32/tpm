@@ -1,11 +1,10 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'styles/globals.css';
 import { Inter } from 'next/font/google';
 import { UserProvider } from 'contexts/user.context';
 import { PasswordEntriesProvider } from 'contexts/password-entries.context';
 import { TagEntriesProvider } from 'contexts/tag-entries.context';
-import { useEffect } from 'react';
 
 import { initTrezor, trezorDispose } from 'lib/trezor';
 import { LocationProvider } from 'contexts/location.context';
@@ -32,6 +31,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
+  useEffect(() => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) =>
+        console.log(
+          'Service Worker registration successful with scope: ',
+          registration.scope
+        )
+      )
+      .catch((err) => console.log('Service Worker registration failed: ', err))
+  }, []);
 
   useEffect(() => {
     if (!TREZOR_CONNECT_CONFIG.init) {
@@ -66,7 +77,7 @@ export default function RootLayout({
       <meta name="keywords" content="Keywords" />
       <title>Temporary Password Manager</title>
 
-      <link rel="manifest" href="/app/manifest.json" />
+      <link rel="manifest" href="/manifest.json" />
       <meta name="theme-color" content="#317EFB" />
     </head>
     <body>
