@@ -5,6 +5,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "tauri": "tauri",
     "cypress:open": "cypress open",
     "prettier": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore",
     "test": "jest --watch"
@@ -18,20 +19,21 @@
     "react-icons": "^4.8.0"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@next/bundle-analyzer": "^15.1.4",
+    "@tauri-apps/cli": "^2.2.5",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "cypress": "^13.17.0",
     "eslint": "8.57.0",
     "eslint-config-next": "13.5.6",
     "eslint-config-prettier": "9.1.0",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
-    "@jest/globals": "^29.7.0",
-    "@testing-library/jest-dom": "^5.16.5",
     "prettier": "3.2.5",
     "sass": "^1.62.0",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "typescript": "^5"
   }
 }

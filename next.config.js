@@ -3,6 +3,9 @@
  */
 const path = require('path');
 
+const isProd = process.env.NODE_ENV === 'production';
+const internalHost = process.env.TAURI_DEV_HOST || 'localhost';
+
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
@@ -12,6 +15,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  assetPrefix: isProd ? undefined : `http://${internalHost}:3000`,
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Custom SVG loader configuration
     config.module.rules.push({
