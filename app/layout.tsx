@@ -13,7 +13,7 @@ import { defaultDeps, DependenciesContext } from 'contexts/deps.context';
 
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : 'http://localhost:3000/';
+  : 'https://tauri.localhost/';
 // Trezor bridge whitelists localhost and trezor.io domains
 const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 const TREZOR_CONNECT_CONFIG = {
@@ -36,7 +36,7 @@ export default function RootLayout({
   useEffect(() => {
     if (!TREZOR_CONNECT_CONFIG.init) {
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
-      initTrezor(APP_URL, trustedHost).catch((error) => {
+      initTrezor(APP_URL, true).catch((error) => {
         // FATAL ERROR
         console.error(error);
         return;

@@ -18,7 +18,7 @@ import { Routes, useLocation } from 'contexts/location.context';
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : 'http://localhost:3000/';
+  : 'https://tauri.localhost/';
 
 export default function App() {
   const router = useRouter();
