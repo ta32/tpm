@@ -16,9 +16,9 @@ import { useRouter } from 'next/navigation';
 import { Routes, useLocation } from 'contexts/location.context';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
-const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : 'https://tauri.localhost/';
+const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
+  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+  : process.env.NEXT_PUBLIC_ORIGIN || 'https://tauri.localhost/';
 
 export default function App() {
   const router = useRouter();
@@ -112,7 +112,9 @@ export default function App() {
       console.error('APP_URI is undefined');
       return;
     }
+    console.log('app url', APP_URL);
     getAuthUrl(APP_URL).then(({authUrl, codeVerifier}) => {
+      console.log('authUrl', authUrl);
       window.sessionStorage.clear();
       window.sessionStorage.setItem('codeVerifier', codeVerifier);
       window.location.href = authUrl as string;

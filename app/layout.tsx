@@ -11,9 +11,10 @@ import { initTrezor, trezorDispose } from 'lib/trezor';
 import { LocationProvider } from 'contexts/location.context';
 import { defaultDeps, DependenciesContext } from 'contexts/deps.context';
 
-const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : 'https://tauri.localhost/';
+const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
+  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+  : process.env.NEXT_PUBLIC_ORIGIN || 'https://tauri.localhost/';
+
 // Trezor bridge whitelists localhost and trezor.io domains
 const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 const TREZOR_CONNECT_CONFIG = {
