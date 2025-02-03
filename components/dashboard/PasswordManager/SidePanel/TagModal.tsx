@@ -92,7 +92,7 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
   const tagTitle = tagId && getTagTitle(tagEntries, tagId);
   const chevronVisibility = mode === 'ADD' || mode === 'EDIT' ? '' : Styles.none;
 
-  const tagIconSvg = SELECTABLE_TAG_ICONS.get(SELECTABLE_TAG_NAMES[tagIconIndex]);
+  const TagIconSvg = SELECTABLE_TAG_ICONS.get(SELECTABLE_TAG_NAMES[tagIconIndex]);
   return (
     // TODO: refactor to use a modal component
     <>
@@ -108,7 +108,7 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
             <div className={Styles.modal_body}>
               <div className={Styles.avatar}>
                 <a className={`${Styles.chevron_left} ${chevronVisibility}`} onClick={handleLeftClick} />
-                <div className={Styles.icon}>{tagIconSvg && tagIconSvg({ fill: Colors.blue_dark, width: '60' })}</div>
+                <div className={Styles.icon}>{TagIconSvg && (<TagIconSvg fill= {Colors.blue_dark} width='60'/>)}</div>
                 <a className={`${Styles.chevron_right} ${chevronVisibility}`} onClick={handleRightClick} />
               </div>
               <span className={Styles.title}>
