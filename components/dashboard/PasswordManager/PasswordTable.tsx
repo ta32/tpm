@@ -60,7 +60,6 @@ export default function PasswordTable({
     if (pullData) {
       readAppFile(masterPublicKey, dbc)
         .then((result) => {
-          console.log(result);
           if (result.initialized) {
             if (result.data === undefined) {
               // TODO: handle error
