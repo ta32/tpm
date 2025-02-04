@@ -122,7 +122,7 @@ export default function SidePanel({ onSelectedTag }: SidePanelProps) {
             })}
             <li className={`${styles.add_tag_btn} ${styles.fadeIn}`}>
               <a onClick={handleAddTag} className={''}>
-                <span className={styles.nav_label}>Add tag</span>
+                <span className={styles.nav_label} data-cy="side-panel-add-new-tag">Add tag</span>
               </a>
             </li>
           </ul>

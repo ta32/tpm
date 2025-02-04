@@ -28,14 +28,14 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
   }
 
   const handleLeftClick = () => {
-    if (!showControls) {
+    if (!showControls && mode === 'EDIT') {
       setShowControls(true);
     }
     setTagIconIndex((tagIconIndex + SELECTABLE_TAG_NAMES.length - 1) % SELECTABLE_TAG_NAMES.length);
   };
 
   const handleRightClick = () => {
-    if (!showControls) {
+    if (!showControls && mode === 'EDIT') {
       setShowControls(true);
     }
     setTagIconIndex((tagIconIndex + 1) % SELECTABLE_TAG_NAMES.length);
@@ -51,7 +51,7 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
     onClosed();
   };
 
-  const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleEnterTitle = (e: ChangeEvent<HTMLInputElement>) => {
     setShowControls(true);
   };
 
@@ -107,9 +107,9 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
           <form className={`${Styles.modal_content} ${error ? Styles.error : ''}`} onSubmit={handleSubmit}>
             <div className={Styles.modal_body}>
               <div className={Styles.avatar}>
-                <a className={`${Styles.chevron_left} ${chevronVisibility}`} onClick={handleLeftClick} />
+                <a className={`${Styles.chevron_left} ${chevronVisibility}`} data-cy="tag-modal-select-icon-left" onClick={handleLeftClick} />
                 <div className={Styles.icon}>{TagIconSvg && (<TagIconSvg fill= {Colors.blue_dark} width='60'/>)}</div>
-                <a className={`${Styles.chevron_right} ${chevronVisibility}`} onClick={handleRightClick} />
+                <a className={`${Styles.chevron_right} ${chevronVisibility}`} data-cy="tag-modal-select-icon-right" onClick={handleRightClick} />
               </div>
               <span className={Styles.title}>
                 {mode === 'ADD' && (
@@ -118,11 +118,12 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
                     name="title"
                     autoComplete="off"
                     placeholder="New tag title"
-                    onInput={handleInput}
+                    onInput={handleEnterTitle}
+                    data-cy="tag-modal-input-title"
                   />
                 )}
                 {mode === 'EDIT' && (
-                  <input type="text" name="title" autoComplete="off" defaultValue={tagTitle} onInput={handleInput} />
+                  <input data-cy="tag-modal-input-title" type="text" name="title" autoComplete="off" defaultValue={tagTitle} onInput={handleEnterTitle} />
                 )}
                 {mode === 'REMOVE' && (
                   <span style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>{`Remove ${tagTitle}`}</span>
@@ -130,11 +131,11 @@ export default function TagModal({ onClosed, onSubmit, mode, tagId }: TagModalPr
               </span>
               <button type="reset" className={Styles.close_icon} onClick={handleClose} />
             </div>
-            <div className={`${Styles.tag_controls} ${showControlsClass}`}>
-              <button type="submit" className={mode !== 'REMOVE' ? Styles.green : Styles.red}>
+            <div data-cy="tag-modals-control-group" className={`${Styles.tag_controls} ${showControlsClass}`}>
+              <button type="submit" data-cy="tag-modal-submit-button" className={mode !== 'REMOVE' ? Styles.green : Styles.red}>
                 {submitDialogText(mode)}
               </button>
-              <button type="reset" className={mode !== 'REMOVE' ? Styles.red : Styles.blank} onClick={handleDiscard}>
+              <button type="reset" data-cy="tag-modal-cancel-button" className={mode !== 'REMOVE' ? Styles.red : Styles.blank} onClick={handleDiscard}>
                 {discardDialogText(mode)}
               </button>
             </div>

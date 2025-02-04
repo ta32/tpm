@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 // ***********************************************************
 // This example support/component.ts is processed and
 // loaded automatically before your test files.
@@ -19,7 +20,7 @@ import './commands'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from 'cypress/react18'
+import { mount } from 'cypress/react'
 
 // Import global styles in _app.tsx
 import 'styles/globals.css';

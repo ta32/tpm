@@ -58,14 +58,18 @@ export default function PasswordTable({
     const pullData =
       passwordSyncStatus == PasswordEntriesStatus.UNINITIALIZED || passwordSyncStatus == PasswordEntriesStatus.SAVED;
     if (pullData) {
+      console.log('pulling data');
       readAppFile(masterPublicKey, dbc)
         .then((result) => {
+          console.log('read app file');
+          console.log(result);
           if (result.initialized) {
             if (result.data === undefined) {
               // TODO: handle error
               console.error('Could not read app data');
               return;
             }
+            console.log('decrypting app data');
             decryptAppData(result.data, appDataEncryptionKey)
               .then((appData) => {
                 if (appData === undefined) {
@@ -85,6 +89,7 @@ export default function PasswordTable({
                 console.log(e);
               });
           } else {
+            console.log('no app data');
             passwordEntriesDispatch({ version: 0, type: 'SYNC', entries: [] });
           }
         })
