@@ -13,8 +13,9 @@ import { LocationProvider } from 'contexts/location.context';
 import { Dependencies, DependenciesContext } from '../../contexts/deps.context';
 import * as dropbox from 'lib/dropbox';
 import { AppData } from '../../lib/storage';
-import { SafePasswordEntry } from '../../lib/trezor';
+import { SafePasswordEntry, TrezorService } from '../../lib/trezor';
 import { TagEntry } from '../../contexts/reducers/tag-entries.reducer';
+import { DropboxService } from 'lib/dropbox';
 const inter = Inter({ subsets: ['latin'] });
 
 
@@ -54,6 +55,30 @@ const DEFAULT_DEPS: Dependencies = {
       readAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
       saveAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
     }
+  }
+}
+
+function withTrezorService(trezorService: Partial<TrezorService>): Dependencies {
+  return {
+    ...DEFAULT_DEPS,
+    trezor: () => ({
+      ...DEFAULT_DEPS.trezor(),
+      ...trezorService,
+    }),
+  }
+}
+
+function withServices(trezorService: Partial<TrezorService>, dropboxService: Partial<DropboxService>): Dependencies {
+  return {
+    ...DEFAULT_DEPS,
+    trezor: () => ({
+      ...DEFAULT_DEPS.trezor(),
+      ...trezorService,
+    }),
+    dropbox: () => ({
+      ...DEFAULT_DEPS.dropbox(),
+      ...dropboxService,
+    }),
   }
 }
 
@@ -154,13 +179,7 @@ describe('Password Manager Page Tests', () => {
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData)
     }
-    const customDeps = {
-      ...DEFAULT_DEPS,
-      trezor: () => ({
-        ...DEFAULT_DEPS.trezor(),
-        ...trezorService,
-      }),
-    };
+    const customDeps = withTrezorService(trezorService);
     cy.viewport(1920,1080);
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps}>
@@ -169,5 +188,42 @@ describe('Password Manager Page Tests', () => {
     ).then(() => {
       debugger;
     });
+  });
+
+  it('adding new tag to password manager for new account', () => {
+      const user = LOGGED_IN_USER;
+      // empty app data
+      const appData: AppData = {
+        entries: [],
+        version: 1,
+        tags: [],
+        modelVersion: 1
+      }
+    const trezorService = {
+      decryptAppData: cy.stub().resolves(appData)
+    }
+    // {data: new Uint8Array(0), rev: 'rev', initialized: true}
+    // trezor password manager has not been used so no dropbox file exists
+    const dropboxService = {
+        readAppFile: cy.stub().resolves({data: undefined, rev: '', initialized: false}),
+    }
+
+    const customDeps = withServices(trezorService, dropboxService);
+    cy.viewport(1920,1080);
+
+    cy.mount(
+      <DashboardPageWrapper initialUser={user} deps={customDeps}>
+        <PasswordManager />
+      </DashboardPageWrapper>
+    )
+    // adding a new tag
+    cy.get('[data-cy=side-panel-add-new-tag]').click();
+    cy.get('[data-cy=tag-modal-select-icon-right]').click();
+    // should not be able to submit - since only icon is selected and tag title is empty
+    cy.get('[data-cy=tag-modal-submit-button]').should('be.hidden');
+    cy.get('[data-cy=tag-modal-input-title]').type('new tag 123');
+    cy.get('[data-cy=tag-modal-submit-button]').click();
+    // should have added the new tag
+    cy.contains('[data-cy=tag-title-span]', 'new tag 123').should('exist');
   });
 });

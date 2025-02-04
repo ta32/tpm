@@ -85,6 +85,7 @@ export default function PasswordTable({
                 console.log(e);
               });
           } else {
+            tagEntriesDispatch({ type: 'SYNC_TAGS', tags: [] });
             passwordEntriesDispatch({ version: 0, type: 'SYNC', entries: [] });
           }
         })
