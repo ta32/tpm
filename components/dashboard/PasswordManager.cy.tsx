@@ -210,6 +210,7 @@ describe('Password Manager Page Tests', () => {
 
     const customDeps = withServices(trezorService, dropboxService);
     cy.viewport(1920,1080);
+
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps}>
         <PasswordManager />
