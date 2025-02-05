@@ -10,13 +10,8 @@ import { useEffect } from 'react';
 import { initTrezor, trezorDispose } from 'lib/trezor';
 import { LocationProvider } from 'contexts/location.context';
 import { defaultDeps, DependenciesContext } from 'contexts/deps.context';
+import { APP_URL, TRUSTED_HOSTS } from 'lib/constants';
 
-const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
-  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : process.env.NEXT_PUBLIC_ORIGIN || 'https://tauri.localhost/';
-
-// Trezor bridge whitelists localhost and trezor.io domains
-const TRUSTED_HOSTS = ['localhost', 'trezor.io'];
 const TREZOR_CONNECT_CONFIG = {
   init: false,
 };
@@ -37,7 +32,7 @@ export default function RootLayout({
   useEffect(() => {
     if (!TREZOR_CONNECT_CONFIG.init) {
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
-      initTrezor(APP_URL, true).catch((error) => {
+      initTrezor(APP_URL, trustedHost).catch((error) => {
         // FATAL ERROR
         console.error(error);
         return;

@@ -1,5 +1,5 @@
 'use client';
-import TrezorConnect, {
+import {
   DEVICE,
   DeviceEventMessage,
   TransportEventMessage,
@@ -14,12 +14,7 @@ import { useUser, useUserDispatch } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
 import { useRouter } from 'next/navigation';
 import { Routes, useLocation } from 'contexts/location.context';
-
-const LOGOUT_URL = 'https://www.dropbox.com/logout';
-const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
-  `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-  : process.env.NEXT_PUBLIC_ORIGIN || 'https://tauri.localhost/';
-
+import { APP_URL } from 'lib/constants';
 export default function App() {
   const router = useRouter();
   const [location, _] = useLocation();
