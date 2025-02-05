@@ -22,10 +22,10 @@ const APP_URL = process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ?
 
 export default function App() {
   const router = useRouter();
-  const [location, setLocation] = useLocation();
+  const [location, _] = useLocation();
   const [user, userRef] = useUser();
   const [userDispatch, userDispatchRef] = useUserDispatch();
-  const [loading, setLoading] = useState(false);
+  const [redirectedFromOauth, setRedirectedFromOauth] = useState(false);
   // Navigation
   useEffect(() => {
     if (location === Routes.DASHBOARD) {
@@ -37,10 +37,9 @@ export default function App() {
     const locationSearch = window.location.search;
     let codeVerifier = window.sessionStorage.getItem('codeVerifier');
     if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth(locationSearch) && codeVerifier !== null) {
-      setLoading(true);
+      setRedirectedFromOauth(true);
       connectDropbox(APP_URL, codeVerifier, locationSearch)
         .then(({ dbc, name }) => {
-          setLoading(false);
           userDispatch({
             type: 'DROPBOX_USER_LOGGED_IN',
             userName: name,
@@ -92,39 +91,18 @@ export default function App() {
     setTrezorEventHandlers(updateDevice, transportEventCb, uiEventCb);
   }, [userDispatchRef, userRef]);
 
-  const openDevice = () => {
-    if (user.device === null) {
-      console.error('wallet is not initialized');
-      return;
-    }
-    getEncryptionKey(user.device.path).then((keyPair) => {
-      if (keyPair !== null) {
-        userDispatch({ type: 'ACTIVATED_TMP_ON_DEVICE', keyPair });
-        setLoading(true);
-        setLocation(Routes.DASHBOARD);
-      } else {
-        // TODO: handle error -- user decided not to activate error or pin was wrong
-      }
-    });
-  };
   const handleDropBoxSignIn = () => {
     if (APP_URL === undefined) {
       console.error('APP_URI is undefined');
       return;
     }
-    console.log('app url', APP_URL);
     getAuthUrl(APP_URL).then(({authUrl, codeVerifier}) => {
-      console.log('authUrl', authUrl);
       window.sessionStorage.clear();
       window.sessionStorage.setItem('codeVerifier', codeVerifier);
       window.location.href = authUrl as string;
     }).catch((error) => {
       console.error(error);
     });
-  };
-  const enterPin = (pin: string) => {
-    userDispatch({ type: 'DEVICE_PIN_ENTERED' });
-    TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
   const handleLogout = () => {
@@ -133,11 +111,10 @@ export default function App() {
   };
 
   return (
-    <Home loading={loading}
-          handleDropBoxSignIn={handleDropBoxSignIn}
-          handleLogout={handleLogout}
-          enterPin={enterPin}
-          openDevice={openDevice}>
+    <Home
+      initialLoadingStatus={redirectedFromOauth}
+      handleDropBoxSignIn={handleDropBoxSignIn}
+      handleLogout={handleLogout}>
     </Home>
   );
 }
