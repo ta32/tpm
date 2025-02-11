@@ -42,9 +42,10 @@ const DEFAULT_DEPS: Dependencies = {
       decryptTrezorAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
       initTrezor: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
       encryptFullEntry: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      getDevices: cy.stub().resolves([LOGGED_IN_USER.device]),
+      getDevice: cy.stub().resolves([LOGGED_IN_USER.device]),
       getEncryptionKey: cy.stub().resolves(new Uint8Array(32)),
-      setTrezorEventHandlers: cy.stub().resolves(),
+      setTrezorUiEventHandler: cy.stub().resolves(),
+      setTrezorDeviceEventHandler: cy.stub().resolves(),
     }
   },
   dropbox: () => {
@@ -132,8 +133,8 @@ function DashboardPageWrapper(props: DashboardPageProps) {
   )
 }
 function DashboardPageController({children, initialUser, onStorageLogin}: DashboardPageProps) {
-  const [user, userRef] = useUser();
-  const [userDispatch, userDispatchRef] = useUserDispatch();
+  const [user] = useUser();
+  const [userDispatch] = useUserDispatch();
   const styleHide: CSSProperties = {visibility: 'hidden'};
   return (
     <>

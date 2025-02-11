@@ -3,6 +3,7 @@ import styles from './PasswordTable.module.scss';
 import Colors from 'styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
 import TableEntry from './PasswordTable/TableEntry';
+import ImportPasswordsModal from './PasswordTable/ImportPasswordsModal';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { fromState } from 'lib/storage';
 import { appFileName } from 'lib/appfile';
@@ -14,7 +15,7 @@ import DropdownMenu from 'components/ui/DropdownMenu';
 import SortIcon from 'components/svg/ui/SortIcon';
 import NoSearchIcon from 'components/svg/ui/NoSearchIcon';
 import { IMAGE_FILE } from 'lib/images';
-import ImportPasswordsModal from './ImportPasswordsModal';
+
 import { Routes, useLocation } from 'contexts/location.context';
 import { DependenciesContext } from 'contexts/deps.context';
 

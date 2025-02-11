@@ -66,10 +66,11 @@ export interface TrezorService {
   decryptTrezorAppData: typeof decryptTrezorAppData;
   encryptFullEntry: typeof encryptFullEntry;
   decryptFullEntry: typeof decryptFullEntry;
-  getDevices: typeof getDevices;
+  getDevice: typeof getDevice;
   getEncryptionKey: typeof getEncryptionKey;
   initTrezor: typeof initTrezor;
-  setTrezorEventHandlers: typeof setTrezorEventHandlers;
+  setTrezorDeviceEventHandler: typeof setTrezorDeviceEventHandler;
+  setTrezorUiEventHandler: typeof setTrezorUiEventHandler;
 }
 
 export const trezorServiceFactory = (): TrezorService => {
@@ -79,10 +80,11 @@ export const trezorServiceFactory = (): TrezorService => {
     decryptTrezorAppData,
     encryptFullEntry,
     decryptFullEntry,
-    getDevices,
+    getDevice,
     getEncryptionKey,
     initTrezor,
-    setTrezorEventHandlers,
+    setTrezorDeviceEventHandler,
+    setTrezorUiEventHandler,
   };
 }
 
@@ -108,34 +110,27 @@ export async function initTrezor(appUrl: string, trustedHost: boolean) {
   }
 }
 
-export function setTrezorEventHandlers(
-  deviceEventCallback: (event: DeviceEventMessage) => void,
-  transportEventCallback: (event: TransportEventMessage) => void,
-  uiEventCallback: (event: UiEventMessage) => void
-) {
+export function setTrezorDeviceEventHandler(deviceEventCallback: (event: DeviceEventMessage) => void) {
   TrezorConnect.on(DEVICE_EVENT, deviceEventCallback);
-  TrezorConnect.on(TRANSPORT_EVENT, transportEventCallback);
+}
+export function setTrezorUiEventHandler(uiEventCallback: (event: UiEventMessage) => void) {
   TrezorConnect.on(UI_EVENT, uiEventCallback);
 }
+
 
 export async function trezorDispose() {
   await TrezorConnect.dispose();
 }
 
-export async function getDevices(): Promise<TrezorDevice | null> {
-  const result = await TrezorConnect.getFeatures();
-  if (result.success) {
-    let { unlocked, label, model, device_id } = result.payload;
-    return {
-      appDataEncryptionKey: new Uint8Array(),
-      appDataSeed: '',
-      path: '',
-      label: label ?? '',
-      model: model ?? '1',
-      deviceId: device_id ?? '',
-    };
-  }
-  return null;
+export function getDevice(deviceInfo: {label: string, model: string, deviceId: string} ): TrezorDevice {
+  return {
+    appDataEncryptionKey: new Uint8Array(0),
+    appDataSeed: '',
+    path: '',
+    label: deviceInfo.label,
+    model: deviceInfo.model,
+    deviceId: deviceInfo.deviceId,
+  };
 }
 
 export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys | null> {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Layout from './Home/Layout';
 import PinDialog from 'components/ui/PinDialog';
 import DeviceIcon from 'components/svg/ui/DeviceIcon';
@@ -7,29 +7,61 @@ import { IMAGE_FILE } from 'lib/images';
 import styles from './Home.module.scss';
 import { UserStatus } from 'contexts/reducers/user.reducer';
 import Colors from 'styles/colors.module.scss';
-import { useUser } from 'contexts/user.context';
+import { useUser, useUserDispatch } from 'contexts/user.context';
+import { DependenciesContext } from 'contexts/deps.context';
+import TrezorConnect, { UI } from '@trezor/connect-web';
+import { Routes, useLocation } from 'contexts/location.context';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
 interface HomeProps {
-  loading: boolean;
+  initialLoadingStatus: boolean;
   handleDropBoxSignIn: () => void;
   handleLogout: () => void;
-  openDevice: () => void;
-  enterPin: (pin: string) => void;
 }
-export default function Home({loading, handleDropBoxSignIn, handleLogout, openDevice, enterPin}: HomeProps) {
-  const [user, userRef] = useUser();
+export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleLogout}: HomeProps) {
+  const { trezor } = useContext(DependenciesContext);
+  const [loading, setLoading] = useState(false);
+  const [user] = useUser();
+  const [_,setLocation] = useLocation();
+  const [userDispatch] = useUserDispatch();
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
 
+  const {getEncryptionKey } = trezor();
   const handleShowLogoutUrl = () => {
     setShowLogoutUrl(!showLogoutUrl);
+  };
+
+  const enterPin = (pin: string) => {
+    userDispatch({ type: 'DEVICE_PIN_ENTERED' });
+    TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
+  };
+
+  const onClickDropboxSignIn = () => {
+    setLoading(true);
+    handleDropBoxSignIn();
+  }
+
+  const openDevice = () => {
+    if (user.device === null) {
+      console.error('wallet is not initialized');
+      return;
+    }
+    getEncryptionKey(user.device.path).then((keyPair) => {
+      if (keyPair !== null) {
+        userDispatch({ type: 'ACTIVATED_TMP_ON_DEVICE', keyPair });
+        setLoading(true);
+        setLocation(Routes.DASHBOARD);
+      } else {
+        // TODO: handle error -- user decided not to activate error or pin was wrong
+      }
+    });
   };
 
   const trezorLogo = user.device?.model == '1' ? IMAGE_FILE.TREZOR_1.path() : IMAGE_FILE.TREZOR_2.path();
   const renderStorageSelection = () => {
     return (
-      <button className={styles.dropbox} onClick={handleDropBoxSignIn} data-cy="storage-login">
+      <button className={styles.dropbox} onClick={onClickDropboxSignIn} data-cy="storage-login">
         <Image
           className={styles.icon_over_button}
           src={IMAGE_FILE.DROPBOX_BLUE.path()}
@@ -85,8 +117,9 @@ export default function Home({loading, handleDropBoxSignIn, handleLogout, openDe
       </div>
     );
   };
+  const redirectedFromOauthAndLoading = initialLoadingStatus && user.status == UserStatus.OFFLINE;
   const renderContent = () => {
-    if (loading) {
+    if (loading || redirectedFromOauthAndLoading) {
       return <span data-cy={'home-page-spinner'} className={styles.spinner}></span>;
     } else {
       switch (user.status) {

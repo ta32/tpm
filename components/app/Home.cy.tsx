@@ -5,7 +5,7 @@ import Home from './Home'
 import { User, UserProvider, useUser, useUserDispatch } from 'contexts/user.context';
 import { IMAGE_FILE } from 'lib/images';
 import { Dropbox } from 'dropbox';
-import { UserAction } from '../../contexts/reducers/user.reducer';
+import { UserAction } from 'contexts/reducers/user.reducer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,8 +26,8 @@ function HomePageWrapper(props: HomePageWrapperProps) {
   )
 }
 function HomePageController({children, initialUser, onStorageLogin}: HomePageWrapperProps) {
-  const [user, userRef] = useUser();
-  const [userDispatch, userDispatchRef] = useUserDispatch();
+  const [user] = useUser();
+  const [userDispatch] = useUserDispatch();
   const styleHide: CSSProperties = {visibility: 'hidden'};
   return (
     <>
@@ -66,7 +66,7 @@ describe('<Home />', () => {
     };
     cy.mount(
       <HomePageWrapper>
-        <Home loading={false} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={handleDropBoxSignIn}/>
+        <Home initialLoadingStatus={false}  handleLogout={voidFunc} handleDropBoxSignIn={handleDropBoxSignIn}/>
       </HomePageWrapper>
     )
     cy.get('[data-cy=storage-login]').click().then(() => {
@@ -79,7 +79,7 @@ describe('<Home />', () => {
     const voidFunc = () => {};
     cy.mount(
       <HomePageWrapper>
-        <Home loading={true} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
+        <Home initialLoadingStatus={true} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
       </HomePageWrapper>
     )
     cy.get('[data-cy=home-page-spinner]').should('exist');
@@ -94,7 +94,7 @@ describe('<Home />', () => {
     // act
     cy.mount(
       <HomePageWrapper onStorageLogin={onStorageLogin}>
-        <Home loading={false} openDevice={voidFunc} enterPin={voidFunc} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
+        <Home initialLoadingStatus={true} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
       </HomePageWrapper>
     )
     cy.get('[data-cy=invoke-user-dispatch-onStorageLogin]').click({ force: true })
@@ -103,5 +103,3 @@ describe('<Home />', () => {
     cy.get('[data-cy=dropbox-account-name]').should('have.text', 'ta32mock');
   });
 })
-
-
