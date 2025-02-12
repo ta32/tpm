@@ -20,9 +20,9 @@ const nextConfig = {
     // Custom SVG loader configuration
     config.module.rules.push({
       test: /\.svg$/,
-      include: [path.resolve(__dirname, './assets/tags'), path.resolve(__dirname, './assets/ui')],
+      include: [path.resolve(__dirname, './src/assets/tags'), path.resolve(__dirname, './src/assets/ui')],
       use: [{
-        loader: path.resolve(__dirname, './components/svg/svg-path-reader.js'),
+        loader: path.resolve(__dirname, './config/svg-path-reader.js'),
       }],
     });
     return config;
