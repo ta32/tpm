@@ -9,13 +9,12 @@ import { Routes, useLocation } from 'contexts/location.context';
 import { APP_URL } from 'lib/constants';
 import { useTrezorUiEvents } from '../hooks/use-trezor-ui-events';
 import { useTrezorDeviceEvents } from '../hooks/use-trezor-device-events';
-import { useDropboxSession } from '../hooks/use-dropbox-session';
+import { DropboxSessionStatus, useDropboxSession } from '../hooks/use-dropbox-session';
 export default function App() {
   const router = useRouter();
   const [location, _] = useLocation();
-  const [user] = useUser();
   const [userDispatch] = useUserDispatch();
-  const isConnected = useDropboxSession();
+  const dropboxStatus = useDropboxSession();
 // Link Trezor events to user context
   useTrezorUiEvents();
   // Link Trezor device events to user context
@@ -48,7 +47,7 @@ export default function App() {
 
   return (
     <Home
-      initialLoadingStatus={isConnected}
+      initialLoadingStatus={dropboxStatus !== DropboxSessionStatus.NOT_CONNECTED}
       handleDropBoxSignIn={handleDropBoxSignIn}
       handleLogout={handleLogout}>
     </Home>
