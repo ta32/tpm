@@ -41,7 +41,12 @@ export async function connectDropbox(redirectUri: string, codeVerifier: string, 
   const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
   const code = getAuthCodeFromUrl(locationSearch);
   dbxAuth.setCodeVerifier(codeVerifier);
-  let response: DropboxResponse<any> = await dbxAuth.getAccessTokenFromCode(redirectUri, code);
+  let response: DropboxResponse<any>;
+  try {
+    response = await dbxAuth.getAccessTokenFromCode(redirectUri, code);
+  } catch (error) {
+    throw new Error('Error getting access token from code: ' + error);
+  }
   if (response.result.access_token) {
     dbxAuth.setAccessToken(response.result.access_token);
     // console.log("token expires in: ", response.result.expires_in);

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { connectDropbox, getAuthUrl, hasRedirectedFromAuth } from 'lib/dropbox';
 import Home from 'components/app/Home';
 import { useUser, useUserDispatch } from 'contexts/user.context';
@@ -9,13 +9,13 @@ import { Routes, useLocation } from 'contexts/location.context';
 import { APP_URL } from 'lib/constants';
 import { useTrezorUiEvents } from '../hooks/use-trezor-ui-events';
 import { useTrezorDeviceEvents } from '../hooks/use-trezor-device-events';
+import { DropboxSessionStatus, useDropboxSession } from '../hooks/use-dropbox-session';
 export default function App() {
   const router = useRouter();
   const [location, _] = useLocation();
-  const [user] = useUser();
   const [userDispatch] = useUserDispatch();
-  const [redirectedFromOauth, setRedirectedFromOauth] = useState(false);
-  // Link Trezor events to user context
+  const dropboxStatus = useDropboxSession();
+// Link Trezor events to user context
   useTrezorUiEvents();
   // Link Trezor device events to user context
   useTrezorDeviceEvents();
@@ -25,25 +25,6 @@ export default function App() {
       router.push('/dashboard');
     }
   }, [location, router]);
-
-  useEffect(() => {
-    const locationSearch = window.location.search;
-    let codeVerifier = window.sessionStorage.getItem('codeVerifier');
-    if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth(locationSearch) && codeVerifier !== null) {
-      setRedirectedFromOauth(true);
-      connectDropbox(APP_URL, codeVerifier, locationSearch)
-        .then(({ dbc, name }) => {
-          userDispatch({
-            type: 'DROPBOX_USER_LOGGED_IN',
-            userName: name,
-            dbc,
-          });
-        }).catch((error) => {
-        console.error(error);
-        window.sessionStorage.clear();
-      });
-    }
-  }, [user, userDispatch]);
 
   const handleDropBoxSignIn = () => {
     if (APP_URL === undefined) {
@@ -66,7 +47,7 @@ export default function App() {
 
   return (
     <Home
-      initialLoadingStatus={redirectedFromOauth}
+      initialLoadingStatus={dropboxStatus !== DropboxSessionStatus.NOT_CONNECTED}
       handleDropBoxSignIn={handleDropBoxSignIn}
       handleLogout={handleLogout}>
     </Home>
