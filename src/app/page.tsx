@@ -7,9 +7,9 @@ import { UserStatus } from 'contexts/reducers/user.reducer';
 import { useRouter } from 'next/navigation';
 import { Routes, useLocation } from 'contexts/location.context';
 import { APP_URL } from 'lib/constants';
-import { useTrezorUiEvents } from '../hooks/use-trezor-ui-events';
-import { useTrezorDeviceEvents } from '../hooks/use-trezor-device-events';
-import { DropboxSessionStatus, useDropboxSession } from '../hooks/use-dropbox-session';
+import { useTrezorUiEvents } from 'hooks/use-trezor-ui-events';
+import { useTrezorDeviceEvents } from 'hooks/use-trezor-device-events';
+import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-session';
 export default function App() {
   const router = useRouter();
   const [location, _] = useLocation();
