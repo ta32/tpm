@@ -11,21 +11,29 @@ import { useUser, useUserDispatch } from 'contexts/user.context';
 import { DependenciesContext } from 'contexts/deps.context';
 import TrezorConnect, { UI } from '@trezor/connect-web';
 import { Routes, useLocation } from 'contexts/location.context';
+import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-session';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
+interface DropBoxArgs {
+  urlSearch: string;
+  codeVerifier: string | null;
+}
+
 interface HomeProps {
-  initialLoadingStatus: boolean;
+  dropboxArgs: DropBoxArgs;
   handleDropBoxSignIn: () => void;
   handleLogout: () => void;
 }
-export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleLogout}: HomeProps) {
+export default function Home({handleDropBoxSignIn, handleLogout, dropboxArgs}: HomeProps) {
   const { trezor } = useContext(DependenciesContext);
   const [loading, setLoading] = useState(false);
   const [user] = useUser();
   const [_,setLocation] = useLocation();
   const [userDispatch] = useUserDispatch();
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
+  const {urlSearch, codeVerifier} = dropboxArgs;
+  const dropboxStatus = useDropboxSession(urlSearch, codeVerifier);
 
   const {getEncryptionKey } = trezor();
   const handleShowLogoutUrl = () => {
@@ -117,6 +125,7 @@ export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleL
       </div>
     );
   };
+  const initialLoadingStatus = dropboxStatus !== DropboxSessionStatus.NOT_CONNECTED;
   const redirectedFromOauthAndLoading = initialLoadingStatus && user.status == UserStatus.OFFLINE;
   const renderContent = () => {
     if (loading || redirectedFromOauthAndLoading) {

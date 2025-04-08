@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useUser, useUserDispatch } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
-import { connectDropbox, hasRedirectedFromAuth } from 'lib/dropbox';
 import { APP_URL } from 'lib/constants';
+import { DependenciesContext } from 'contexts/deps.context';
 
 export enum DropboxSessionStatus {
   NOT_CONNECTED = 'NOT_CONNECTED',
@@ -10,14 +10,14 @@ export enum DropboxSessionStatus {
   CONNECTED = 'CONNECTED',
 }
 
-export function useDropboxSession(): DropboxSessionStatus {
+export function useDropboxSession( locationSearch: string, codeVerifier: string | null): DropboxSessionStatus {
+  const { dropbox } = useContext(DependenciesContext);
+  const {connectDropbox, hasRedirectedFromAuth} = dropbox();
   const [user] = useUser();
   const [userDispatch] = useUserDispatch();
   const isConnected = useRef(false);
   const [status, setStatus] = useState(DropboxSessionStatus.NOT_CONNECTED);
   useEffect(() => {
-    const locationSearch = window.location.search;
-    let codeVerifier = window.sessionStorage.getItem('codeVerifier');
     if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth(locationSearch) && codeVerifier !== null && !isConnected.current) {
       setStatus(DropboxSessionStatus.CONNECTING);
       connectDropbox(APP_URL, codeVerifier, locationSearch)
@@ -34,6 +34,6 @@ export function useDropboxSession(): DropboxSessionStatus {
         window.sessionStorage.clear();
       });
     }
-  }, [user.status, userDispatch]);
+  }, [codeVerifier, locationSearch, user.status, userDispatch]);
   return status;
 }

@@ -42,10 +42,7 @@ export default function RootLayout({
     // cleanup
     return () => {
       TREZOR_CONNECT_CONFIG.init = false;
-      trezorDispose().catch((error) => {
-        console.error(error);
-        return;
-      });
+      trezorDispose();
     };
   }, []);
 

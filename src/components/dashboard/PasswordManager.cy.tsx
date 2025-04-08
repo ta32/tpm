@@ -1,21 +1,20 @@
 /// <reference types="cypress" />
 
 import { Inter } from 'next/font/google';
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import { User, UserAction, UserStatus } from 'contexts/reducers/user.reducer';
-import { UserProvider, useUser, useUserDispatch } from 'contexts/user.context';
+import { UserProvider } from 'contexts/user.context';
 import { IMAGE_FILE } from 'lib/images';
 import PasswordManager from './PasswordManager';
 import { TagEntriesProvider } from 'contexts/tag-entries.context';
 import { PasswordEntriesProvider } from 'contexts/password-entries.context';
-import { Dropbox, DropboxAuth, DropboxResponse, files } from 'dropbox';
+import { Dropbox, DropboxAuth } from 'dropbox';
 import { LocationProvider } from 'contexts/location.context';
-import { Dependencies, DependenciesContext } from '../../contexts/deps.context';
-import * as dropbox from 'lib/dropbox';
-import { AppData } from '../../lib/storage';
-import { SafePasswordEntry, TrezorService } from '../../lib/trezor';
-import { TagEntry } from '../../contexts/reducers/tag-entries.reducer';
-import { DropboxService } from 'lib/dropbox';
+import { Dependencies, DependenciesContext } from 'contexts/deps.context';
+import { AppData } from 'lib/storage';
+import { SafePasswordEntry } from 'lib/trezor';
+import { TagEntry } from 'contexts/reducers/tag-entries.reducer';
+import { withServices, withTrezorService } from 'lib/mocks';
 const inter = Inter({ subsets: ['latin'] });
 
 
@@ -33,55 +32,6 @@ const LOGGED_IN_USER: User = {
   dropboxAccountName: 'test',
 }
 
-const DEFAULT_DEPS: Dependencies = {
-  trezor: () => {
-    return {
-      decryptAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      encryptAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      decryptFullEntry: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      decryptTrezorAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      initTrezor: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      encryptFullEntry: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      getDevice: cy.stub().resolves([LOGGED_IN_USER.device]),
-      getEncryptionKey: cy.stub().resolves(new Uint8Array(32)),
-      setTrezorUiEventHandler: cy.stub().resolves(),
-      setTrezorDeviceEventHandler: cy.stub().resolves(),
-    }
-  },
-  dropbox: () => {
-    return {
-      hasRedirectedFromAuth: cy.stub().returns(true),
-      connectDropbox: cy.stub().resolves({dbc: LOGGED_IN_USER.dbc, name: LOGGED_IN_USER.dropboxAccountName}),
-      getAuthUrl: cy.stub().resolves('authUrl'),
-      readAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      saveAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-    }
-  }
-}
-
-function withTrezorService(trezorService: Partial<TrezorService>): Dependencies {
-  return {
-    ...DEFAULT_DEPS,
-    trezor: () => ({
-      ...DEFAULT_DEPS.trezor(),
-      ...trezorService,
-    }),
-  }
-}
-
-function withServices(trezorService: Partial<TrezorService>, dropboxService: Partial<DropboxService>): Dependencies {
-  return {
-    ...DEFAULT_DEPS,
-    trezor: () => ({
-      ...DEFAULT_DEPS.trezor(),
-      ...trezorService,
-    }),
-    dropbox: () => ({
-      ...DEFAULT_DEPS.dropbox(),
-      ...dropboxService,
-    }),
-  }
-}
 
 interface DashboardPageProps {
   deps: Dependencies;
@@ -113,40 +63,21 @@ function tageEntry(num: number): TagEntry {
   };
 }
 
-function DashboardPageWrapper(props: DashboardPageProps) {
+function DashboardPageWrapper({deps, initialUser, children}: DashboardPageProps) {
   return (
     <div className={inter.className} style={{margin: 0}}>
-      <DependenciesContext.Provider value={props.deps}>
+      <DependenciesContext.Provider value={deps}>
         <LocationProvider>
-          <UserProvider initialUser={props.initialUser}>
+          <UserProvider initialUser={initialUser}>
             <TagEntriesProvider>
               <PasswordEntriesProvider>
-                <DashboardPageController {...props}>
-                  {props.children}
-                </DashboardPageController>
+                {children}
               </PasswordEntriesProvider>
             </TagEntriesProvider>
           </UserProvider>
         </LocationProvider>
       </DependenciesContext.Provider>
     </div>
-  )
-}
-function DashboardPageController({children, initialUser, onStorageLogin}: DashboardPageProps) {
-  const [user] = useUser();
-  const [userDispatch] = useUserDispatch();
-  const styleHide: CSSProperties = {visibility: 'hidden'};
-  return (
-    <>
-      {children}
-      <button style={styleHide} data-cy="invoke-user-dispatch-onStorageLogin" onClick={() => {
-        if (onStorageLogin) {
-          userDispatch(onStorageLogin());
-        } else
-          console.error('onStorageLogin is not defined');
-      }}
-      />
-    </>
   )
 }
 

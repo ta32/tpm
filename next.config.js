@@ -22,7 +22,7 @@ const nextConfig = {
       test: /\.svg$/,
       include: [path.resolve(__dirname, './src/assets/tags'), path.resolve(__dirname, './src/assets/ui')],
       use: [{
-        loader: path.resolve(__dirname, './config/svg-path-reader.js'),
+        loader: path.resolve(__dirname, './scripts/svg-path-reader.js'),
       }],
     });
     return config;

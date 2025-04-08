@@ -1,45 +1,30 @@
 /// <reference types="cypress" />
 import { Inter } from "next/font/google";
-import React, { CSSProperties} from 'react';
+import React from 'react';
 import Home from './Home'
-import { User, UserProvider, useUser, useUserDispatch } from 'contexts/user.context';
+import { User, UserProvider } from 'contexts/user.context';
 import { IMAGE_FILE } from 'lib/images';
-import { Dropbox } from 'dropbox';
-import { UserAction } from 'contexts/reducers/user.reducer';
+import { Dropbox, DropboxAuth } from 'dropbox';
+import { Dependencies, DependenciesContext } from 'contexts/deps.context';
+import { withDropboxService, withStubDeps } from '../../lib/mocks';
+import { DropboxService } from '../../lib/dropbox';
 
 const inter = Inter({ subsets: ['latin'] });
 
 interface HomePageWrapperProps {
-  children: React.ReactNode;
   initialUser?: User;
-  onStorageLogin?: () => UserAction;
+  children: React.ReactNode;
+  deps: Dependencies;
 }
-function HomePageWrapper(props: HomePageWrapperProps) {
+function HomePageWrapper({deps, initialUser, children}: HomePageWrapperProps) {
   return (
     <div className={inter.className} style={{margin: 0}}>
-      <UserProvider initialUser={props.initialUser}>
-        <HomePageController {...props}>
-          {props.children}
-        </HomePageController>
-      </UserProvider>
+      <DependenciesContext.Provider value={deps}>
+        <UserProvider initialUser={initialUser}>
+          {children}
+        </UserProvider>
+      </DependenciesContext.Provider>
     </div>
-  )
-}
-function HomePageController({children, initialUser, onStorageLogin}: HomePageWrapperProps) {
-  const [user] = useUser();
-  const [userDispatch] = useUserDispatch();
-  const styleHide: CSSProperties = {visibility: 'hidden'};
-  return (
-    <>
-      {children}
-      <button style={styleHide} data-cy="invoke-user-dispatch-onStorageLogin" onClick={() => {
-        if (onStorageLogin) {
-          userDispatch(onStorageLogin());
-        } else
-          console.error('onStorageLogin is not defined');
-       }}
-      />
-    </>
   )
 }
 
@@ -64,9 +49,10 @@ describe('<Home />', () => {
     const handleDropBoxSignIn = () => {
       dropboxSignInClicked = true;
     };
+    const customDeps = withStubDeps();
     cy.mount(
-      <HomePageWrapper>
-        <Home initialLoadingStatus={false}  handleLogout={voidFunc} handleDropBoxSignIn={handleDropBoxSignIn}/>
+      <HomePageWrapper deps={customDeps}>
+        <Home dropboxArgs={{urlSearch: "", codeVerifier: null}} handleLogout={voidFunc} handleDropBoxSignIn={handleDropBoxSignIn}/>
       </HomePageWrapper>
     )
     cy.get('[data-cy=storage-login]').click().then(() => {
@@ -74,31 +60,44 @@ describe('<Home />', () => {
     });
   })
 
-  it('after OAUTH while signing in to the storage account, the user sees the spinner', () => {
+  it('after OAUTH redirect while connecting to storage account, the user sees the spinner', () => {
     cy.viewport(1920,1080);
     const voidFunc = () => {};
+    const neverResolvingPromise = new Promise(() => {});
+    const dropboxService: Partial<DropboxService> = {
+      connectDropbox: cy.stub().returns(neverResolvingPromise),
+    }
+    const customDeps = withDropboxService(dropboxService);
+
     cy.mount(
-      <HomePageWrapper>
-        <Home initialLoadingStatus={true} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
+      <HomePageWrapper deps={customDeps}>
+        <Home dropboxArgs={{urlSearch: "?code=REDIRECT_CODE_AFTER_OAUTH_FROM_DROPBOX_IS_ACCEPTED", codeVerifier:"some_value"}} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
       </HomePageWrapper>
     )
+    // should appear after the OAUTH redirect
+    cy.get('[data-cy=storage-login]').should('exist');
+    // page realizes that it loaded after the OAUTH redirect
     cy.get('[data-cy=home-page-spinner]').should('exist');
   });
 
   it('after OAUTH redirect and sign in to the storage account, the dropbox user is shown', () => {
     cy.viewport(1920,1080);
     const voidFunc = () => {};
-    const onStorageLogin = () => {
-      return { type: 'DROPBOX_USER_LOGGED_IN', userName: 'ta32mock', dbc: new Dropbox() } as UserAction;
+    // dummy dropbox instance
+    const dbc = new Dropbox({ auth: new DropboxAuth({ clientId: '123' }) });
+    // once dropbox is connected, the user should see the account name
+    const dropboxService: Partial<DropboxService> = {
+      connectDropbox: cy.stub().resolves({dbc: dbc, name: "ta32mock"}),
     }
+    const customDeps = withDropboxService(dropboxService);
     // act
     cy.mount(
-      <HomePageWrapper onStorageLogin={onStorageLogin}>
-        <Home initialLoadingStatus={true} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
+      <HomePageWrapper deps={customDeps}>
+        <Home dropboxArgs={{urlSearch: "?code=REDIRECT_CODE_AFTER_OAUTH_FROM_DROPBOX_IS_ACCEPTED", codeVerifier:"some_value"}} handleLogout={voidFunc} handleDropBoxSignIn={voidFunc}/>
       </HomePageWrapper>
     )
-    cy.get('[data-cy=invoke-user-dispatch-onStorageLogin]').click({ force: true })
-
+    // should appear after the OAUTH redirect
+    cy.get('[data-cy=storage-login]').should('exist');
     // assert
     cy.get('[data-cy=dropbox-account-name]').should('have.text', 'ta32mock');
   });
