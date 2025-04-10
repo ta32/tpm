@@ -14,7 +14,6 @@ import { AppData } from 'lib/storage';
 import { ClearPasswordEntry, SafePasswordEntry } from 'lib/trezor';
 import { TagEntry } from 'contexts/reducers/tag-entries.reducer';
 import { LOGGED_IN_USER, withServices, withTrezorService } from 'lib/mocks';
-import entry from 'next/dist/server/typescript/rules/entry';
 const inter = Inter({ subsets: ['latin'] });
 
 
