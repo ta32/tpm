@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
 import styles from '../TableEntry.module.scss';
 import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/tag-entries.context';
-import { ClearPasswordEntry, decryptFullEntry, SafePasswordEntry } from 'lib/trezor';
+import { ClearPasswordEntry, SafePasswordEntry } from 'lib/trezor';
 import ToolTip from 'components/ui/ToolTip';
 import { useUser } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
+import { DependenciesContext } from '../../../../../contexts/deps.context';
 
 enum STATUS {
   DECRYPTING_ENTRY,
@@ -19,16 +20,18 @@ enum STATUS {
 interface ClosedEntryProps {
   onLockChange: (status: boolean) => void;
   locked: boolean;
-  entry: SafePasswordEntry;
+  safeEntry: SafePasswordEntry;
   onOpenEntry: (entry: ClearPasswordEntry) => void;
 }
 
 export default function ClosedEntry({
   onLockChange,
-  entry,
+  safeEntry,
   onOpenEntry,
   locked,
 }: ClosedEntryProps) {
+  const { trezor } = useContext(DependenciesContext);
+  const {decryptFullEntry} = trezor();
   const [status, setStatus] = useState(STATUS.DEFAULT);
   const [user] = useUser();
   const tagEntries = useTagEntries();
@@ -50,7 +53,7 @@ export default function ClosedEntry({
   const handleCopyPassword = () => {
     setStatus(STATUS.DECRYPTING_PASSWORD);
     onLockChange(true);
-    decryptFullEntry(entry, false)
+    decryptFullEntry(safeEntry, safeEntry.legacyMode)
       .then((clearEntry) => {
         if (clearEntry != null) {
           navigator.clipboard.writeText(clearEntry.password).then(() => {
@@ -69,8 +72,7 @@ export default function ClosedEntry({
   const handleEditEntry = () => {
     setStatus(STATUS.DECRYPTING_ENTRY);
     onLockChange(true);
-    const safeEntry = entry;
-    decryptFullEntry(safeEntry, safeEntry?.legacyMode || false)
+    decryptFullEntry(safeEntry, safeEntry.legacyMode)
       .then((clearEntry) => {
         if (clearEntry != null) {
           onOpenEntry(clearEntry);
@@ -107,7 +109,7 @@ export default function ClosedEntry({
     );
   };
   const renderAccountInfo = ()  => {
-    const title = entry.metaTitle ?? entry.title;
+    const title = safeEntry.metaTitle ?? safeEntry.title;
     if (status != STATUS.DEFAULT) {
       const msg = requiresTrezorAck ? 'Look at Trezor!' : 'Unlocking...';
       const actionMsg = status === STATUS.DECRYPTING_ENTRY ? 'Editing Entry' : 'Copying Password to clipboard';
@@ -115,28 +117,30 @@ export default function ClosedEntry({
         <div className={styles.account_info}>
           <strong className={styles.title}>{msg}</strong>
           <div className={styles.credentials}>
-            <div className={styles.label}>{actionMsg}</div>
+            <div data-cy={"closed-entry-action-msg"} className={styles.label}>{actionMsg}</div>
           </div>
         </div>
       );
     } else {
       return (
         <div className={styles.account_info}>
-          <label className={styles.title}>{title}</label>
+          <label data-cy={"closed-entry-title-" + safeEntry.key} className={styles.title}>{title}</label>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
-              <div className={`${styles.label} ${styles.clickable}`} onClick={() => handleCopyUsername(entry.username)}>
-                {entry.username}
+              <div className={`${styles.label} ${styles.clickable}`} onClick={() => handleCopyUsername(safeEntry.username)}>
+                {safeEntry.username}
               </div>
             </ToolTip>
             {!locked && (
-              <ToolTip text={'Copy password'} position={'bottom'}>
-                <input onClick={handleCopyPassword}
-                       className={styles.password_shadow}
-                       title={'Copy to clipboard'}
-                       type="password"
-                       value={'password'}
-                       readOnly
+              <ToolTip text={'Copy password'} position={'bottom'} dataCy={"closed-entry-password-copy-wrapper-" + safeEntry.key}>
+                <input
+                  data-cy={"closed-entry-password-copy-" + safeEntry.key}
+                  onClick={handleCopyPassword}
+                  className={styles.password_shadow}
+                  title={'Copy to clipboard'}
+                  type="password"
+                  value={'password'}
+                  readOnly
                 />
               </ToolTip>
             )}
@@ -147,7 +151,7 @@ export default function ClosedEntry({
   };
   return (
     <>
-      {renderLockedEntryIcon(entry.tags[0] ?? '')}
+      {renderLockedEntryIcon(safeEntry.tags[0] ?? '')}
       {renderAccountInfo()}
       {!locked && (
         <div className={styles.account_info_controls}>

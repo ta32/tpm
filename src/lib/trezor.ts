@@ -1,15 +1,12 @@
 import TrezorConnect, {
   DEVICE_EVENT,
   DeviceEventMessage, DeviceUniquePath,
-  TransportEventMessage,
   UI_EVENT,
   UiEventMessage,
 } from '@trezor/connect-web';
 import { hexFromUint8Array, uint8ArrayFromHex } from './buffer';
 
 import { AppData, deserializeObject, serializeObject, TrezorAppData } from './storage';
-import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport';
-import { devices } from '@trezor/transport/lib/utils/bridgeApiResult';
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
 const SLIP_16_PATH = 10016;
@@ -47,7 +44,7 @@ export interface SafePasswordEntry {
   tags: string[];
   createdDate: number;
   lastModifiedDate: number;
-  legacyMode?: boolean;
+  legacyMode: boolean;
 }
 export interface ClearPasswordEntry {
   key: string;

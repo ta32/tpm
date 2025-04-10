@@ -1,10 +1,10 @@
 import { Dependencies } from 'contexts/deps.context';
-import { TrezorService } from 'lib/trezor';
+import { SafePasswordEntry, TrezorService } from 'lib/trezor';
 import { DropboxService } from 'lib/dropbox';
 import { User, UserStatus } from 'contexts/reducers/user.reducer';
 import { Dropbox, DropboxAuth } from 'dropbox';
 
-const LOGGED_IN_USER: User = {
+export const LOGGED_IN_USER: User = {
   status: UserStatus.ONLINE_WITH_TREZOR,
   dbc: new Dropbox({ auth: new DropboxAuth({ clientId: '123' }) }),
   device:{

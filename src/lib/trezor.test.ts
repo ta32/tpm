@@ -100,6 +100,7 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
     safeKey: 'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted',
     createdDate: 0,
     lastModifiedDate: 0,
+    legacyMode: false,
   };
   const appData: AppData = {
     tags: [],

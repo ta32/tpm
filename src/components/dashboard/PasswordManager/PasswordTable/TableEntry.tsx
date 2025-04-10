@@ -107,7 +107,7 @@ export default function TableEntry({
           <ClosedEntry
             onLockChange={onLockChange}
             locked={locked}
-            entry={row.entry}
+            safeEntry={row.entry}
             onOpenEntry={onOpenEntry}
           />
         </div>
