@@ -28,7 +28,7 @@ function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry 
   return {
     key: `key${num}`,
     item: `item${num}`,
-    title: `title${num}`,
+    title: `Title${num}`,
     username: `username${num}`,
     passwordEnc: new Uint8Array([num]),
     secretNoteEnc: new Uint8Array([num]),
@@ -95,7 +95,7 @@ describe('Password Manager Page Tests', () => {
     });
   });
 
-  it('password manager password displays closed passwords', () => {
+  it('password manager password can filter password entries', () => {
     const user = LOGGED_IN_USER;
 
     const appData: AppData = {
@@ -120,6 +120,9 @@ describe('Password Manager Page Tests', () => {
     ).then(() => {
       // debugger;
     });
+    cy.get('[data-cy=filter-input]').type('TitLe1');
+    cy.get('[data-cy=closed-entry-key1]').should('exist');
+    cy.get('[data-cy=closed-entry-key2]').should('not.exist');
   });
 
   it('adding new tag to password manager for new account', () => {

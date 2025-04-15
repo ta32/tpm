@@ -35,6 +35,7 @@ export default function FilterInput({ placeholder, onChangeCallback }: FilterInp
       <form onSubmit={onSubmit}>
         <div className={styles.filter_wrapper}>
           <input
+            data-cy="filter-input"
             name="filter"
             className={styles.filter}
             type="text"

@@ -123,7 +123,7 @@ export default function ClosedEntry({
       );
     } else {
       return (
-        <div className={styles.account_info}>
+        <div data-cy={`closed-entry-${safeEntry.key}`} className={styles.account_info}>
           <label data-cy={"closed-entry-title-" + safeEntry.key} className={styles.title}>{title}</label>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>

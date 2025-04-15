@@ -169,7 +169,7 @@ export default function PasswordTable({
   if (filter !== '') {
     entries = entries.filter((entry) => {
       const title = entry.metaTitle ?? entry.title;
-      return title.includes(filter);
+      return title.toLowerCase().includes(filter.toLowerCase());
     });
   }
   if (selectedTag !== '' && selectedTag !== DEFAULT_TAGS.ALL) {
