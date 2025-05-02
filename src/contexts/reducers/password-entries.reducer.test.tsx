@@ -2,7 +2,7 @@ import { describe, expect } from '@jest/globals';
 import {
   AddEntry,
   getSafePasswordEntries,
-  PasswordEntries,
+  PasswordEntries, PasswordEntriesAction,
   passwordEntriesReducer,
   PasswordEntriesStatus,
   RemoveEntry,
@@ -17,12 +17,11 @@ jest.mock('lib/utils');
 const mUniqueId = jest.mocked(uniqueId);
 const mDateNow = jest.spyOn(Date, 'now');
 
-function initialEntries(): PasswordEntries {
-  return {
-    status: PasswordEntriesStatus.UNINITIALIZED,
-    version: 0,
-    lastError: '',
-  };
+const INITIAL_ENTRIES: PasswordEntries = {
+  entries: {},
+  status: PasswordEntriesStatus.UNINITIALIZED,
+  version: 0,
+  lastError: '',
 }
 
 function entry(num: number): SafePasswordEntry {
@@ -37,15 +36,23 @@ function entry(num: number): SafePasswordEntry {
     tags: [`tag${num}`],
     createdDate: 0,
     lastModifiedDate: 0,
+    legacyMode: false
   };
+}
+
+function callPasswordEntriesReducerWithSnapshots(state: PasswordEntries, action: PasswordEntriesAction) {
+  const initialStateBefore = JSON.stringify(state);
+  const actual = passwordEntriesReducer(state, action);
+  const initialStateAfter = JSON.stringify(state);
+  return { initialStateBefore, actual, initialStateAfter}
 }
 
 describe('Get safe password entries', () => {
   test('Get safe password entries', () => {
-    let initialState: PasswordEntries = initialEntries();
-    initialState.key1 = entry(1);
-    initialState.key2 = entry(2);
-    initialState.key3 = entry(3);
+    let initialState: PasswordEntries = INITIAL_ENTRIES;
+    initialState.entries.key1 = entry(1);
+    initialState.entries.key2 = entry(2);
+    initialState.entries.key3 = entry(3);
 
     const actualEntries = getSafePasswordEntries(initialState);
     expect(actualEntries).toEqual([entry(1), entry(2), entry(3)]);
@@ -53,92 +60,109 @@ describe('Get safe password entries', () => {
 });
 
 describe('Uploading and Synchronization', () => {
-  test('Uploading entries sets state to unsynced', () => {
-    let initialState: PasswordEntries = initialEntries();
-    initialState.key1 = entry(1);
-    initialState.version = 2;
-    initialState.status = PasswordEntriesStatus.SAVE_REQUIRED;
+  test('Uploading entries sets state to un-synced', () => {
+    const initialState: PasswordEntries = {
+      ...INITIAL_ENTRIES,
+      entries: {
+        key1: entry(1),
+      },
+      version: 2,
+      status: PasswordEntriesStatus.SAVE_REQUIRED,
+    };
 
     const action: UploadEntries = {
       type: 'UPLOADED_ENTRIES',
       version_uploaded: 3,
     };
-    const actualEntriesUpload = passwordEntriesReducer(initialState, action);
+
+    const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
     const expectedUploadState: PasswordEntries = {
       version: 3,
       status: PasswordEntriesStatus.SAVED,
-      key1: entry(1),
+      entries: {
+        key1: entry(1),
+      },
       lastError: '',
     };
-    expect(actualEntriesUpload.version).toEqual(expectedUploadState.version);
-    expect(actualEntriesUpload.status).toEqual(expectedUploadState.status);
-    expect(actualEntriesUpload.key1).toEqual(expectedUploadState.key1);
+    expect(actual.version).toEqual(expectedUploadState.version);
+    expect(actual.status).toEqual(expectedUploadState.status);
+    expect(actual.entries.key1).toEqual(expectedUploadState.entries.key1);
+    expect(initialStateBefore).toEqual(initialStateAfter);
   });
 
   test('Passwords must be re-synced after uploading', () => {
     const UPLOADED_VERSION = 2;
-    let initialState: PasswordEntries = initialEntries();
-    initialState.key1 = entry(1);
-    initialState.version = UPLOADED_VERSION;
-    initialState.status = PasswordEntriesStatus.SAVED;
+    const initialState: PasswordEntries = {
+      ...INITIAL_ENTRIES,
+      entries: {
+        key1: entry(1),
+      },
+      version: UPLOADED_VERSION,
+      status: PasswordEntriesStatus.SAVED,
+    };
 
     const action: Sync = {
       type: 'SYNC',
       entries: [entry(1)],
       version: UPLOADED_VERSION,
     };
-    const actual = passwordEntriesReducer(initialState, action);
+
+    const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
     const expectedState: PasswordEntries = {
       ...initialState,
       status: PasswordEntriesStatus.SYNCED,
     };
-    expectedState.key1 = entry(1);
+    expectedState.entries.key1 = entry(1);
     expect(actual.version).toEqual(expectedState.version);
     expect(actual.status).toEqual(expectedState.status);
-    expect(actual.key1).toEqual(expectedState.key1);
+    expect(actual.entries.key1).toEqual(expectedState.entries.key1);
+    expect(initialStateBefore).toEqual(initialStateAfter);
   });
 });
 
 test('Adding new entry to loaded database', () => {
   let initialState: PasswordEntries = {
-    ...initialEntries(),
+    ...INITIAL_ENTRIES,
     version: 1,
     status: PasswordEntriesStatus.SYNCED,
   };
-  initialState.key1 = entry(1);
+  initialState.entries.key1 = entry(1);
 
   let entry2 = { ...entry(2), key: 'value set by reducer when added' };
   const action: AddEntry = { type: 'ADD_ENTRY', entry: entry2 };
   mUniqueId.mockReturnValue('key2');
   mDateNow.mockReturnValue(0);
 
-  // noinspection DuplicatedCode
-  const actual = passwordEntriesReducer(initialState, action);
+  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
-  // noinspection DuplicatedCode
   const expectedState: PasswordEntries = {
     version: 1,
     status: PasswordEntriesStatus.SAVE_REQUIRED,
-    key1: entry(1),
-    key2: entry(2),
+    entries: {
+      key1: entry(1),
+      key2: entry(2),
+    },
     lastError: '',
   };
 
+  // noinspection DuplicatedCode
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
-  expect(actual.key1).toEqual(expectedState.key1);
-  expect(actual.key2).toEqual(expectedState.key2);
+  expect(actual.entries.key1).toEqual(expectedState.entries.key1);
+  expect(actual.entries.key2).toEqual(expectedState.entries.key2);
+  expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
 test('Should not add entry if database is not loaded', () => {
-  const initialState: PasswordEntries = initialEntries();
+  const initialState: PasswordEntries = INITIAL_ENTRIES;
   const action: AddEntry = { type: 'ADD_ENTRY', entry: entry(1) };
 
-  const actual = passwordEntriesReducer(initialState, action);
+  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
   const expectedState: PasswordEntries = {
+    entries: {},
     version: 0,
     status: PasswordEntriesStatus.ERROR,
     lastError: '',
@@ -146,106 +170,125 @@ test('Should not add entry if database is not loaded', () => {
 
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
+  expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
 test('Do not override entries if version is lower', () => {
-  let initialState: PasswordEntries = { ...initialEntries(), version: 1 };
-  initialState.status = PasswordEntriesStatus.SAVED;
-  initialState.item1 = entry(1);
-  initialState.item2 = entry(2);
-
+  const initialState: PasswordEntries = {
+    ...INITIAL_ENTRIES,
+    entries: {
+      item1: entry(1),
+      item2: entry(2),
+    },
+    version: 1,
+    status: PasswordEntriesStatus.SAVED,
+  };
   const action: Sync = { type: 'SYNC', entries: [entry(1)], version: 0 };
-  const actual = passwordEntriesReducer(initialState, action);
+
+  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
   const expectedState: PasswordEntries = {
     version: 1,
     status: PasswordEntriesStatus.ERROR,
-    item1: entry(1),
-    item2: entry(2),
+    entries: {
+      item1: entry(1),
+      item2: entry(2),
+    },
     lastError: '',
   };
   expect(actual.status).toEqual(expectedState.status);
-  expect(actual.item1).toEqual(expectedState.item1);
-  expect(actual.item2).toEqual(expectedState.item2);
+  expect(actual.entries.item1).toEqual(expectedState.entries.item1);
+  expect(actual.entries.item2).toEqual(expectedState.entries.item2);
+  expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
 test('Sync passwords from cloud action', () => {
-  const initialState: PasswordEntries = initialEntries();
+  const initialState: PasswordEntries = INITIAL_ENTRIES;
   const action: Sync = {
     type: 'SYNC',
     entries: [entry(1), entry(2)],
     version: 1,
   };
 
-  // noinspection DuplicatedCode
-  const actual = passwordEntriesReducer(initialState, action);
+  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
   const expectedState: PasswordEntries = {
     version: 1,
     status: PasswordEntriesStatus.SYNCED,
-    key1: entry(1),
-    key2: entry(2),
+    entries: {
+      key1: entry(1),
+      key2: entry(2),
+    },
     lastError: '',
   };
+
+  // noinspection DuplicatedCode
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
-  expect(actual.key1).toEqual(expectedState.key1);
-  expect(actual.key2).toEqual(expectedState.key2);
+  expect(actual.entries.key1).toEqual(expectedState.entries.key1);
+  expect(actual.entries.key2).toEqual(expectedState.entries.key2);
+  expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
 test('Update entry test', () => {
   const initialState: PasswordEntries = {
-    ...initialEntries(),
+    ...INITIAL_ENTRIES,
     version: 1,
     status: PasswordEntriesStatus.SYNCED,
   };
   const entry1 = entry(1);
   const entry2 = entry(2);
-  initialState.key1 = entry1;
-  initialState.key2 = entry2;
+  initialState.entries.key1 = entry1;
+  initialState.entries.key2 = entry2;
 
   const action: UpdateEntry = {
     type: 'UPDATE_ENTRY',
     entry: { ...entry1, title: 'new title' },
     key: entry1.key,
   };
-  const actual = passwordEntriesReducer(initialState, action);
+
+  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
   const expectedState: PasswordEntries = {
     ...initialState,
     status: PasswordEntriesStatus.SAVE_REQUIRED,
-    key1: { ...entry1, title: 'new title' },
-    key2: entry2,
+    entries: {
+      key1: { ...entry1, title: 'new title' },
+      key2: entry2,
+    }
   };
 
+  // noinspection DuplicatedCode
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
-  expect(actual.key1).toEqual(expectedState.key1);
-  expect(actual.key2).toEqual(expectedState.key2);
+  expect(actual.entries.key1).toEqual(expectedState.entries.key1);
+  expect(actual.entries.key2).toEqual(expectedState.entries.key2);
+  expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
 test('Entry is removed by key', () => {
   const initialState: PasswordEntries = {
-    ...initialEntries(),
+    ...INITIAL_ENTRIES,
     version: 1,
     status: PasswordEntriesStatus.SYNCED,
   };
   const entry1 = entry(1);
   const entry2 = entry(2);
-  initialState.key1 = entry1;
-  initialState.key2 = entry2;
+  initialState.entries.key1 = entry1;
+  initialState.entries.key2 = entry2;
 
   const action: RemoveEntry = { type: 'REMOVE_ENTRY', key: entry1.key };
-  const actual = passwordEntriesReducer(initialState, action);
+  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
 
   const expectedState: PasswordEntries = {
     ...initialState,
     status: PasswordEntriesStatus.SAVE_REQUIRED,
   };
-  delete expectedState.key1;
+  delete expectedState.entries.key1;
 
   expect(actual.version).toEqual(expectedState.version);
   expect(actual.status).toEqual(expectedState.status);
-  expect(actual.key1).toBeUndefined();
-  expect(actual.key2).toEqual(expectedState.key2);
+  expect(actual.entries.key1).toBeUndefined();
+  expect(actual.entries.key2).toEqual(expectedState.entries.key2);
+  expect(initialStateBefore).toEqual(initialStateAfter);
 });

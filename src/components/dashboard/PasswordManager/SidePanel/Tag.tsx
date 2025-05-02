@@ -40,7 +40,7 @@ export default function Tag({ title, icon, selected, onEdit, onRemove, id }: Tag
   const IconSvg = SELECTABLE_TAG_ICONS.get(icon) ?? AllIcon;
   return (
     <>
-      <a className={selected ? styles.active : ''} data-tag-key={title} data-tag-name={title}>
+      <a className={selected ? styles.active : ''} data-cy={`tag-${title}`}>
         <div className={styles.tag_icon}>{IconSvg && <IconSvg width={34} fill={Colors.white} />}</div>
         <span data-cy="tag-title-span" className={styles.nav_label}>{title}</span>
         <div className={showMoreControls} onClick={handleClickedMore}>

@@ -4,57 +4,60 @@ import { DropboxService } from 'lib/dropbox';
 import { User, UserStatus } from 'contexts/reducers/user.reducer';
 import { Dropbox, DropboxAuth } from 'dropbox';
 
-export const LOGGED_IN_USER: User = {
-  status: UserStatus.ONLINE_WITH_TREZOR,
-  dbc: new Dropbox({ auth: new DropboxAuth({ clientId: '123' }) }),
-  device:{
-    label: 'trezor_device_label',
-    appDataSeed: 'appDataSeed',
-    appDataEncryptionKey: new Uint8Array(32),
-    deviceId: 'deviceId',
-    model: 't1',
-    path: 'path',
-  },
-  dropboxAccountName: 'test',
-}
 
-const DEFAULT_DEPS: Dependencies = {
-  trezor: () => {
-    return {
-      decryptAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      encryptAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      decryptFullEntry: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      decryptTrezorAppData: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      initTrezor: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      encryptFullEntry: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      getDevice: cy.stub().resolves([LOGGED_IN_USER.device]),
+// region Object Builders
+export function withLoggedInUser(): User {
+  return {
+    status: UserStatus.ONLINE_WITH_TREZOR,
+    dbc: Cypress.sinon.createStubInstance(Dropbox),
+    device:{
+      label: 'trezor_device_label',
+      appDataSeed: 'appDataSeed',
+      appDataEncryptionKey: new Uint8Array(32),
+      deviceId: 'deviceId',
+      model: 't1',
+      path: 'path',
+    },
+    dropboxAccountName: 'test',
+  }
+}
+function withDefaultDeps(): Dependencies {
+  return {
+    trezor: () => ({
+      decryptAppData: cy.stub().resolves(),
+      encryptAppData: cy.stub().resolves(new Uint8Array(32)),
+      decryptFullEntry: cy.stub().resolves(),
+      decryptTrezorAppData: cy.stub().resolves(),
+      initTrezor: cy.stub().resolves(),
+      encryptFullEntry: cy.stub().resolves(),
+      getDevice: cy.stub().resolves([withLoggedInUser().device]),
       getEncryptionKey: cy.stub().resolves(new Uint8Array(32)),
       setTrezorUiEventHandler: cy.stub().resolves(),
       setTrezorDeviceEventHandler: cy.stub().resolves(),
-    }
-  },
-  dropbox: () => {
-    return {
+    }),
+    dropbox: () => ({
       hasRedirectedFromAuth: cy.stub().returns(true),
-      connectDropbox: cy.stub().resolves({dbc: LOGGED_IN_USER.dbc, name: LOGGED_IN_USER.dropboxAccountName}),
+      connectDropbox: cy.stub().resolves({dbc: withLoggedInUser().dbc, name: withLoggedInUser().dropboxAccountName}),
       getAuthUrl: cy.stub().resolves('authUrl'),
       readAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-      saveAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
-    }
+      saveAppFile: cy.stub().resolves({}),
+    }),
   }
 }
+// endregion
 
+// region Dependency Builders
 export function withStubDeps(): Dependencies {
   return {
-    ...DEFAULT_DEPS,
+    ...withDefaultDeps(),
   }
 }
 
 export function withTrezorService(trezorService: Partial<TrezorService>): Dependencies {
   return {
-    ...DEFAULT_DEPS,
+    ...withDefaultDeps(),
     trezor: () => ({
-      ...DEFAULT_DEPS.trezor(),
+      ...withDefaultDeps().trezor(),
       ...trezorService,
     }),
   }
@@ -62,9 +65,9 @@ export function withTrezorService(trezorService: Partial<TrezorService>): Depend
 
 export function withDropboxService(dropboxService: Partial<DropboxService>): Dependencies {
   return {
-    ...DEFAULT_DEPS,
+    ...withDefaultDeps(),
     dropbox: () => ({
-      ...DEFAULT_DEPS.dropbox(),
+      ...withDefaultDeps().dropbox(),
       ...dropboxService,
     }),
   }
@@ -72,14 +75,37 @@ export function withDropboxService(dropboxService: Partial<DropboxService>): Dep
 
 export function withServices(trezorService: Partial<TrezorService>, dropboxService: Partial<DropboxService>): Dependencies {
   return {
-    ...DEFAULT_DEPS,
+    ...withDefaultDeps(),
     trezor: () => ({
-      ...DEFAULT_DEPS.trezor(),
+      ...withDefaultDeps().trezor(),
       ...trezorService,
     }),
     dropbox: () => ({
-      ...DEFAULT_DEPS.dropbox(),
+      ...withDefaultDeps().dropbox(),
       ...dropboxService,
     }),
   }
 }
+// endregion
+
+// region Builders Trezor
+export function withTrezorPasswordEntry(title: string, tags: string[]): any {
+  return {
+    title: title,
+    username: 'username',
+    password: {
+      type: 'Buffer',
+      data: [1,2,3]
+    },
+    nonce: 'abc',
+    tags: tags,
+    safe_note: {
+      type: 'Buffer',
+      data: [1,2,3]
+    },
+    note: '',
+    success: false,
+    export: false
+  };
+}
+// endregion

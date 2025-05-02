@@ -124,7 +124,7 @@ export default function ClosedEntry({
     } else {
       return (
         <div data-cy={`closed-entry-${safeEntry.key}`} className={styles.account_info}>
-          <label data-cy={"closed-entry-title-" + safeEntry.key} className={styles.title}>{title}</label>
+          <label data-cy={"closed-entry-title-" + safeEntry.title} className={styles.title}>{title}</label>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
               <div className={`${styles.label} ${styles.clickable}`} onClick={() => handleCopyUsername(safeEntry.username)}>

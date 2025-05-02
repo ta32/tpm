@@ -1,5 +1,5 @@
 import React, { createContext, Dispatch, useReducer } from 'react';
-import { TagEntries, TagsAction, tagsReducer, TagsStatus } from './reducers/tag-entries.reducer';
+import { TagEntries, TagEntry, TagsAction, tagsReducer, TagsStatus } from './reducers/tag-entries.reducer';
 import { TAG_ALL, TAG_BITCOIN, TAG_SOCIAL } from '../lib/images';
 
 const ALL_ID = '0';
@@ -10,21 +10,23 @@ export const enum DEFAULT_TAGS {
   BITCOIN = BITCOIN_ID,
   SOCIAL = SOCIAL_ID,
 }
-const initialTageEntries: TagEntries = {
-  [ALL_ID]: {
-    id: ALL_ID,
-    title: 'ALL',
-    icon: TAG_ALL,
-  },
-  [SOCIAL_ID]: {
-    id: SOCIAL_ID,
-    title: 'Social',
-    icon: TAG_SOCIAL,
-  },
-  [BITCOIN_ID]: {
-    id: BITCOIN_ID,
-    title: 'Bitcoin',
-    icon: TAG_BITCOIN,
+const defaultTagEntries: TagEntries = {
+  entries: {
+    [ALL_ID]: {
+      id: ALL_ID,
+      title: 'ALL',
+      icon: TAG_ALL,
+    },
+    [SOCIAL_ID]: {
+      id: SOCIAL_ID,
+      title: 'Social',
+      icon: TAG_SOCIAL,
+    },
+    [BITCOIN_ID]: {
+      id: BITCOIN_ID,
+      title: 'Bitcoin',
+      icon: TAG_BITCOIN,
+    },
   },
   status: TagsStatus.UNINITIALIZED,
   lastError: '',
@@ -33,8 +35,8 @@ const initialTageEntries: TagEntries = {
 const TagsContext = createContext<TagEntries | undefined>(undefined);
 const TagsDispatchContext = createContext<Dispatch<TagsAction> | undefined>(undefined);
 
-export function TagEntriesProvider({ children }: { children: React.ReactNode }) {
-  const [tagEntries, dispatchTags] = useReducer(tagsReducer, initialTageEntries);
+export function TagEntriesProvider({ children, initialTagEntries = defaultTagEntries }: { children: React.ReactNode, initialTagEntries?: TagEntries }) {
+  const [tagEntries, dispatchTags] = useReducer(tagsReducer, initialTagEntries);
   return (
     <TagsContext.Provider value={tagEntries}>
       <TagsDispatchContext.Provider value={dispatchTags}>{children}</TagsDispatchContext.Provider>

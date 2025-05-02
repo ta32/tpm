@@ -30,6 +30,7 @@ interface PasswordTableProps {
 enum SortType {
   TITLE,
   DATE,
+  UPDATED,
 }
 
 export default function PasswordTable({
@@ -184,6 +185,8 @@ export default function PasswordTable({
         return a.title.localeCompare(b.title);
       case SortType.DATE:
         return b.createdDate - a.createdDate;
+      case SortType.UPDATED:
+        return b.lastModifiedDate - a.lastModifiedDate;
     }
   });
   return (
@@ -215,6 +218,7 @@ export default function PasswordTable({
           >
             <div className={styles.dropdown_button}>Title</div>
             <div className={styles.dropdown_button}>Date</div>
+            <div className={styles.dropdown_button}>Updated</div>
           </DropdownMenu>
           <DropdownMenu
             xOffset={-20}
@@ -223,21 +227,18 @@ export default function PasswordTable({
             isSelectable={false}
             onClickCallback={handleUserMenuClick}
             button={
-              <button
-                className={styles.drop_box_btn}
-                style={{
+              <button data-cy={"password-table-account-name"} className={styles.drop_box_btn} style={{
                   backgroundSize: '1rem 1rem',
                   backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
                   backgroundPosition: '20px center',
                   backgroundRepeat: 'no-repeat',
-                }}
-              >
+                }}>
                 {accountName}
               </button>
             }
           >
             <div className={styles.dropdown_button}>Switch user</div>
-            <div className={styles.dropdown_button}>Import passwords</div>
+            <div data-cy={"password-table-import-passwords"} className={styles.dropdown_button}>Import passwords</div>
           </DropdownMenu>
         </div>
       </div>
@@ -283,7 +284,7 @@ export default function PasswordTable({
         )}
       </div>
       {passwordEntries.status == PasswordEntriesStatus.ERROR && (
-        <div className={styles.notification_error}>Error loading password entries</div>
+        <div className={styles.notification_error}>Error loading password entries: {passwordEntries.lastError}</div>
       )}
     </div>
   );

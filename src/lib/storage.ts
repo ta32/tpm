@@ -1,9 +1,7 @@
-import {} from '../contexts/password-entries.context';
 import { getSafePasswordEntries, PasswordEntries } from '../contexts/reducers/password-entries.reducer';
-import { getTags, TagEntry, TagEntries } from '../contexts/reducers/tag-entries.reducer';
+import { getTags, TagEntries, TagEntry } from '../contexts/reducers/tag-entries.reducer';
 import { SafePasswordEntry } from './trezor';
 import { uniqueId } from './utils';
-import entry from 'next/dist/server/typescript/rules/entry';
 import { FROM_TREZOR_ICON_KEY_TO_TAG_NAME, TAG_SOCIAL } from './images';
 
 const MODEL_VERSION = 1;
@@ -14,38 +12,39 @@ export interface AppData {
   tags: TagEntry[];
   modelVersion: number;
 }
-
 export interface TrezorAppData {
   version: string;
   extVersion: string;
   config: {
     orderType: string;
   };
-  tags: {
-    [key: string]: {
-      title: string;
-      icon: string;
-    };
-  };
+  tags: TrezorTags;
   entries: {
-    [key: string]: {
-      title: string;
-      username: string;
-      password: {
-        type: string;
-        data: number[];
-      };
-      nonce: string;
-      tags: number[];
-      safe_note: {
-        type: string;
-        data: number[];
-      };
-      note: string;
-      success: boolean;
-      export: boolean;
-    };
+    [key: string]: TrezorEntry
   };
+}
+interface TrezorTags {
+  [key: string]: {
+    title: string;
+    icon: string;
+  }
+}
+interface TrezorEntry {
+  title: string;
+  username: string;
+  password: {
+    type: string;
+    data: number[];
+  };
+  nonce: string;
+  tags: number[];
+  safe_note: {
+    type: string;
+    data: number[];
+  };
+  note: string;
+  success: boolean;
+  export: boolean;
 }
 
 export interface MergeAppData {
@@ -61,41 +60,38 @@ export interface MergeAppData {
  * The title and the username are used to for the entryKey for decryption.
  * Decryption will fail with a different entryKey.
  */
-export function mergeAppData(appData: AppData, newData: TrezorAppData, getUniqueId: () => string = uniqueId ): MergeAppData {
+export function mergeAppData(appData: AppData, trezorAppData: TrezorAppData, getUniqueId: () => string = uniqueId ): MergeAppData {
   // Merge tags
-  const tags: TagEntry[] = [];
+  const newTags: TagEntry[] = [];
   const conflicts: SafePasswordEntry[] = [];
-  for (const key in newData.tags) {
-    const tag = newData.tags[key];
+  for (const key in trezorAppData.tags) {
+    const tag = trezorAppData.tags[key];
     const existingTag = appData.tags.find((t) => t.title === tag.title);
     if (!existingTag && tag.title !== 'All') {
       const newIconName: string = FROM_TREZOR_ICON_KEY_TO_TAG_NAME.get(tag.icon) || TAG_SOCIAL;
       const newId = getUniqueId();
-      tags.push({
+      newTags.push({
         id: newId,
         title: tag.title,
         icon:newIconName
       });
     }
   }
-  const allTags = appData.tags.concat(tags);
+  const allTags = appData.tags.concat(newTags);
   // merge entries
   const passwordEntries: SafePasswordEntry[] = [];
-  for (const key in newData.entries) {
-    const entry = newData.entries[key];
-    const existingEntry = appData.entries.find((e) => e.title === entry.title);
+  for (const key in trezorAppData.entries) {
+    const trezorEntry = trezorAppData.entries[key];
+    const existingEntry = appData.entries.find((e) => e.title === trezorEntry.title);
     const newEntry: SafePasswordEntry = {
       key: getUniqueId(),
-      item: entry.title,
-      title: entry.title,
-      username: entry.username,
-      safeKey: entry.nonce,
-      passwordEnc: new Uint8Array(entry.password.data),
-      secretNoteEnc: new Uint8Array(entry.safe_note.data),
-      tags: entry.tags.map((tagId) => {
-        const tag = allTags.find((t) => t.title === newData?.tags[tagId]?.title || '');
-        return tag ? tag.id : '';
-      }),
+      item: trezorEntry.title,
+      title: trezorEntry.title,
+      username: trezorEntry.username,
+      safeKey: trezorEntry.nonce,
+      passwordEnc: new Uint8Array(trezorEntry.password.data),
+      secretNoteEnc: new Uint8Array(trezorEntry.safe_note.data),
+      tags: mapTagsToNewTagIds(trezorEntry, trezorAppData.tags, allTags),
       legacyMode: true,
       createdDate: Date.now(),
       lastModifiedDate: Date.now(),
@@ -109,7 +105,7 @@ export function mergeAppData(appData: AppData, newData: TrezorAppData, getUnique
   }
   return {
     passwordEntries,
-    tags,
+    tags: newTags,
     conflicts,
   }
 }
@@ -150,4 +146,21 @@ function deserializeWithTypedArrays<T>(data: string): T {
     }
     return value;
   });
+}
+
+function mapTagsToNewTagIds(entry: TrezorEntry, trezorTags: TrezorTags, allTags: TagEntry[]): string[]
+{
+  let tagsIds: string[] = [];
+  for (const tagId of entry.tags) {
+    const oldTag = trezorTags[tagId];
+    const tag = findTagIdByTitle(allTags, oldTag.title);
+    if(tag) {
+      tagsIds.push(tag.id);
+    }
+  }
+  return tagsIds
+}
+
+function findTagIdByTitle(allTags: TagEntry[], title: string): TagEntry | undefined {
+  return allTags.find((tag) => tag.title === title);
 }

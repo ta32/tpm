@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Modal from 'components/ui/Modal';
 import styles from './ImportPasswordsModal.module.scss';
-import { decryptTrezorAppData, SafePasswordEntry } from 'lib/trezor';
+import { SafePasswordEntry } from 'lib/trezor';
 import { fromState, mergeAppData } from 'lib/storage';
 import { useTagEntries, useTagEntriesDispatch } from 'contexts/tag-entries.context';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import Colors from 'styles/colors.module.scss';
 import FolderIcon from 'components/svg/ui/FolderIcon';
 import { TagEntry } from 'contexts/reducers/tag-entries.reducer';
+import { DependenciesContext } from 'contexts/deps.context';
 
 interface ImportedData {
   tags: TagEntry[];
@@ -28,7 +29,6 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [importFailed, setImportFailed] = useState(false);
-
   const [requestConfirmation, setRequestConfirmation] = useState(false);
   const [importedData, setImportedData] = useState<ImportedData|undefined>(undefined);
   const [file, setFile] = useState<File|undefined>(undefined);
@@ -36,6 +36,10 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
   const tagEntriesDispatch = useTagEntriesDispatch();
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
   const passwordEntries = usePasswordEntries();
+  const { trezor } = useContext(DependenciesContext);
+
+  const { decryptTrezorAppData } = trezor();
+
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault();
     setDragging(true);
@@ -121,6 +125,7 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
       <div>
         <p>You can only import trezor data if it was encrypted with the current device.</p>
         <div
+          data-cy={"import-passwords-dropzone"}
           className={`${styles.dropzone} ${dragging ? styles.dragging : ''}`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -195,13 +200,13 @@ export default function ImportPasswordsModal({show, onCanceled, appDataEncryptio
         )}
         <div className={styles.controls}>
           {requestConfirmation && (
-            <button className={styles.green} type="button"
+            <button data-cy={"import-passwords-save"} className={styles.green} type="button"
                     onClick={handleSave}>
               Save
             </button>
           )}
           {!requestConfirmation && !importFailed && (
-            <button className={importDisabled ? styles.blank : styles.green} disabled={importDisabled} type="button"
+            <button data-cy={"import-passwords-load-passwords"} className={importDisabled ? styles.blank : styles.green} disabled={importDisabled} type="button"
                     onClick={handleImport}>
               Load
             </button>
