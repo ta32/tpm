@@ -96,7 +96,16 @@ export default function PasswordTable({
           console.log(e);
         });
     }
-  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordSyncStatus, tagEntriesDispatch, passwordEntriesDispatch, readAppFile, decryptAppData]);
+  }, [
+    appDataEncryptionKey,
+    dbc,
+    masterPublicKey,
+    passwordSyncStatus,
+    tagEntriesDispatch,
+    passwordEntriesDispatch,
+    readAppFile,
+    decryptAppData,
+  ]);
 
   useEffect(() => {
     const pushData =
@@ -123,7 +132,18 @@ export default function PasswordTable({
         });
       });
     }
-  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordEntries, rev, tagEntries, tagEntriesDispatch, passwordEntriesDispatch, encryptAppData, saveAppFile]);
+  }, [
+    appDataEncryptionKey,
+    dbc,
+    masterPublicKey,
+    passwordEntries,
+    rev,
+    tagEntries,
+    tagEntriesDispatch,
+    passwordEntriesDispatch,
+    encryptAppData,
+    saveAppFile,
+  ]);
 
   const handleAddEntry = () => {
     setLockEntries(true);
@@ -191,7 +211,11 @@ export default function PasswordTable({
   });
   return (
     <div className={styles.container}>
-      <ImportPasswordsModal appDataEncryptionKey={appDataEncryptionKey} show={importPassword} onCanceled={onCancelImportPassword}/>
+      <ImportPasswordsModal
+        appDataEncryptionKey={appDataEncryptionKey}
+        show={importPassword}
+        onCanceled={onCancelImportPassword}
+      />
       <div className={styles.start_bar}>
         <div className={styles.col1}>
           <button onClick={handleAddEntry} className={styles.add_btn}>
@@ -227,18 +251,24 @@ export default function PasswordTable({
             isSelectable={false}
             onClickCallback={handleUserMenuClick}
             button={
-              <button data-cy={"password-table-account-name"} className={styles.drop_box_btn} style={{
+              <button
+                data-cy={'password-table-account-name'}
+                className={styles.drop_box_btn}
+                style={{
                   backgroundSize: '1rem 1rem',
                   backgroundImage: `url(${IMAGE_FILE.DROPBOX_GREY.path()})`,
                   backgroundPosition: '20px center',
                   backgroundRepeat: 'no-repeat',
-                }}>
+                }}
+              >
                 {accountName}
               </button>
             }
           >
             <div className={styles.dropdown_button}>Switch user</div>
-            <div data-cy={"password-table-import-passwords"} className={styles.dropdown_button}>Import passwords</div>
+            <div data-cy={'password-table-import-passwords'} className={styles.dropdown_button}>
+              Import passwords
+            </div>
           </DropdownMenu>
         </div>
       </div>

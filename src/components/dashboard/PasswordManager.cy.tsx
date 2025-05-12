@@ -48,18 +48,18 @@ function withInitialTagEntries(): TagEntries {
     status: TagsStatus.UNINITIALIZED,
     lastError: '',
     entries: {
-      "0": {
-        id: "0",
+      '0': {
+        id: '0',
         title: 'ALL',
         icon: TAG_ALL,
       }, // ALL tag must match the real tag id or behaviour will change
-      "1": {
-        id: "1",
+      '1': {
+        id: '1',
         title: 'Social',
         icon: TAG_SOCIAL,
       },
-      "2": {
-        id: "2",
+      '2': {
+        id: '2',
         title: 'Bitcoin',
         icon: TAG_BITCOIN,
       },
@@ -88,22 +88,20 @@ function withTagEntry(num: number): TagEntry {
   };
 }
 
-function DashboardPageWrapper({deps, initialUser, initialTags, children}: DashboardPageProps) {
+function DashboardPageWrapper({ deps, initialUser, initialTags, children }: DashboardPageProps) {
   return (
-    <div className={inter.className} style={{margin: 0}}>
+    <div className={inter.className} style={{ margin: 0 }}>
       <DependenciesContext.Provider value={deps}>
         <LocationProvider>
           <UserProvider initialUser={initialUser}>
             <TagEntriesProvider initialTagEntries={initialTags}>
-              <PasswordEntriesProvider>
-                {children}
-              </PasswordEntriesProvider>
+              <PasswordEntriesProvider>{children}</PasswordEntriesProvider>
             </TagEntriesProvider>
           </UserProvider>
         </LocationProvider>
       </DependenciesContext.Provider>
     </div>
-  )
+  );
 }
 // endregion
 
@@ -125,20 +123,16 @@ describe('Password Manager Page Tests', () => {
     const user = withLoggedInUser();
 
     const appData: AppData = {
-      entries: [
-        withSafePasswordEntry(1, false),
-        withSafePasswordEntry(2, false),
-        withSafePasswordEntry(3, false),
-      ],
+      entries: [withSafePasswordEntry(1, false), withSafePasswordEntry(2, false), withSafePasswordEntry(3, false)],
       version: 1,
       tags: [withTagEntry(1)],
-      modelVersion: 1
-    }
+      modelVersion: 1,
+    };
     const trezorService = {
-      decryptAppData: cy.stub().resolves(appData)
-    }
+      decryptAppData: cy.stub().resolves(appData),
+    };
     const customDeps = withTrezorService(trezorService);
-    cy.viewport(1920,1080);
+    cy.viewport(1920, 1080);
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps}>
         <PasswordManager />
@@ -152,31 +146,31 @@ describe('Password Manager Page Tests', () => {
   });
 
   it('adding new tag to password manager for new account', () => {
-      const user = withLoggedInUser();
-      // empty app data
-      const appData: AppData = {
-        entries: [],
-        version: 1,
-        tags: [],
-        modelVersion: 1
-      }
+    const user = withLoggedInUser();
+    // empty app data
+    const appData: AppData = {
+      entries: [],
+      version: 1,
+      tags: [],
+      modelVersion: 1,
+    };
     const trezorService = {
-      decryptAppData: cy.stub().resolves(appData)
-    }
+      decryptAppData: cy.stub().resolves(appData),
+    };
     // {data: new Uint8Array(0), rev: 'rev', initialized: true}
     // trezor password manager has not been used so no dropbox file exists
     const dropboxService = {
-        readAppFile: cy.stub().resolves({data: undefined, rev: '', initialized: false}),
-    }
+      readAppFile: cy.stub().resolves({ data: undefined, rev: '', initialized: false }),
+    };
 
     const customDeps = withServices(trezorService, dropboxService);
-    cy.viewport(1920,1080);
+    cy.viewport(1920, 1080);
 
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps}>
         <PasswordManager />
       </DashboardPageWrapper>
-    )
+    );
     // adding a new tag
     cy.get('[data-cy=side-panel-add-new-tag]').click();
     cy.get('[data-cy=tag-modal-select-icon-right]').click();
@@ -194,26 +188,27 @@ describe('Password Manager Page Tests', () => {
     const legacyEntry = withSafePasswordEntry(2, true);
 
     const appData: AppData = {
-      entries: [
-        newEntry,
-        legacyEntry,
-      ],
+      entries: [newEntry, legacyEntry],
       version: 1,
       tags: [],
-      modelVersion: 1
-    }
+      modelVersion: 1,
+    };
     const neverResolvingPromise = new Promise(() => {});
 
     // using a never resolving promise otherwise test will exit early
     const clearEntry = null;
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
-      decryptFullEntry: cy.stub().withArgs(newEntry, false).returns(neverResolvingPromise)
-                                 .withArgs(legacyEntry, true).returns(neverResolvingPromise),
-    }
+      decryptFullEntry: cy
+        .stub()
+        .withArgs(newEntry, false)
+        .returns(neverResolvingPromise)
+        .withArgs(legacyEntry, true)
+        .returns(neverResolvingPromise),
+    };
     const customDeps = withTrezorService(trezorService);
 
-    cy.viewport(1920,1080);
+    cy.viewport(1920, 1080);
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps}>
         <PasswordManager />
@@ -228,12 +223,12 @@ describe('Password Manager Page Tests', () => {
     cy.wrap(trezorService.decryptAppData).should('be.called');
 
     // cypress doesn't support hover so we need to click a hidden button
-    cy.get('[data-cy=closed-entry-password-copy-key1]').click({force: true});     // https://docs.cypress.io/api/commands/hover
+    cy.get('[data-cy=closed-entry-password-copy-key1]').click({ force: true }); // https://docs.cypress.io/api/commands/hover
     cy.get('[data-cy=closed-entry-action-msg]').should('contain', 'Copying Password to clipboard');
     cy.wrap(trezorService.decryptFullEntry).should('be.calledWith', newEntry, false);
 
     // need to remount because the promise is not resolving
-    cy.viewport(1920,1080);
+    cy.viewport(1920, 1080);
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps}>
         <PasswordManager />
@@ -243,10 +238,9 @@ describe('Password Manager Page Tests', () => {
     });
 
     // copy legacy password
-    cy.get('[data-cy=closed-entry-password-copy-key2]').click({force: true});    // https://docs.cypress.io/api/commands/hover
+    cy.get('[data-cy=closed-entry-password-copy-key2]').click({ force: true }); // https://docs.cypress.io/api/commands/hover
     cy.get('[data-cy=closed-entry-action-msg]').should('contain', 'Copying Password to clipboard');
     cy.wrap(trezorService.decryptFullEntry).should('be.calledWith', legacyEntry, true);
-
   });
 
   it('imports old trezor passwords with new tags and entries', () => {
@@ -257,37 +251,37 @@ describe('Password Manager Page Tests', () => {
       entries: [],
       version: 1,
       tags: Object.values(withInitialTagEntries().entries),
-      modelVersion: 1
-    }
+      modelVersion: 1,
+    };
     const importedAppData: TrezorAppData = {
-      version: "0",
-      extVersion: "0",
+      version: '0',
+      extVersion: '0',
       config: {
-        orderType: "0",
+        orderType: '0',
       },
       tags: {
-        "trezor_original_all_tag": {
-          title: "All",
-          icon: "home"
+        trezor_original_all_tag: {
+          title: 'All',
+          icon: 'home',
         },
-        "trezor_original_social": {
-          title: "Social",
-          icon: "person-stalker"
+        trezor_original_social: {
+          title: 'Social',
+          icon: 'person-stalker',
         },
-        "trezor_original_bitcoin": {
-            title: "Bitcoin",
-            icon: "social-bitcoin"
+        trezor_original_bitcoin: {
+          title: 'Bitcoin',
+          icon: 'social-bitcoin',
         },
-        "3b": {
-          title: "Tag1",
-          icon: "person" // --> should be "account_circle"
+        '3b': {
+          title: 'Tag1',
+          icon: 'person', // --> should be "account_circle"
         },
       },
       entries: {
-        "0": withTrezorPasswordEntry("item2", ['3b']),
-        "1": withTrezorPasswordEntry("item1", ['trezor_original_all_tag']),
-      }
-    }
+        '0': withTrezorPasswordEntry('item2', ['3b']),
+        '1': withTrezorPasswordEntry('item1', ['trezor_original_all_tag']),
+      },
+    };
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
       decryptTrezorAppData: cy.stub().resolves(importedAppData),
@@ -295,30 +289,34 @@ describe('Password Manager Page Tests', () => {
         Object.assign(appData, newAppData);
         return Promise.resolve(new Uint8Array(32));
       }),
-    }
+    };
     const customDeps = withTrezorService(trezorService);
-    cy.viewport(1920,1080);
+    cy.viewport(1920, 1080);
     cy.mount(
       <DashboardPageWrapper initialUser={user} deps={customDeps} initialTags={tagEntries}>
         <PasswordManager />
       </DashboardPageWrapper>
     ).then(() => {
       debugger;
-    })
+    });
     cy.get('[data-cy=password-table-account-name]').should('exist').click();
     cy.get('[data-cy=password-table-import-passwords]').click();
 
-    cy.get('[data-cy=import-passwords-dropzone]').should('exist')
-      .selectFile({
-        contents: Cypress.Buffer.from('file contents'),
-        fileName: 'file.pswd',
-        mimeType: 'application/octet-stream',
-        lastModified: Date.now(),
-      }, {
-      action: 'drag-drop'
-    })
+    cy.get('[data-cy=import-passwords-dropzone]')
+      .should('exist')
+      .selectFile(
+        {
+          contents: Cypress.Buffer.from('file contents'),
+          fileName: 'file.pswd',
+          mimeType: 'application/octet-stream',
+          lastModified: Date.now(),
+        },
+        {
+          action: 'drag-drop',
+        }
+      );
 
-    cy.get('[data-cy=import-passwords-load-passwords]').click()
+    cy.get('[data-cy=import-passwords-load-passwords]').click();
     cy.get('[data-cy=import-passwords-save]').click();
 
     cy.get('[data-cy=closed-entry-title-item2]').should('exist');

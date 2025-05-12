@@ -42,7 +42,9 @@ export default function Tag({ title, icon, selected, onEdit, onRemove, id }: Tag
     <>
       <a className={selected ? styles.active : ''} data-cy={`tag-${title}`}>
         <div className={styles.tag_icon}>{IconSvg && <IconSvg width={34} fill={Colors.white} />}</div>
-        <span data-cy="tag-title-span" className={styles.nav_label}>{title}</span>
+        <span data-cy="tag-title-span" className={styles.nav_label}>
+          {title}
+        </span>
         <div className={showMoreControls} onClick={handleClickedMore}>
           <MoreIcon fill={Colors.white} width={24} />
         </div>

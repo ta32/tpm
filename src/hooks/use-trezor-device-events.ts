@@ -20,7 +20,7 @@ export function useTrezorDeviceEvents() {
           switch (event.payload.type) {
             case 'acquired':
               const device = getDevice(extractDeviceInfo(event.payload));
-              userDispatch({ type: 'ADD_DEVICE', device: device});
+              userDispatch({ type: 'ADD_DEVICE', device: device });
               break;
             case 'unacquired':
               const unacquiredDevice = getDevice(extractDeviceInfo(event.payload));
@@ -43,7 +43,7 @@ export function useTrezorDeviceEvents() {
   return isInitialized.current;
 }
 
-function extractDeviceInfo(payload: KnownDevice | UnknownDevice): { label: string, model: string, deviceId: string } {
+function extractDeviceInfo(payload: KnownDevice | UnknownDevice): { label: string; model: string; deviceId: string } {
   return {
     label: payload.label,
     model: payload.features?.model || '',

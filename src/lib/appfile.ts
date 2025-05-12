@@ -6,7 +6,10 @@ export async function appFileName(appDataSeed: string): Promise<string> {
   let fileNameSeed = appDataSeed.substring(0, appDataSeed.length / 2);
   const enc = new TextEncoder();
   const algorithm = { name: 'HMAC', hash: 'SHA-256' };
-  const fileNameKey = await crypto.subtle.importKey('raw', enc.encode(fileNameSeed), algorithm, false, ['sign', 'verify']);
+  const fileNameKey = await crypto.subtle.importKey('raw', enc.encode(fileNameSeed), algorithm, false, [
+    'sign',
+    'verify',
+  ]);
   const fileNameHash = await crypto.subtle.sign(algorithm.name, fileNameKey, enc.encode(FILENAME_MESS));
   const fileName = hexFromUint8Array(new Uint8Array(fileNameHash));
   return fileName + '.pswd';

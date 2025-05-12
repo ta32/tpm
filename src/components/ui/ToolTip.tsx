@@ -24,7 +24,9 @@ export default function ToolTip({ text, position, children, mode, active, width,
     <div>
       <div className={className} data-cy={dataCy}>
         {children}
-        <span style={{ width: widthStyle }} className={styles.tooltip_text}>{text}</span>
+        <span style={{ width: widthStyle }} className={styles.tooltip_text}>
+          {text}
+        </span>
       </div>
     </div>
   );

@@ -2,7 +2,8 @@ import { describe, expect } from '@jest/globals';
 import {
   AddEntry,
   getSafePasswordEntries,
-  PasswordEntries, PasswordEntriesAction,
+  PasswordEntries,
+  PasswordEntriesAction,
   passwordEntriesReducer,
   PasswordEntriesStatus,
   RemoveEntry,
@@ -22,7 +23,7 @@ const INITIAL_ENTRIES: PasswordEntries = {
   status: PasswordEntriesStatus.UNINITIALIZED,
   version: 0,
   lastError: '',
-}
+};
 
 function entry(num: number): SafePasswordEntry {
   return {
@@ -36,7 +37,7 @@ function entry(num: number): SafePasswordEntry {
     tags: [`tag${num}`],
     createdDate: 0,
     lastModifiedDate: 0,
-    legacyMode: false
+    legacyMode: false,
   };
 }
 
@@ -44,7 +45,7 @@ function callPasswordEntriesReducerWithSnapshots(state: PasswordEntries, action:
   const initialStateBefore = JSON.stringify(state);
   const actual = passwordEntriesReducer(state, action);
   const initialStateAfter = JSON.stringify(state);
-  return { initialStateBefore, actual, initialStateAfter}
+  return { initialStateBefore, actual, initialStateAfter };
 }
 
 describe('Get safe password entries', () => {
@@ -75,7 +76,10 @@ describe('Uploading and Synchronization', () => {
       version_uploaded: 3,
     };
 
-    const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+    const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+      initialState,
+      action
+    );
 
     const expectedUploadState: PasswordEntries = {
       version: 3,
@@ -108,7 +112,10 @@ describe('Uploading and Synchronization', () => {
       version: UPLOADED_VERSION,
     };
 
-    const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+    const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+      initialState,
+      action
+    );
 
     const expectedState: PasswordEntries = {
       ...initialState,
@@ -135,7 +142,10 @@ it('Adding new entry to loaded database', () => {
   mUniqueId.mockReturnValue('key2');
   mDateNow.mockReturnValue(0);
 
-  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+  const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+    initialState,
+    action
+  );
 
   const expectedState: PasswordEntries = {
     version: 1,
@@ -159,7 +169,10 @@ it('Should not add entry if database is not loaded', () => {
   const initialState: PasswordEntries = INITIAL_ENTRIES;
   const action: AddEntry = { type: 'ADD_ENTRY', entry: entry(1) };
 
-  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+  const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+    initialState,
+    action
+  );
 
   const expectedState: PasswordEntries = {
     entries: {},
@@ -185,7 +198,10 @@ it('Do not override entries if version is lower', () => {
   };
   const action: Sync = { type: 'SYNC', entries: [entry(1)], version: 0 };
 
-  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+  const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+    initialState,
+    action
+  );
 
   const expectedState: PasswordEntries = {
     version: 1,
@@ -210,7 +226,10 @@ it('Sync passwords from cloud action', () => {
     version: 1,
   };
 
-  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+  const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+    initialState,
+    action
+  );
 
   const expectedState: PasswordEntries = {
     version: 1,
@@ -247,7 +266,10 @@ it('Update entry test', () => {
     key: entry1.key,
   };
 
-  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+  const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+    initialState,
+    action
+  );
 
   const expectedState: PasswordEntries = {
     ...initialState,
@@ -255,7 +277,7 @@ it('Update entry test', () => {
     entries: {
       key1: { ...entry1, title: 'new title' },
       key2: entry2,
-    }
+    },
   };
 
   // noinspection DuplicatedCode
@@ -278,7 +300,10 @@ it('Entry is removed by key', () => {
   initialState.entries.key2 = entry2;
 
   const action: RemoveEntry = { type: 'REMOVE_ENTRY', key: entry1.key };
-  const {initialStateBefore, actual, initialStateAfter} = callPasswordEntriesReducerWithSnapshots(initialState, action);
+  const { initialStateBefore, actual, initialStateAfter } = callPasswordEntriesReducerWithSnapshots(
+    initialState,
+    action
+  );
 
   const expectedState: PasswordEntries = {
     ...initialState,

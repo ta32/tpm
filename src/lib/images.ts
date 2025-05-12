@@ -103,7 +103,7 @@ export class IMAGE_FILE {
   }
   public static getPaths(): string[] {
     return Object.values(IMAGE_FILE)
-      .filter(value => value instanceof IMAGE_FILE)
+      .filter((value) => value instanceof IMAGE_FILE)
       .map((imageFile: IMAGE_FILE) => imageFile.path());
   }
 }

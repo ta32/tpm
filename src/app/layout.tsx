@@ -19,16 +19,15 @@ const TREZOR_CONNECT_CONFIG = {
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
-})
+});
 
 export default function RootLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   useEffect(() => {
     if (!TREZOR_CONNECT_CONFIG.init) {
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
@@ -48,31 +47,29 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={inter.className}>
-    <head>
-      <meta charSet="utf-8" />
-      <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-      <meta
-        name="viewport"
-        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=2,user-scalable=yes"
-      />
-      <meta name="description" content="Description" />
-      <meta name="keywords" content="Keywords" />
-      <title>Temporary Password Manager</title>
-      <meta name="theme-color" content="#317EFB" />
-    </head>
-    <body>
-      <DependenciesContext.Provider value={defaultDeps}>
-        <LocationProvider>
-          <UserProvider>
-            <TagEntriesProvider>
-              <PasswordEntriesProvider>
-                {children}
-              </PasswordEntriesProvider>
-            </TagEntriesProvider>
-          </UserProvider>
-        </LocationProvider>
-      </DependenciesContext.Provider>
-    </body>
+      <head>
+        <meta charSet="utf-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+          name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=2,user-scalable=yes"
+        />
+        <meta name="description" content="Description" />
+        <meta name="keywords" content="Keywords" />
+        <title>Temporary Password Manager</title>
+        <meta name="theme-color" content="#317EFB" />
+      </head>
+      <body>
+        <DependenciesContext.Provider value={defaultDeps}>
+          <LocationProvider>
+            <UserProvider>
+              <TagEntriesProvider>
+                <PasswordEntriesProvider>{children}</PasswordEntriesProvider>
+              </TagEntriesProvider>
+            </UserProvider>
+          </LocationProvider>
+        </DependenciesContext.Provider>
+      </body>
     </html>
-  )
+  );
 }

@@ -14,7 +14,7 @@ export default function App() {
   const router = useRouter();
   const [location, _] = useLocation();
   const [userDispatch] = useUserDispatch();
-  const {search, codeVerifier} = useDropboxWindowOauthParams();
+  const { search, codeVerifier } = useDropboxWindowOauthParams();
   const dropboxStatus = useDropboxSession(search, codeVerifier);
   // Link Trezor events to user context
   useTrezorUiEvents();
@@ -32,13 +32,15 @@ export default function App() {
       console.error('APP_URI is undefined');
       return;
     }
-    getAuthUrl(APP_URL).then(({authUrl, codeVerifier}) => {
-      window.sessionStorage.clear();
-      window.sessionStorage.setItem('codeVerifier', codeVerifier);
-      window.location.href = authUrl as string;
-    }).catch((error) => {
-      console.error(error);
-    });
+    getAuthUrl(APP_URL)
+      .then(({ authUrl, codeVerifier }) => {
+        window.sessionStorage.clear();
+        window.sessionStorage.setItem('codeVerifier', codeVerifier);
+        window.location.href = authUrl as string;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleLogout = () => {
@@ -53,7 +55,7 @@ export default function App() {
         codeVerifier: codeVerifier,
       }}
       handleDropBoxSignIn={handleDropBoxSignIn}
-      handleLogout={handleLogout}>
-    </Home>
+      handleLogout={handleLogout}
+    ></Home>
   );
 }

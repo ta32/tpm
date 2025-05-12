@@ -20,6 +20,9 @@ public
 # all files starting with dot
 .*
 
+# Tauri src
+src-tauri
+
 # other files
 tsconfig.json
 jest.config.mjs

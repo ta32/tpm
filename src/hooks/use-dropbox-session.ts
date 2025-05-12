@@ -10,15 +10,20 @@ export enum DropboxSessionStatus {
   CONNECTED = 'CONNECTED',
 }
 
-export function useDropboxSession( locationSearch: string, codeVerifier: string | null): DropboxSessionStatus {
+export function useDropboxSession(locationSearch: string, codeVerifier: string | null): DropboxSessionStatus {
   const { dropbox } = useContext(DependenciesContext);
-  const {connectDropbox, hasRedirectedFromAuth} = dropbox();
+  const { connectDropbox, hasRedirectedFromAuth } = dropbox();
   const [user] = useUser();
   const [userDispatch] = useUserDispatch();
   const isConnected = useRef(false);
   const [status, setStatus] = useState(DropboxSessionStatus.NOT_CONNECTED);
   useEffect(() => {
-    if (user.status === UserStatus.OFFLINE && hasRedirectedFromAuth(locationSearch) && codeVerifier !== null && !isConnected.current) {
+    if (
+      user.status === UserStatus.OFFLINE &&
+      hasRedirectedFromAuth(locationSearch) &&
+      codeVerifier !== null &&
+      !isConnected.current
+    ) {
       setStatus(DropboxSessionStatus.CONNECTING);
       connectDropbox(APP_URL, codeVerifier, locationSearch)
         .then(({ dbc, name }) => {
@@ -29,10 +34,11 @@ export function useDropboxSession( locationSearch: string, codeVerifier: string 
           });
           setStatus(DropboxSessionStatus.CONNECTED);
           isConnected.current = true;
-        }).catch((error) => {
-        console.error(error);
-        window.sessionStorage.clear();
-      });
+        })
+        .catch((error) => {
+          console.error(error);
+          window.sessionStorage.clear();
+        });
     }
   }, [codeVerifier, locationSearch, user.status, userDispatch]);
   return status;

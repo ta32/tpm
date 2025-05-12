@@ -65,7 +65,13 @@ type UserDispatchContextType = [Dispatch<UserAction>];
 const UserContext = createContext<UserContextType | undefined>(undefined);
 const UserDispatchContext = createContext<UserDispatchContextType | undefined>(undefined);
 
-export function UserProvider({ children, initialUser = defaultInitialUser }: { children: React.ReactNode, initialUser?: User }) {
+export function UserProvider({
+  children,
+  initialUser = defaultInitialUser,
+}: {
+  children: React.ReactNode;
+  initialUser?: User;
+}) {
   const [user, userDispatch] = useReducer(userReducer, initialUser);
 
   return (

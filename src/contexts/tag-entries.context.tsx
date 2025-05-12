@@ -35,7 +35,13 @@ const defaultTagEntries: TagEntries = {
 const TagsContext = createContext<TagEntries | undefined>(undefined);
 const TagsDispatchContext = createContext<Dispatch<TagsAction> | undefined>(undefined);
 
-export function TagEntriesProvider({ children, initialTagEntries = defaultTagEntries }: { children: React.ReactNode, initialTagEntries?: TagEntries }) {
+export function TagEntriesProvider({
+  children,
+  initialTagEntries = defaultTagEntries,
+}: {
+  children: React.ReactNode;
+  initialTagEntries?: TagEntries;
+}) {
   const [tagEntries, dispatchTags] = useReducer(tagsReducer, initialTagEntries);
   return (
     <TagsContext.Provider value={tagEntries}>

@@ -20,14 +20,14 @@ export interface TrezorAppData {
   };
   tags: TrezorTags;
   entries: {
-    [key: string]: TrezorEntry
+    [key: string]: TrezorEntry;
   };
 }
 interface TrezorTags {
   [key: string]: {
     title: string;
     icon: string;
-  }
+  };
 }
 interface TrezorEntry {
   title: string;
@@ -60,7 +60,11 @@ export interface MergeAppData {
  * The title and the username are used to for the entryKey for decryption.
  * Decryption will fail with a different entryKey.
  */
-export function mergeAppData(appData: AppData, trezorAppData: TrezorAppData, getUniqueId: () => string = uniqueId ): MergeAppData {
+export function mergeAppData(
+  appData: AppData,
+  trezorAppData: TrezorAppData,
+  getUniqueId: () => string = uniqueId
+): MergeAppData {
   // Merge tags
   const newTags: TagEntry[] = [];
   const conflicts: SafePasswordEntry[] = [];
@@ -73,7 +77,7 @@ export function mergeAppData(appData: AppData, trezorAppData: TrezorAppData, get
       newTags.push({
         id: newId,
         title: tag.title,
-        icon:newIconName
+        icon: newIconName,
       });
     }
   }
@@ -95,7 +99,7 @@ export function mergeAppData(appData: AppData, trezorAppData: TrezorAppData, get
       legacyMode: true,
       createdDate: Date.now(),
       lastModifiedDate: Date.now(),
-    }
+    };
     if (!existingEntry) {
       passwordEntries.push(newEntry);
     } else {
@@ -107,7 +111,7 @@ export function mergeAppData(appData: AppData, trezorAppData: TrezorAppData, get
     passwordEntries,
     tags: newTags,
     conflicts,
-  }
+  };
 }
 
 export function fromState(passwordState: PasswordEntries, tagState: TagEntries, newVersion: number): AppData {
@@ -148,17 +152,16 @@ function deserializeWithTypedArrays<T>(data: string): T {
   });
 }
 
-function mapTagsToNewTagIds(entry: TrezorEntry, trezorTags: TrezorTags, allTags: TagEntry[]): string[]
-{
+function mapTagsToNewTagIds(entry: TrezorEntry, trezorTags: TrezorTags, allTags: TagEntry[]): string[] {
   let tagsIds: string[] = [];
   for (const tagId of entry.tags) {
     const oldTag = trezorTags[tagId];
     const tag = findTagIdByTitle(allTags, oldTag.title);
-    if(tag) {
+    if (tag) {
       tagsIds.push(tag.id);
     }
   }
-  return tagsIds
+  return tagsIds;
 }
 
 function findTagIdByTitle(allTags: TagEntry[], title: string): TagEntry | undefined {

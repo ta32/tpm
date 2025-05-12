@@ -12,15 +12,15 @@ export interface DropboxService {
   readAppFile: typeof readAppFile;
   saveAppFile: typeof saveAppFile;
 }
-export const dropboxServiceFactory  = () : DropboxService => {
+export const dropboxServiceFactory = (): DropboxService => {
   return {
     hasRedirectedFromAuth,
     connectDropbox,
     getAuthUrl,
     readAppFile,
     saveAppFile,
-  }
-}
+  };
+};
 
 export function hasRedirectedFromAuth(locationSearch: string): boolean {
   return locationSearch.includes('code=');
@@ -37,7 +37,11 @@ interface DropboxConnection {
   name: string;
 }
 
-export async function connectDropbox(redirectUri: string, codeVerifier: string, locationSearch: string): Promise<DropboxConnection> {
+export async function connectDropbox(
+  redirectUri: string,
+  codeVerifier: string,
+  locationSearch: string
+): Promise<DropboxConnection> {
   const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
   const code = getAuthCodeFromUrl(locationSearch);
   dbxAuth.setCodeVerifier(codeVerifier);
@@ -57,16 +61,18 @@ export async function connectDropbox(redirectUri: string, codeVerifier: string, 
   throw new Error('No access token');
 }
 
-export async function getAuthUrl(appUrl: string): Promise<{authUrl: string, codeVerifier: string}> {
+export async function getAuthUrl(appUrl: string): Promise<{ authUrl: string; codeVerifier: string }> {
   const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
   try {
-    const authUrlObj = await dbxAuth.getAuthenticationUrl(appUrl,
+    const authUrlObj = await dbxAuth.getAuthenticationUrl(
+      appUrl,
       undefined,
       'code',
       'offline',
       undefined,
       undefined,
-      true);
+      true
+    );
     const codeVerifier = dbxAuth.getCodeVerifier();
     window.sessionStorage.setItem('codeVerifier', codeVerifier);
     const authUrl = authUrlObj.toString();
@@ -130,8 +136,6 @@ export async function saveAppFile(dbc: Dropbox, data: Uint8Array, appFileName: s
       throw new Error(e);
     });
 }
-
-
 
 async function listFiles(dbc: Dropbox): Promise<string[]> {
   let response = await dbc.filesListFolder({ path: '' });

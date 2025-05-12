@@ -4,13 +4,12 @@ import { DropboxService } from 'lib/dropbox';
 import { User, UserStatus } from 'contexts/reducers/user.reducer';
 import { Dropbox, DropboxAuth } from 'dropbox';
 
-
 // region Object Builders
 export function withLoggedInUser(): User {
   return {
     status: UserStatus.ONLINE_WITH_TREZOR,
     dbc: Cypress.sinon.createStubInstance(Dropbox),
-    device:{
+    device: {
       label: 'trezor_device_label',
       appDataSeed: 'appDataSeed',
       appDataEncryptionKey: new Uint8Array(32),
@@ -19,7 +18,7 @@ export function withLoggedInUser(): User {
       path: 'path',
     },
     dropboxAccountName: 'test',
-  }
+  };
 }
 function withDefaultDeps(): Dependencies {
   return {
@@ -37,12 +36,12 @@ function withDefaultDeps(): Dependencies {
     }),
     dropbox: () => ({
       hasRedirectedFromAuth: cy.stub().returns(true),
-      connectDropbox: cy.stub().resolves({dbc: withLoggedInUser().dbc, name: withLoggedInUser().dropboxAccountName}),
+      connectDropbox: cy.stub().resolves({ dbc: withLoggedInUser().dbc, name: withLoggedInUser().dropboxAccountName }),
       getAuthUrl: cy.stub().resolves('authUrl'),
-      readAppFile: cy.stub().resolves({data: new Uint8Array(0), rev: 'rev', initialized: true}),
+      readAppFile: cy.stub().resolves({ data: new Uint8Array(0), rev: 'rev', initialized: true }),
       saveAppFile: cy.stub().resolves({}),
     }),
-  }
+  };
 }
 // endregion
 
@@ -50,7 +49,7 @@ function withDefaultDeps(): Dependencies {
 export function withStubDeps(): Dependencies {
   return {
     ...withDefaultDeps(),
-  }
+  };
 }
 
 export function withTrezorService(trezorService: Partial<TrezorService>): Dependencies {
@@ -60,7 +59,7 @@ export function withTrezorService(trezorService: Partial<TrezorService>): Depend
       ...withDefaultDeps().trezor(),
       ...trezorService,
     }),
-  }
+  };
 }
 
 export function withDropboxService(dropboxService: Partial<DropboxService>): Dependencies {
@@ -70,10 +69,13 @@ export function withDropboxService(dropboxService: Partial<DropboxService>): Dep
       ...withDefaultDeps().dropbox(),
       ...dropboxService,
     }),
-  }
+  };
 }
 
-export function withServices(trezorService: Partial<TrezorService>, dropboxService: Partial<DropboxService>): Dependencies {
+export function withServices(
+  trezorService: Partial<TrezorService>,
+  dropboxService: Partial<DropboxService>
+): Dependencies {
   return {
     ...withDefaultDeps(),
     trezor: () => ({
@@ -84,7 +86,7 @@ export function withServices(trezorService: Partial<TrezorService>, dropboxServi
       ...withDefaultDeps().dropbox(),
       ...dropboxService,
     }),
-  }
+  };
 }
 // endregion
 
@@ -95,17 +97,17 @@ export function withTrezorPasswordEntry(title: string, tags: string[]): any {
     username: 'username',
     password: {
       type: 'Buffer',
-      data: [1,2,3]
+      data: [1, 2, 3],
     },
     nonce: 'abc',
     tags: tags,
     safe_note: {
       type: 'Buffer',
-      data: [1,2,3]
+      data: [1, 2, 3],
     },
     note: '',
     success: false,
-    export: false
+    export: false,
   };
 }
 // endregion

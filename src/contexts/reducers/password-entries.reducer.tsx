@@ -101,14 +101,20 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
       }
       if (state.status === PasswordEntriesStatus.SYNCED) {
         return {
-          ...state
-        }
+          ...state,
+        };
       }
       // internal error
       return {
         ...state,
         status: PasswordEntriesStatus.ERROR,
-        lastError: 'Synced called when state is: ' + state.status + ' action version is: ' + action.version + ' state version is: ' + state.version,
+        lastError:
+          'Synced called when state is: ' +
+          state.status +
+          ' action version is: ' +
+          action.version +
+          ' state version is: ' +
+          state.version,
       };
     }
     case 'ADD_ENTRY': {
@@ -125,7 +131,7 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
         ...action.entry,
         key: nextKey,
         createdDate: Date.now(),
-        lastModifiedDate: Date.now()
+        lastModifiedDate: Date.now(),
       };
       return { ...newEntries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }

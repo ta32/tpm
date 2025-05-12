@@ -1,15 +1,17 @@
 import { expect } from '@jest/globals';
 import {
-  AddTag, BulkAddTags,
+  AddTag,
+  BulkAddTags,
   getTags,
   getTagTitle,
   RemoveTag,
-  SyncTags, TagEntries, TagsAction,
+  SyncTags,
+  TagEntries,
+  TagsAction,
   tagsReducer,
   TagsStatus,
   UpdateTag,
 } from './tag-entries.reducer';
-
 
 const INITIAL_TAGS = {
   entries: {
@@ -46,7 +48,7 @@ it('use default tags if no tags are synced from the app data', () => {
     tags: undefined,
   };
 
-  let {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(INITIAL_TAGS, syncTagsEmpty);
+  let { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(INITIAL_TAGS, syncTagsEmpty);
 
   expect(actualTags.status).toEqual(TagsStatus.SYNCED);
   expect(stateBefore).toEqual(stateAfter);
@@ -59,9 +61,9 @@ it('cannot add duplicate tags', () => {
     icon: 'Bitcoin',
   };
 
-  const syncedTags = {...INITIAL_TAGS, status: TagsStatus.SYNCED };
+  const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.SYNCED };
 
-  let {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, addTag);
+  let { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, addTag);
 
   expect(actualTags.status).toEqual(TagsStatus.ERROR);
   expect(stateBefore).toEqual(stateAfter);
@@ -76,13 +78,13 @@ it('cannot add duplicate tags', () => {
   const {
     stateBefore: stateBefore2,
     actualTags: actualTags2,
-    stateAfter: stateAfter2
+    stateAfter: stateAfter2,
   } = callTagsReducerWithSnapshots(actualTags, addTag2);
 
   //const
 
   expect(actualTags2.status).toEqual(TagsStatus.SAVE_REQUIRED);
-  expect(stateAfter2).toEqual(stateBefore2)
+  expect(stateAfter2).toEqual(stateBefore2);
 });
 
 it('cannot add tags if state is not synced', () => {
@@ -92,7 +94,7 @@ it('cannot add tags if state is not synced', () => {
     icon: 'Ethernet',
   };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(INITIAL_TAGS, addTag);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(INITIAL_TAGS, addTag);
 
   expect(actualTags.status).toEqual(TagsStatus.UNINITIALIZED);
   expect(stateBefore).toEqual(stateAfter);
@@ -106,7 +108,7 @@ it('remove tag', () => {
 
   const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.SYNCED };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, removeTag);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, removeTag);
 
   expect(actualTags.status).toEqual(TagsStatus.SAVE_REQUIRED);
   expect(actualTags.entries['bitcoin']).toBeUndefined();
@@ -161,7 +163,7 @@ it('update tag', () => {
 
   const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.SYNCED };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, updateTag);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, updateTag);
 
   expect(actualTags.status).toEqual(TagsStatus.SAVE_REQUIRED);
   expect(stateBefore).toEqual(stateAfter);
@@ -179,7 +181,7 @@ it('should not be able to update tag if the new value conflicts with an existing
   };
   const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.SYNCED };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, updateTag);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, updateTag);
 
   expect(stateBefore).toEqual(stateAfter);
   expect(actualTags.status).toEqual(TagsStatus.ERROR);
@@ -194,7 +196,7 @@ it('should be able to update the icon of the same tag', () => {
   };
   const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.SYNCED };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, updateTagIcon);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, updateTagIcon);
 
   expect(stateBefore).toEqual(stateAfter);
   expect(actualTags.status).toEqual(TagsStatus.SAVE_REQUIRED);
@@ -230,9 +232,9 @@ it('add tag after error', () => {
 
   const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.ERROR };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, addTag);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, addTag);
 
-  expect(stateAfter).toEqual(stateBefore)
+  expect(stateAfter).toEqual(stateBefore);
   expect(actualTags.status).toEqual(TagsStatus.ERROR);
 
   const addTag2: AddTag = {
@@ -259,9 +261,9 @@ it('bulk add new tags will append to the existing tags', () => {
 
   const syncedTags = { ...INITIAL_TAGS, status: TagsStatus.SYNCED };
 
-  const {stateBefore, actualTags, stateAfter} = callTagsReducerWithSnapshots(syncedTags, bulkAddTags);
+  const { stateBefore, actualTags, stateAfter } = callTagsReducerWithSnapshots(syncedTags, bulkAddTags);
 
-  expect(stateAfter).toEqual(stateBefore)
+  expect(stateAfter).toEqual(stateBefore);
   expect(Object.entries(actualTags.entries).length).toEqual(4);
   expect(actualTags.status).toEqual(TagsStatus.SAVE_REQUIRED);
-})
+});

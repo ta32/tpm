@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
 export function useDropboxWindowOauthParams() {
-  const [search, setSearch] = useState("");
-  const [codeVerifier, setCodeVerifier] = useState<string|null>("");
+  const [search, setSearch] = useState('');
+  const [codeVerifier, setCodeVerifier] = useState<string | null>('');
 
   useEffect(() => {
     const locationSearch = window.location.search;
