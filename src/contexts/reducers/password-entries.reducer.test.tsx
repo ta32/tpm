@@ -48,7 +48,7 @@ function callPasswordEntriesReducerWithSnapshots(state: PasswordEntries, action:
 }
 
 describe('Get safe password entries', () => {
-  test('Get safe password entries', () => {
+  it('Get safe password entries', () => {
     let initialState: PasswordEntries = INITIAL_ENTRIES;
     initialState.entries.key1 = entry(1);
     initialState.entries.key2 = entry(2);
@@ -60,7 +60,7 @@ describe('Get safe password entries', () => {
 });
 
 describe('Uploading and Synchronization', () => {
-  test('Uploading entries sets state to un-synced', () => {
+  it('Uploading entries sets state to un-synced', () => {
     const initialState: PasswordEntries = {
       ...INITIAL_ENTRIES,
       entries: {
@@ -91,7 +91,7 @@ describe('Uploading and Synchronization', () => {
     expect(initialStateBefore).toEqual(initialStateAfter);
   });
 
-  test('Passwords must be re-synced after uploading', () => {
+  it('Passwords must be re-synced after uploading', () => {
     const UPLOADED_VERSION = 2;
     const initialState: PasswordEntries = {
       ...INITIAL_ENTRIES,
@@ -122,7 +122,7 @@ describe('Uploading and Synchronization', () => {
   });
 });
 
-test('Adding new entry to loaded database', () => {
+it('Adding new entry to loaded database', () => {
   let initialState: PasswordEntries = {
     ...INITIAL_ENTRIES,
     version: 1,
@@ -155,7 +155,7 @@ test('Adding new entry to loaded database', () => {
   expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
-test('Should not add entry if database is not loaded', () => {
+it('Should not add entry if database is not loaded', () => {
   const initialState: PasswordEntries = INITIAL_ENTRIES;
   const action: AddEntry = { type: 'ADD_ENTRY', entry: entry(1) };
 
@@ -173,7 +173,7 @@ test('Should not add entry if database is not loaded', () => {
   expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
-test('Do not override entries if version is lower', () => {
+it('Do not override entries if version is lower', () => {
   const initialState: PasswordEntries = {
     ...INITIAL_ENTRIES,
     entries: {
@@ -202,7 +202,7 @@ test('Do not override entries if version is lower', () => {
   expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
-test('Sync passwords from cloud action', () => {
+it('Sync passwords from cloud action', () => {
   const initialState: PasswordEntries = INITIAL_ENTRIES;
   const action: Sync = {
     type: 'SYNC',
@@ -230,7 +230,7 @@ test('Sync passwords from cloud action', () => {
   expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
-test('Update entry test', () => {
+it('Update entry test', () => {
   const initialState: PasswordEntries = {
     ...INITIAL_ENTRIES,
     version: 1,
@@ -266,7 +266,7 @@ test('Update entry test', () => {
   expect(initialStateBefore).toEqual(initialStateAfter);
 });
 
-test('Entry is removed by key', () => {
+it('Entry is removed by key', () => {
   const initialState: PasswordEntries = {
     ...INITIAL_ENTRIES,
     version: 1,

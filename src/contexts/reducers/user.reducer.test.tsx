@@ -15,8 +15,7 @@ describe('User state transitions that results in the dashboard component being r
 
   const mockDropbox = new Dropbox();
 
-  test('User state transitions that results in the dashboard component being rendered', () => {
-    // TODO break this into separate tests
+  it('User state transitions that results in the dashboard component being rendered', () => {
     const dropBoxUserLoggedIn: DropboxUserLoggedIn = {
       type: 'DROPBOX_USER_LOGGED_IN',
       userName: 'test',
