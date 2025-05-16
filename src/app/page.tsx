@@ -15,7 +15,7 @@ export default function App() {
   const [location, _] = useLocation();
   const [userDispatch] = useUserDispatch();
   const { search, codeVerifier } = useDropboxWindowOauthParams();
-  const dropboxStatus = useDropboxSession(search, codeVerifier);
+  const dropboxStatus = useDropboxSession(search, DROPBOX_CLIENT_ID, codeVerifier, );
   // Link Trezor events to user context
   useTrezorUiEvents();
   // Link Trezor device events to user context
@@ -36,7 +36,7 @@ export default function App() {
       console.error('APP_URI is undefined');
       return;
     }
-    getAuthUrl(APP_URL)
+    getAuthUrl(APP_URL, DROPBOX_CLIENT_ID)
       .then(({ authUrl, codeVerifier }) => {
         window.sessionStorage.clear();
         window.sessionStorage.setItem('codeVerifier', codeVerifier);

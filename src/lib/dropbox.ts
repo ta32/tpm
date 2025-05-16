@@ -37,9 +37,10 @@ interface DropboxConnection {
 export async function connectDropbox(
   redirectUri: string,
   codeVerifier: string,
-  locationSearch: string
+  locationSearch: string,
+  clientId: string
 ): Promise<DropboxConnection> {
-  const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
+  const dbxAuth = new DropboxAuth({ clientId });
   const code = getAuthCodeFromUrl(locationSearch);
   dbxAuth.setCodeVerifier(codeVerifier);
   let response: DropboxResponse<any>;
@@ -58,8 +59,8 @@ export async function connectDropbox(
   throw new Error('No access token');
 }
 
-export async function getAuthUrl(appUrl: string): Promise<{ authUrl: string; codeVerifier: string }> {
-  const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
+export async function getAuthUrl(appUrl: string, clientId: string): Promise<{ authUrl: string; codeVerifier: string }> {
+  const dbxAuth = new DropboxAuth({ clientId });
   try {
     const authUrlObj = await dbxAuth.getAuthenticationUrl(
       appUrl,

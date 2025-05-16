@@ -12,6 +12,7 @@ import { DependenciesContext } from 'contexts/deps.context';
 import TrezorConnect, { UI } from '@trezor/connect-web';
 import { Routes, useLocation } from 'contexts/location.context';
 import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-session';
+import { DROPBOX_CLIENT_ID } from 'lib/constants';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
@@ -33,7 +34,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
   const [userDispatch] = useUserDispatch();
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
   const { urlSearch, codeVerifier } = dropboxArgs;
-  const dropboxStatus = useDropboxSession(urlSearch, codeVerifier);
+  const dropboxStatus = useDropboxSession(urlSearch, DROPBOX_CLIENT_ID, codeVerifier);
 
   const { getEncryptionKey } = trezor();
   const handleShowLogoutUrl = () => {
