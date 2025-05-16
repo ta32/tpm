@@ -2,9 +2,6 @@ import { Dropbox, DropboxAuth, DropboxResponse, files } from 'dropbox';
 import { appFileName } from './appfile';
 import { readBlob } from './utils';
 
-// App key from dropbox app console. This is not secret.
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
-
 export interface DropboxService {
   hasRedirectedFromAuth: typeof hasRedirectedFromAuth;
   connectDropbox: typeof connectDropbox;

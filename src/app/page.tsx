@@ -5,7 +5,7 @@ import Home from 'components/app/Home';
 import { useUserDispatch } from 'contexts/user.context';
 import { useRouter } from 'next/navigation';
 import { Routes, useLocation } from 'contexts/location.context';
-import { APP_URL } from 'lib/constants';
+import { APP_URL, DROPBOX_CLIENT_ID } from 'lib/constants';
 import { useTrezorUiEvents } from 'hooks/use-trezor-ui-events';
 import { useTrezorDeviceEvents } from 'hooks/use-trezor-device-events';
 import { useDropboxSession } from 'hooks/use-dropbox-session';
@@ -28,6 +28,10 @@ export default function App() {
   }, [location, router]);
 
   const handleDropBoxSignIn = () => {
+    if (DROPBOX_CLIENT_ID === undefined) {
+      console.error('DROPBOX_CLIENT_ID is undefined');
+      return;
+    }
     if (APP_URL === undefined) {
       console.error('APP_URI is undefined');
       return;
