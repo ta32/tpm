@@ -59,6 +59,7 @@ export default function EntryInput({
   const renderInput = (mandatory: boolean) => {
     const inputElement = (
       <input
+        data-cy={`input-${name.toLowerCase()}`}
         autoComplete="off"
         autoCorrect="off"
         name={name}

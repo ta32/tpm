@@ -43,6 +43,22 @@ function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry 
   };
 }
 
+function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePasswordEntry {
+  return {
+    key: clearEntry.key,
+    item: clearEntry.item,
+    title: clearEntry.title,
+    username: clearEntry.username,
+    passwordEnc: new Uint8Array([1]), // dummy data, real encryption is not needed for tests
+    secretNoteEnc: new Uint8Array([1]), // dummy data, real encryption is not needed for tests
+    safeKey: 'safeKey-' + clearEntry.key,
+    tags: clearEntry.tags,
+    createdDate: clearEntry.createdDate,
+    lastModifiedDate: clearEntry.lastModifiedDate,
+    legacyMode: false, // default to false for new entries
+  }
+}
+
 function withInitialTagEntries(): TagEntries {
   return {
     status: TagsStatus.UNINITIALIZED,
@@ -157,7 +173,6 @@ describe('Password Manager Page Tests', () => {
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
     };
-    // {data: new Uint8Array(0), rev: 'rev', initialized: true}
     // trezor password manager has not been used so no dropbox file exists
     const dropboxService = {
       readAppFile: cy.stub().resolves({ data: undefined, rev: '', initialized: false }),
@@ -196,11 +211,9 @@ describe('Password Manager Page Tests', () => {
     const neverResolvingPromise = new Promise(() => {});
 
     // using a never resolving promise otherwise test will exit early
-    const clearEntry = null;
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
-      decryptFullEntry: cy
-        .stub()
+      decryptFullEntry: cy.stub()
         .withArgs(newEntry, false)
         .returns(neverResolvingPromise)
         .withArgs(legacyEntry, true)
@@ -324,5 +337,48 @@ describe('Password Manager Page Tests', () => {
     // apply tag filter for item2 (tag1)
     cy.get('[data-cy=tag-Tag1]').click();
     cy.get('[data-cy=closed-entry-title-item2]').should('exist');
+  });
+
+  it('adding new password to password manager', () => {
+    const user = withLoggedInUser();
+    const tagEntries = withInitialTagEntries();
+    // empty app data
+    const appData: AppData = {
+      entries: [],
+      version: 1,
+      tags: Object.values(withInitialTagEntries().entries),
+      modelVersion: 1,
+    };
+    const trezorService = {
+      decryptAppData: cy.stub().resolves(appData),
+      encryptFullEntry: cy.stub().callsFake((entry: ClearPasswordEntry) => {
+        const safeEntry = withSafePasswordEntryFrom(entry);
+      return Promise.resolve(safeEntry);
+    }),
+      encryptAppData: cy.stub().callsFake((newAppData: AppData, encryptionKey: Uint8Array) => {
+        Object.assign(appData, newAppData);
+        return Promise.resolve(new Uint8Array(32));
+      }),
+    };
+    const customDeps = withTrezorService(trezorService);
+    cy.viewport(1920, 1080);
+    cy.mount(
+      <DashboardPageWrapper initialUser={user} deps={customDeps}>
+        <PasswordManager />
+      </DashboardPageWrapper>
+    ).then(() => {
+      // debugger;
+    });
+    cy.get('[data-cy=password-table-add-entry]').click();
+
+    // item is mandatory and title should be filled if its empty
+    cy.get('[data-cy=input-item]').type('item1');
+    cy.get('[data-cy=input-username]').type('username1');
+    cy.get('[data-cy=submit-password-entry]').click();
+
+    // title should be filled with item1 (if title is empty)
+    // should find closed entry with title item1
+    cy.get('[data-cy=closed-entry-title-item1]').should('exist');
+
   });
 });

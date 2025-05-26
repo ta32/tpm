@@ -1,5 +1,5 @@
-import { getSafePasswordEntries, PasswordEntries } from '../contexts/reducers/password-entries.reducer';
-import { getTags, TagEntries, TagEntry } from '../contexts/reducers/tag-entries.reducer';
+import { getSafePasswordEntries, PasswordEntries } from 'contexts/reducers/password-entries.reducer';
+import { getTags, TagEntries, TagEntry } from 'contexts/reducers/tag-entries.reducer';
 import { SafePasswordEntry } from './trezor';
 import { uniqueId } from './utils';
 import { FROM_TREZOR_ICON_KEY_TO_TAG_NAME, TAG_SOCIAL } from './images';

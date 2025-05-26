@@ -93,6 +93,7 @@ export async function initTrezor(appUrl: string, trustedHost: boolean) {
     debug: false,
     popup: !trustedHost,
     lazyLoad: false,
+    coreMode: "iframe",
     manifest: {
       email: 'test@gmail.com',
       appUrl: appUrl,

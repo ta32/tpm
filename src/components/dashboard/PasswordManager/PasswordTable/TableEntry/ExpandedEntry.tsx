@@ -114,7 +114,7 @@ export default function ExpandedEntry({
             mandatory={true}
             invalid={itemMissing}
           />
-          <EntryInput name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
+          <EntryInput data-cy={"password-entry-title-input"} name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
           <EntryInput
             name="username"
             label={'Username'}
@@ -152,7 +152,7 @@ export default function ExpandedEntry({
         </div>
         {changed && (
           <div className={styles.account_info_controls}>
-            <button type="submit" disabled={saving} className={styles.save_btn}>
+            <button data-cy={"submit-password-entry"} type="submit" disabled={saving} className={styles.save_btn}>
               {saving ? 'Saving' : 'Save'}
             </button>
             <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>

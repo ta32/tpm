@@ -218,7 +218,7 @@ export default function PasswordTable({
       />
       <div className={styles.start_bar}>
         <div className={styles.col1}>
-          <button onClick={handleAddEntry} className={styles.add_btn}>
+          <button data-cy={'password-table-add-entry'} onClick={handleAddEntry} className={styles.add_btn}>
             Add entry
           </button>
           <div className={styles.filter_container}>
