@@ -11,7 +11,7 @@ import { PasswordEntriesProvider } from 'contexts/password-entries.context';
 import { LocationProvider } from 'contexts/location.context';
 import { Dependencies, DependenciesContext } from 'contexts/deps.context';
 import { AppData, TrezorAppData } from 'lib/storage';
-import { ClearPasswordEntry, SafePasswordEntry } from 'lib/trezor';
+import { ClearPasswordEntry, SafePasswordEntry, TrezorService } from 'lib/trezor';
 import { TagEntries, TagEntry, TagsStatus } from 'contexts/reducers/tag-entries.reducer';
 import { withLoggedInUser, withServices, withTrezorPasswordEntry, withTrezorService } from 'lib/mocks';
 
@@ -120,6 +120,29 @@ function DashboardPageWrapper({ deps, initialUser, initialTags, children }: Dash
   );
 }
 // endregion
+
+function withTrezorServiceFakedEncryptionAndDecryption(entries: SafePasswordEntry[]): Partial<TrezorService> {
+  const appData: AppData = {
+    entries: entries,
+    version: 1,
+    tags: Object.values(withInitialTagEntries().entries),
+    modelVersion: 1,
+  };
+  return {
+    decryptAppData: cy.stub().resolves(appData),
+    encryptFullEntry: cy.stub().callsFake((entry: ClearPasswordEntry) => {
+      const safeEntry = withSafePasswordEntryFrom(entry);
+      return Promise.resolve(safeEntry);
+    }),
+    decryptFullEntry: cy.stub().callsFake((safeEntry: SafePasswordEntry, legacy: boolean) => {
+      return Promise.resolve(withClearPasswordEntry(safeEntry));
+    }),
+    encryptAppData: cy.stub().callsFake((newAppData: AppData, encryptionKey: Uint8Array) => {
+      Object.assign(appData, newAppData);
+      return Promise.resolve(new Uint8Array(32));
+    }),
+  };
+}
 
 describe('Password Manager Page Tests', () => {
   beforeEach(() => {
@@ -343,23 +366,7 @@ describe('Password Manager Page Tests', () => {
     const user = withLoggedInUser();
     const tagEntries = withInitialTagEntries();
     // empty app data
-    const appData: AppData = {
-      entries: [],
-      version: 1,
-      tags: Object.values(withInitialTagEntries().entries),
-      modelVersion: 1,
-    };
-    const trezorService = {
-      decryptAppData: cy.stub().resolves(appData),
-      encryptFullEntry: cy.stub().callsFake((entry: ClearPasswordEntry) => {
-        const safeEntry = withSafePasswordEntryFrom(entry);
-      return Promise.resolve(safeEntry);
-    }),
-      encryptAppData: cy.stub().callsFake((newAppData: AppData, encryptionKey: Uint8Array) => {
-        Object.assign(appData, newAppData);
-        return Promise.resolve(new Uint8Array(32));
-      }),
-    };
+    const trezorService = withTrezorServiceFakedEncryptionAndDecryption([]);
     const customDeps = withTrezorService(trezorService);
     cy.viewport(1920, 1080);
     cy.mount(
@@ -379,6 +386,39 @@ describe('Password Manager Page Tests', () => {
     // title should be filled with item1 (if title is empty)
     // should find closed entry with title item1
     cy.get('[data-cy=closed-entry-title-item1]').should('exist');
-
   });
+
+  it('editing an existing password in the password manager', () => {
+    const user = withLoggedInUser();
+    const tagEntries = withInitialTagEntries();
+    // empty app data
+    const entryOne = withSafePasswordEntry(1, false)
+    const entryOneTitle = entryOne.title;
+
+    const trezorService = withTrezorServiceFakedEncryptionAndDecryption([entryOne]);
+
+    const customDeps = withTrezorService(trezorService);
+
+    cy.viewport(1920, 1080);
+    cy.mount(
+      <DashboardPageWrapper initialUser={user} deps={customDeps}>
+        <PasswordManager />
+      </DashboardPageWrapper>
+    ).then(() => {
+      // debugger;
+    });
+    cy.get(`[data-cy=closed-entry-title-${entryOneTitle}]`).should('exist');
+
+    // cypress doesn't support hover so we need to click a hidden button
+    cy.get(`[data-cy=closed-entry-edit-button-${entryOneTitle}]`).click({force: true});
+
+    cy.get('[data-cy=input-title]').type('-changed');
+
+    cy.get('[data-cy=submit-password-entry')
+      .should('contain.text', 'Save')
+      .click();
+
+    cy.get(`[data-cy=closed-entry-title-${entryOneTitle}-changed]`).should('exist');
+
+  })
 });
