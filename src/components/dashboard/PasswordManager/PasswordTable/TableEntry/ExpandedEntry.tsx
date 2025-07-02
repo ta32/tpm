@@ -96,6 +96,7 @@ export default function ExpandedEntry({
     <>
       {entry?.title && (
         <DeleteModal
+          data-cy={"delete-modal"}
           entryName={entry.title}
           show={showDeleteModal}
           submitCallback={handleRemoveEntryConfirm}
@@ -142,7 +143,7 @@ export default function ExpandedEntry({
             <div className={styles.layout}>
               <div className={styles.container}>
                 <label className={styles.label}>Actions</label>
-                <button className={styles.remove_button} onClick={handleRemoveEntry} type="button">
+                <button data-cy={"expanded-entry-remove-password"} className={styles.remove_button} onClick={handleRemoveEntry} type="button">
                   <DeleteIcon className={styles.delete_icon} width={15}></DeleteIcon>
                   <span>REMOVE ENTRY</span>
                 </button>

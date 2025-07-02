@@ -421,4 +421,39 @@ describe('Password Manager Page Tests', () => {
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}-changed]`).should('exist');
 
   })
+
+  it('able to delete an existing password in the password manager', () => {
+    const user = withLoggedInUser();
+    const tagEntries = withInitialTagEntries();
+    // empty app data
+    const entryOne = withSafePasswordEntry(1, false)
+    const entryTwo = withSafePasswordEntry(2, false);
+    const entryOneTitle = entryOne.title;
+    const entryTwoTitle = entryTwo.title;
+
+    const trezorService = withTrezorServiceFakedEncryptionAndDecryption([entryOne, entryTwo]);
+    const customDeps = withTrezorService(trezorService);
+
+    cy.viewport(1920, 1080);
+    cy.mount(
+      <DashboardPageWrapper initialUser={user} deps={customDeps}>
+        <PasswordManager />
+      </DashboardPageWrapper>
+    ).then(() => {
+      // debugger;
+    });
+    cy.get(`[data-cy=closed-entry-title-${entryTwoTitle}]`).should('exist');
+
+    // cypress doesn't support hover so we need to click a hidden button
+    cy.get(`[data-cy=closed-entry-edit-button-${entryTwoTitle}]`).click({force: true});
+
+    cy.get('[data-cy=expanded-entry-remove-password]').should('exist');
+    cy.get('[data-cy=expanded-entry-remove-password]').click();
+
+    cy.get('[data-cy=delete-modal]').should('exist');
+    cy.get('[data-cy=delete-confirmation]').click();
+
+    cy.get(`[data-cy=closed-entry-title-${entryTwoTitle}]`).should('not.exist');
+    cy.get(`[data-cy=closed-entry-title-${entryOneTitle}]`).should('exist');
+  })
 });
