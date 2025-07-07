@@ -59,6 +59,7 @@ export default function EntryInput({
   const renderInput = (mandatory: boolean) => {
     const inputElement = (
       <input
+        data-cy={`input-${name.toLowerCase()}`}
         autoComplete="off"
         autoCorrect="off"
         name={name}
@@ -96,12 +97,12 @@ export default function EntryInput({
       </div>
       {type === 'password' && (
         <div className={styles.container_row_no_wrap}>
-          <ToolTip text={"Show password"} position={'top'} width={'150px'}>
+          <ToolTip text={'Show password'} position={'top'} width={'150px'}>
             <button type={'button'} className={styles.control_btn} onClick={handleToggleShowPassword}>
               <VisibilityIcon fill={Colors.black} />
             </button>
           </ToolTip>
-          <ToolTip text={"Generate password"} position={'top'} width={'150px'}>
+          <ToolTip text={'Generate password'} position={'top'} width={'150px'}>
             <button type={'button'} className={styles.control_btn} onClick={handleGeneratePassword}>
               <RefreshIcon fill={Colors.black} />
             </button>

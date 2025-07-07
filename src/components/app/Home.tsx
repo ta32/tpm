@@ -11,23 +11,32 @@ import { useUser, useUserDispatch } from 'contexts/user.context';
 import { DependenciesContext } from 'contexts/deps.context';
 import TrezorConnect, { UI } from '@trezor/connect-web';
 import { Routes, useLocation } from 'contexts/location.context';
+import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-session';
+import { DROPBOX_CLIENT_ID } from 'lib/constants';
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
+interface DropBoxArgs {
+  urlSearch: string;
+  codeVerifier: string | null;
+}
+
 interface HomeProps {
-  initialLoadingStatus: boolean;
+  dropboxArgs: DropBoxArgs;
   handleDropBoxSignIn: () => void;
   handleLogout: () => void;
 }
-export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleLogout}: HomeProps) {
+export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }: HomeProps) {
   const { trezor } = useContext(DependenciesContext);
   const [loading, setLoading] = useState(false);
   const [user] = useUser();
-  const [_,setLocation] = useLocation();
+  const [_, setLocation] = useLocation();
   const [userDispatch] = useUserDispatch();
   const [showLogoutUrl, setShowLogoutUrl] = useState(false);
+  const { urlSearch, codeVerifier } = dropboxArgs;
+  const dropboxStatus = useDropboxSession(urlSearch, DROPBOX_CLIENT_ID, codeVerifier);
 
-  const {getEncryptionKey } = trezor();
+  const { getEncryptionKey } = trezor();
   const handleShowLogoutUrl = () => {
     setShowLogoutUrl(!showLogoutUrl);
   };
@@ -40,7 +49,7 @@ export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleL
   const onClickDropboxSignIn = () => {
     setLoading(true);
     handleDropBoxSignIn();
-  }
+  };
 
   const openDevice = () => {
     if (user.device === null) {
@@ -80,7 +89,7 @@ export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleL
         <div className={styles.dropbox_user}>
           <span className={styles.dropbox_user}>Signed in as</span>
           <h3 className={styles.dropbox_user}>
-            <b data-cy={"dropbox-account-name"}>{user.dropboxAccountName}</b>
+            <b data-cy={'dropbox-account-name'}>{user.dropboxAccountName}</b>
           </h3>
           <span className={styles.connect_trezor}>
             <Image src={IMAGE_FILE.CONNECT_TREZOR.path()} alt={'trezor-disconnected'} width={20} height={45} />
@@ -117,6 +126,7 @@ export default function Home({initialLoadingStatus, handleDropBoxSignIn, handleL
       </div>
     );
   };
+  const initialLoadingStatus = dropboxStatus !== DropboxSessionStatus.NOT_CONNECTED;
   const redirectedFromOauthAndLoading = initialLoadingStatus && user.status == UserStatus.OFFLINE;
   const renderContent = () => {
     if (loading || redirectedFromOauthAndLoading) {

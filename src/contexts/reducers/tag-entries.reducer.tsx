@@ -3,9 +3,16 @@
 import { uniqueId } from 'lib/utils';
 
 export interface TagEntries {
-  [key: string]: TagEntry | string | TagsStatus;
+  entries: Record<string, TagEntry>;
   status: TagsStatus;
   lastError: string;
+}
+
+function structuredClone(state: TagEntries): TagEntries {
+  return {
+    ...state,
+    entries: { ...state.entries },
+  };
 }
 
 export enum TagsStatus {
@@ -68,7 +75,7 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
           lastError: 'Cannot add until new tag is saved',
         };
       }
-      const newEntries = { ...state };
+      const newEntries = structuredClone(state);
       const tagId = uniqueId();
       if (titleExists(state, action.title)) {
         return {
@@ -86,7 +93,7 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
       }
       newEntries.status = TagsStatus.SAVE_REQUIRED;
       newEntries.lastError = '';
-      newEntries[tagId] = { title: action.title, icon: action.icon, id: tagId };
+      newEntries.entries[tagId] = { title: action.title, icon: action.icon, id: tagId };
       return newEntries;
     }
     case 'REMOVE_TAG': {
@@ -98,7 +105,7 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
         };
       }
       const tagId = action.tagId;
-      if (state[tagId] === undefined) {
+      if (state.entries[tagId] === undefined) {
         return {
           ...state,
           status: TagsStatus.ERROR,
@@ -106,13 +113,14 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
         };
       }
       const newEntries: TagEntries = {
+        entries: {},
         status: TagsStatus.SAVE_REQUIRED,
         lastError: '',
       };
       const tags = getTags(state);
       const tagsWithoutRemoved = tags.filter((tag) => tag.id !== tagId);
       for (const tag of tagsWithoutRemoved) {
-        newEntries[tag.id] = tag;
+        newEntries.entries[tag.id] = tag;
       }
       return newEntries;
     }
@@ -124,9 +132,9 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
           lastError: 'Cannot add until new tag is saved',
         };
       }
-      const newEntries = { ...state };
+      const newEntries = structuredClone(state);
       const oldTagId = action.tagId;
-      if (newEntries[oldTagId] === undefined) {
+      if (newEntries.entries[oldTagId] === undefined) {
         return {
           ...state,
           status: TagsStatus.ERROR,
@@ -141,8 +149,8 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
         };
       }
       newEntries.status = TagsStatus.SAVE_REQUIRED;
-      newEntries[action.tagId] = {
-        ...(newEntries[oldTagId] as TagEntry),
+      newEntries.entries[action.tagId] = {
+        ...newEntries.entries[oldTagId],
         title: action.title,
         icon: action.icon,
       };
@@ -157,13 +165,13 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
         return { ...state, status: TagsStatus.SYNCED };
       }
       const newTagEntries: TagEntries = {
-        ...state,
+        ...structuredClone(state),
         status: TagsStatus.SYNCED,
         lastError: '',
       };
       for (const tag of tags) {
         const tagId = tag.id;
-        newTagEntries[tagId] = tag;
+        newTagEntries.entries[tagId] = tag;
       }
       return newTagEntries;
     }
@@ -171,9 +179,8 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
       return { ...state, status: TagsStatus.SYNCED, lastError: '' };
     }
     case 'BULK_ADD_TAGS': {
-      const newEntries = { ...state };
+      const newEntries = structuredClone(state);
       for (const tag of action.tags) {
-        const tagId = uniqueId();
         if (titleExists(state, tag.title)) {
           return {
             ...state,
@@ -181,7 +188,7 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
             lastError: 'Cannot add duplicate tag',
           };
         }
-        newEntries[tagId] = { title: tag.title, icon: tag.icon, id: tagId };
+        newEntries.entries[tag.id] = { title: tag.title, icon: tag.icon, id: tag.id };
       }
       newEntries.status = TagsStatus.SAVE_REQUIRED;
       newEntries.lastError = '';
@@ -194,7 +201,7 @@ export function tagsReducer(state: TagEntries, action: TagsAction): TagEntries {
 
 export function getTags(state: TagEntries): TagEntry[] {
   const tags: TagEntry[] = [];
-  for (const [key, value] of Object.entries(state)) {
+  for (const [key, value] of Object.entries(state.entries)) {
     let entry = value as TagEntry;
     if (entry.title) {
       tags.push(entry);
@@ -204,7 +211,7 @@ export function getTags(state: TagEntries): TagEntry[] {
 }
 
 export function getTag(state: TagEntries, tagId: string): TagEntry | undefined {
-  return state[tagId] as TagEntry;
+  return state.entries[tagId] as TagEntry;
 }
 
 export function getTagTitle(state: TagEntries, tagId: string): string {

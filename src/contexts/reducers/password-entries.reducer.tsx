@@ -1,6 +1,6 @@
 // MODEL
 import { uniqueId } from 'lib/utils';
-import { SafePasswordEntry } from '../../lib/trezor';
+import { SafePasswordEntry } from 'lib/trezor';
 
 export enum PasswordEntriesStatus {
   UNINITIALIZED,
@@ -10,11 +10,18 @@ export enum PasswordEntriesStatus {
   ERROR,
 }
 export interface PasswordEntries {
-  [key: string]: SafePasswordEntry | number | string;
+  entries: Record<string, SafePasswordEntry>;
   version: number;
   status: PasswordEntriesStatus;
   lastError: string;
 }
+function structuredClone(state: PasswordEntries): PasswordEntries {
+  return {
+    ...state,
+    entries: { ...state.entries },
+  };
+}
+
 // ACTIONS
 export interface Sync {
   type: 'SYNC';
@@ -49,21 +56,22 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
   switch (action.type) {
     case 'SYNC': {
       if (state.status === PasswordEntriesStatus.UNINITIALIZED) {
-        let new_entries: PasswordEntries = {
+        let newEntries: PasswordEntries = {
+          entries: {},
           status: PasswordEntriesStatus.SYNCED,
           version: action.version,
           lastError: '',
         };
         for (const entry of action.entries) {
-          new_entries[entry.key] = entry;
+          newEntries.entries[entry.key] = entry;
         }
-        return { ...new_entries };
+        return { ...newEntries };
       }
       if (state.status === PasswordEntriesStatus.SAVED) {
         if (action.version === state.version) {
           // check items
           for (const entry of action.entries) {
-            if (state[entry.key] === undefined) {
+            if (state.entries[entry.key] === undefined) {
               return {
                 ...state,
                 status: PasswordEntriesStatus.ERROR,
@@ -77,29 +85,36 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
           return {
             ...state,
             status: PasswordEntriesStatus.ERROR,
-            lastError: 'new version is older than current version',
+            lastError: `new version is older than current version, new version: ${action.version} old version: ${state.version}`,
           };
         }
-        let new_entries: PasswordEntries = {
+        let newEntries: PasswordEntries = {
+          entries: {},
           status: PasswordEntriesStatus.SYNCED,
           version: action.version,
           lastError: '',
         };
         for (const entry of action.entries) {
-          new_entries[entry.key] = entry;
+          newEntries.entries[entry.key] = entry;
         }
-        return { ...new_entries };
+        return { ...newEntries };
       }
       if (state.status === PasswordEntriesStatus.SYNCED) {
         return {
-          ...state
-        }
+          ...state,
+        };
       }
       // internal error
       return {
         ...state,
         status: PasswordEntriesStatus.ERROR,
-        lastError: 'Synced called when state is: ' + state.status + ' action version is: ' + action.version + ' state version is: ' + state.version,
+        lastError:
+          'Synced called when state is: ' +
+          state.status +
+          ' action version is: ' +
+          action.version +
+          ' state version is: ' +
+          state.version,
       };
     }
     case 'ADD_ENTRY': {
@@ -110,10 +125,15 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
           lastError: 'Cannot add entry to un-synced state',
         };
       }
-      let new_entries: PasswordEntries = { ...state };
+      let newEntries: PasswordEntries = structuredClone(state);
       let nextKey = uniqueId();
-      new_entries[nextKey] = { ...action.entry, key: nextKey, createdDate: Date.now(), lastModifiedDate: Date.now() };
-      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
+      newEntries.entries[nextKey] = {
+        ...action.entry,
+        key: nextKey,
+        createdDate: Date.now(),
+        lastModifiedDate: Date.now(),
+      };
+      return { ...newEntries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case 'REMOVE_ENTRY': {
       if (state.status !== PasswordEntriesStatus.SYNCED) {
@@ -123,9 +143,9 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
           lastError: 'Cannot remove entry from un-synced state',
         };
       }
-      let new_entries: PasswordEntries = { ...state };
-      delete new_entries[action.key];
-      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
+      let newEntries: PasswordEntries = structuredClone(state);
+      delete newEntries.entries[action.key];
+      return { ...newEntries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case 'UPDATE_ENTRY': {
       if (state.status !== PasswordEntriesStatus.SYNCED) {
@@ -135,12 +155,12 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
           lastError: 'Cannot update entry in un-synced state',
         };
       }
-      let new_entries: PasswordEntries = { ...state };
+      let newEntries: PasswordEntries = structuredClone(state);
       const updatedEntry = action.entry;
       updatedEntry.key = action.key;
       updatedEntry.lastModifiedDate = Date.now();
-      new_entries[action.key] = updatedEntry;
-      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
+      newEntries.entries[action.key] = updatedEntry;
+      return { ...newEntries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
     case 'UPLOADED_ENTRIES': {
       return {
@@ -157,23 +177,21 @@ export function passwordEntriesReducer(state: PasswordEntries, action: PasswordE
           lastError: 'Cannot add entries to un-synced state',
         };
       }
-      let new_entries: PasswordEntries = { ...state };
+      let newEntries: PasswordEntries = { ...state };
       for (const entry of action.entries) {
         let nextKey = uniqueId();
-        new_entries[nextKey] = { ...entry, key: nextKey };
+        newEntries.entries[nextKey] = { ...entry, key: nextKey };
       }
-      return { ...new_entries, status: PasswordEntriesStatus.SAVE_REQUIRED };
+      return { ...newEntries, status: PasswordEntriesStatus.SAVE_REQUIRED };
     }
   }
 }
 
 export function getSafePasswordEntries(state: PasswordEntries): SafePasswordEntry[] {
   const entries: SafePasswordEntry[] = [];
-  for (const [key, value] of Object.entries(state)) {
+  for (const [key, value] of Object.entries(state.entries)) {
     let entry = value as SafePasswordEntry;
-    if (entry.item) {
-      entries.push(entry);
-    }
+    entries.push(entry);
   }
   return entries;
 }

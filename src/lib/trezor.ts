@@ -1,14 +1,13 @@
 import TrezorConnect, {
   DEVICE_EVENT,
   DeviceEventMessage,
-  TransportEventMessage,
+  DeviceUniquePath,
   UI_EVENT,
   UiEventMessage,
 } from '@trezor/connect-web';
 import { hexFromUint8Array, uint8ArrayFromHex } from './buffer';
 
 import { AppData, deserializeObject, serializeObject, TrezorAppData } from './storage';
-import { TRANSPORT_EVENT } from '@trezor/connect/lib/events/transport';
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
 const SLIP_16_PATH = 10016;
@@ -46,7 +45,7 @@ export interface SafePasswordEntry {
   tags: string[];
   createdDate: number;
   lastModifiedDate: number;
-  legacyMode?: boolean;
+  legacyMode: boolean;
 }
 export interface ClearPasswordEntry {
   key: string;
@@ -86,7 +85,7 @@ export const trezorServiceFactory = (): TrezorService => {
     setTrezorDeviceEventHandler,
     setTrezorUiEventHandler,
   };
-}
+};
 
 export async function initTrezor(appUrl: string, trustedHost: boolean) {
   await TrezorConnect.init({
@@ -94,6 +93,7 @@ export async function initTrezor(appUrl: string, trustedHost: boolean) {
     debug: false,
     popup: !trustedHost,
     lazyLoad: false,
+    coreMode: "iframe",
     manifest: {
       email: 'test@gmail.com',
       appUrl: appUrl,
@@ -117,12 +117,11 @@ export function setTrezorUiEventHandler(uiEventCallback: (event: UiEventMessage)
   TrezorConnect.on(UI_EVENT, uiEventCallback);
 }
 
-
-export async function trezorDispose() {
-  await TrezorConnect.dispose();
+export function trezorDispose() {
+  TrezorConnect.dispose();
 }
 
-export function getDevice(deviceInfo: {label: string, model: string, deviceId: string} ): TrezorDevice {
+export function getDevice(deviceInfo: { label: string; model: string; deviceId: string }): TrezorDevice {
   return {
     appDataEncryptionKey: new Uint8Array(0),
     appDataSeed: '',
@@ -136,7 +135,7 @@ export function getDevice(deviceInfo: {label: string, model: string, deviceId: s
 export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys | null> {
   const result = await TrezorConnect.cipherKeyValue({
     device: {
-      path: devicePath,
+      path: DeviceUniquePath(devicePath),
     },
     override: true,
     useEmptyPassphrase: true,
@@ -158,7 +157,7 @@ export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys 
 }
 
 export async function encryptAppData(appData: AppData, key: Uint8Array): Promise<Uint8Array> {
-  const passKey = await importAesGcmKey(key)
+  const passKey = await importAesGcmKey(key);
   return encryptWithKey(passKey, serializeObject(appData));
 }
 
@@ -167,7 +166,10 @@ export async function decryptAppData(appDataCipherText: Uint8Array, key: Uint8Ar
   return deserializeObject(result);
 }
 
-export async function decryptTrezorAppData(appDataCipherText: Uint8Array, key: Uint8Array): Promise<TrezorAppData | undefined> {
+export async function decryptTrezorAppData(
+  appDataCipherText: Uint8Array,
+  key: Uint8Array
+): Promise<TrezorAppData | undefined> {
   const result = await decryptWithKey(await importAesGcmKey(key), appDataCipherText, true);
   return deserializeObject(result);
 }
@@ -210,7 +212,10 @@ export async function encryptFullEntry(entry: ClearPasswordEntry): Promise<SafeP
   return undefined;
 }
 
-export async function decryptFullEntry(entry: SafePasswordEntry, legacyMode: boolean): Promise<ClearPasswordEntry | undefined> {
+export async function decryptFullEntry(
+  entry: SafePasswordEntry,
+  legacyMode: boolean
+): Promise<ClearPasswordEntry | undefined> {
   const entryUnlockKey = entry.safeKey;
   const response = await TrezorConnect.cipherKeyValue({
     path: PATH,
@@ -230,8 +235,8 @@ export async function decryptFullEntry(entry: SafePasswordEntry, legacyMode: boo
       item: entry.item,
       title: entry.title,
       username: entry.username,
-      password: legacyMode? trimDoubleQuotes(passwordClear) : passwordClear,
-      safeNote: legacyMode? trimDoubleQuotes(safeNoteClear) : safeNoteClear,
+      password: legacyMode ? trimDoubleQuotes(passwordClear) : passwordClear,
+      safeNote: legacyMode ? trimDoubleQuotes(safeNoteClear) : safeNoteClear,
       tags: entry.tags,
       createdDate: entry.createdDate,
       lastModifiedDate: entry.lastModifiedDate,
@@ -261,7 +266,7 @@ async function encryptWithKey(key: CryptoKey, data: Uint8Array): Promise<Uint8Ar
 }
 
 async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array, legacyMode: boolean): Promise<ArrayBuffer> {
-  const { iv, cipherTextArray} = prepareForDecryption(cipherText, legacyMode);
+  const { iv, cipherTextArray } = prepareForDecryption(cipherText, legacyMode);
   return await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
@@ -272,7 +277,7 @@ async function decryptWithKey(key: CryptoKey, cipherText: Uint8Array, legacyMode
   );
 }
 
-async function importAesGcmKey (key: Uint8Array) {
+async function importAesGcmKey(key: Uint8Array) {
   return await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
 }
 
@@ -280,7 +285,10 @@ function trimDoubleQuotes(str: string): string {
   return str.replace(/^"(.*)"$/, '$1');
 }
 
-function prepareForDecryption(cipherText: Uint8Array, legacyMode: boolean): { iv: Uint8Array, cipherTextArray: Uint8Array} {
+function prepareForDecryption(
+  cipherText: Uint8Array,
+  legacyMode: boolean
+): { iv: Uint8Array; cipherTextArray: Uint8Array } {
   // CipherText is prepended with the IV
   const iv = cipherText.slice(0, IV_SIZE);
   if (legacyMode) {
@@ -305,5 +313,5 @@ function getEntryKey(tile: string, username: string): string {
 function getAppDataKey(): string {
   // Entries must be decrypted with the same key that was used to encrypt them.
   // Using the same key as the legacy Trezor Password Manager for backward compatibility
-  return 'Activate TREZOR Password Manager?'
+  return 'Activate TREZOR Password Manager?';
 }

@@ -30,6 +30,7 @@ interface PasswordTableProps {
 enum SortType {
   TITLE,
   DATE,
+  UPDATED,
 }
 
 export default function PasswordTable({
@@ -95,7 +96,16 @@ export default function PasswordTable({
           console.log(e);
         });
     }
-  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordSyncStatus, tagEntriesDispatch, passwordEntriesDispatch, readAppFile, decryptAppData]);
+  }, [
+    appDataEncryptionKey,
+    dbc,
+    masterPublicKey,
+    passwordSyncStatus,
+    tagEntriesDispatch,
+    passwordEntriesDispatch,
+    readAppFile,
+    decryptAppData,
+  ]);
 
   useEffect(() => {
     const pushData =
@@ -122,7 +132,18 @@ export default function PasswordTable({
         });
       });
     }
-  }, [appDataEncryptionKey, dbc, masterPublicKey, passwordEntries, rev, tagEntries, tagEntriesDispatch, passwordEntriesDispatch, encryptAppData, saveAppFile]);
+  }, [
+    appDataEncryptionKey,
+    dbc,
+    masterPublicKey,
+    passwordEntries,
+    rev,
+    tagEntries,
+    tagEntriesDispatch,
+    passwordEntriesDispatch,
+    encryptAppData,
+    saveAppFile,
+  ]);
 
   const handleAddEntry = () => {
     setLockEntries(true);
@@ -169,7 +190,7 @@ export default function PasswordTable({
   if (filter !== '') {
     entries = entries.filter((entry) => {
       const title = entry.metaTitle ?? entry.title;
-      return title.includes(filter);
+      return title.toLowerCase().includes(filter.toLowerCase());
     });
   }
   if (selectedTag !== '' && selectedTag !== DEFAULT_TAGS.ALL) {
@@ -184,14 +205,20 @@ export default function PasswordTable({
         return a.title.localeCompare(b.title);
       case SortType.DATE:
         return b.createdDate - a.createdDate;
+      case SortType.UPDATED:
+        return b.lastModifiedDate - a.lastModifiedDate;
     }
   });
   return (
     <div className={styles.container}>
-      <ImportPasswordsModal appDataEncryptionKey={appDataEncryptionKey} show={importPassword} onCanceled={onCancelImportPassword}/>
+      <ImportPasswordsModal
+        appDataEncryptionKey={appDataEncryptionKey}
+        show={importPassword}
+        onCanceled={onCancelImportPassword}
+      />
       <div className={styles.start_bar}>
         <div className={styles.col1}>
-          <button onClick={handleAddEntry} className={styles.add_btn}>
+          <button data-cy={'password-table-add-entry'} onClick={handleAddEntry} className={styles.add_btn}>
             Add entry
           </button>
           <div className={styles.filter_container}>
@@ -215,6 +242,7 @@ export default function PasswordTable({
           >
             <div className={styles.dropdown_button}>Title</div>
             <div className={styles.dropdown_button}>Date</div>
+            <div className={styles.dropdown_button}>Updated</div>
           </DropdownMenu>
           <DropdownMenu
             xOffset={-20}
@@ -224,6 +252,7 @@ export default function PasswordTable({
             onClickCallback={handleUserMenuClick}
             button={
               <button
+                data-cy={'password-table-account-name'}
                 className={styles.drop_box_btn}
                 style={{
                   backgroundSize: '1rem 1rem',
@@ -237,7 +266,9 @@ export default function PasswordTable({
             }
           >
             <div className={styles.dropdown_button}>Switch user</div>
-            <div className={styles.dropdown_button}>Import passwords</div>
+            <div data-cy={'password-table-import-passwords'} className={styles.dropdown_button}>
+              Import passwords
+            </div>
           </DropdownMenu>
         </div>
       </div>
@@ -283,7 +314,7 @@ export default function PasswordTable({
         )}
       </div>
       {passwordEntries.status == PasswordEntriesStatus.ERROR && (
-        <div className={styles.notification_error}>Error loading password entries</div>
+        <div className={styles.notification_error}>Error loading password entries: {passwordEntries.lastError}</div>
       )}
     </div>
   );

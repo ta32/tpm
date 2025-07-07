@@ -7,9 +7,10 @@ interface ToolTipProps {
   mode?: 'manual';
   width?: string;
   position: 'top' | 'bottom' | 'left' | 'right';
+  dataCy?: string;
   children: React.ReactNode | React.ReactNode[];
 }
-export default function ToolTip({ text, position, children, mode, active, width }: ToolTipProps) {
+export default function ToolTip({ text, position, children, mode, active, width, dataCy }: ToolTipProps) {
   const tooltip_type = {
     top: styles.tooltip_top,
     bottom: styles.tooltip_bottom,
@@ -21,9 +22,11 @@ export default function ToolTip({ text, position, children, mode, active, width 
   const className = `${styles.tooltip} ${activeClass} ${tooltip_type[position]}`;
   return (
     <div>
-      <div className={className}>
+      <div className={className} data-cy={dataCy}>
         {children}
-        <span style={{ width: widthStyle }} className={styles.tooltip_text}>{text}</span>
+        <span style={{ width: widthStyle }} className={styles.tooltip_text}>
+          {text}
+        </span>
       </div>
     </div>
   );

@@ -10,6 +10,6 @@ export interface Dependencies {
 export const defaultDeps: Dependencies = {
   dropbox: dropboxServiceFactory,
   trezor: trezorServiceFactory,
-}
+};
 
 export const DependenciesContext = createContext<Dependencies>(defaultDeps);

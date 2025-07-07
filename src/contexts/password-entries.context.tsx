@@ -7,6 +7,7 @@ import {
 } from './reducers/password-entries.reducer';
 
 const initialEntries: PasswordEntries = {
+  entries: {},
   status: PasswordEntriesStatus.UNINITIALIZED,
   version: 0,
   lastError: '',

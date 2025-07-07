@@ -87,9 +87,7 @@ export default function TableEntry({
     setClearEntry(clearEntry);
   };
 
-  const expanded =
-    (!hidden && row.type === 'NEW_ENTRY') ||
-    (row.type === 'VIEW_ENTRY' && clearEntry);
+  const expanded = (!hidden && row.type === 'NEW_ENTRY') || (row.type === 'VIEW_ENTRY' && clearEntry);
 
   return (
     <div className={`${styles.card}`}>
@@ -104,12 +102,7 @@ export default function TableEntry({
       )}
       {!expanded && row.type === 'VIEW_ENTRY' && (
         <div className={`${styles.entry} ${styles.highlight}`}>
-          <ClosedEntry
-            onLockChange={onLockChange}
-            locked={locked}
-            entry={row.entry}
-            onOpenEntry={onOpenEntry}
-          />
+          <ClosedEntry onLockChange={onLockChange} locked={locked} safeEntry={row.entry} onOpenEntry={onOpenEntry} />
         </div>
       )}
     </div>

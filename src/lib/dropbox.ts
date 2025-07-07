@@ -2,9 +2,6 @@ import { Dropbox, DropboxAuth, DropboxResponse, files } from 'dropbox';
 import { appFileName } from './appfile';
 import { readBlob } from './utils';
 
-// App key from dropbox app console. This is not secret.
-const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
-
 export interface DropboxService {
   hasRedirectedFromAuth: typeof hasRedirectedFromAuth;
   connectDropbox: typeof connectDropbox;
@@ -12,15 +9,15 @@ export interface DropboxService {
   readAppFile: typeof readAppFile;
   saveAppFile: typeof saveAppFile;
 }
-export const dropboxServiceFactory  = () : DropboxService => {
+export const dropboxServiceFactory = (): DropboxService => {
   return {
     hasRedirectedFromAuth,
     connectDropbox,
     getAuthUrl,
     readAppFile,
     saveAppFile,
-  }
-}
+  };
+};
 
 export function hasRedirectedFromAuth(locationSearch: string): boolean {
   return locationSearch.includes('code=');
@@ -37,8 +34,13 @@ interface DropboxConnection {
   name: string;
 }
 
-export async function connectDropbox(redirectUri: string, codeVerifier: string, locationSearch: string): Promise<DropboxConnection> {
-  const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
+export async function connectDropbox(
+  redirectUri: string,
+  codeVerifier: string,
+  locationSearch: string,
+  clientId: string
+): Promise<DropboxConnection> {
+  const dbxAuth = new DropboxAuth({ clientId });
   const code = getAuthCodeFromUrl(locationSearch);
   dbxAuth.setCodeVerifier(codeVerifier);
   let response: DropboxResponse<any>;
@@ -57,16 +59,18 @@ export async function connectDropbox(redirectUri: string, codeVerifier: string, 
   throw new Error('No access token');
 }
 
-export async function getAuthUrl(appUrl: string): Promise<{authUrl: string, codeVerifier: string}> {
-  const dbxAuth = new DropboxAuth({ clientId: CLIENT_ID });
+export async function getAuthUrl(appUrl: string, clientId: string): Promise<{ authUrl: string; codeVerifier: string }> {
+  const dbxAuth = new DropboxAuth({ clientId });
   try {
-    const authUrlObj = await dbxAuth.getAuthenticationUrl(appUrl,
+    const authUrlObj = await dbxAuth.getAuthenticationUrl(
+      appUrl,
       undefined,
       'code',
       'offline',
       undefined,
       undefined,
-      true);
+      true
+    );
     const codeVerifier = dbxAuth.getCodeVerifier();
     window.sessionStorage.setItem('codeVerifier', codeVerifier);
     const authUrl = authUrlObj.toString();
@@ -130,8 +134,6 @@ export async function saveAppFile(dbc: Dropbox, data: Uint8Array, appFileName: s
       throw new Error(e);
     });
 }
-
-
 
 async function listFiles(dbc: Dropbox): Promise<string[]> {
   let response = await dbc.filesListFolder({ path: '' });

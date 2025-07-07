@@ -18,7 +18,5 @@ export default function Dashboard() {
     }
   }, [user.status, router, location]);
 
-  return (
-    <PasswordManager />
-  );
+  return <PasswordManager />;
 }

@@ -59,7 +59,7 @@ export default function DropdownMenu({
             return (
               <li className={isActive} key={index}>
                 <div
-                  style={{ width: itemWidth}}
+                  style={{ width: itemWidth }}
                   key={index}
                   onClick={() => {
                     handleMenuClick(index);

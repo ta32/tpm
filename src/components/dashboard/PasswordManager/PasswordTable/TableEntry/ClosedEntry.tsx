@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
 import styles from '../TableEntry.module.scss';
 import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/tag-entries.context';
-import { ClearPasswordEntry, decryptFullEntry, SafePasswordEntry } from 'lib/trezor';
+import { ClearPasswordEntry, SafePasswordEntry } from 'lib/trezor';
 import ToolTip from 'components/ui/ToolTip';
 import { useUser } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
+import { DependenciesContext } from '../../../../../contexts/deps.context';
 
 enum STATUS {
   DECRYPTING_ENTRY,
@@ -19,21 +20,18 @@ enum STATUS {
 interface ClosedEntryProps {
   onLockChange: (status: boolean) => void;
   locked: boolean;
-  entry: SafePasswordEntry;
+  safeEntry: SafePasswordEntry;
   onOpenEntry: (entry: ClearPasswordEntry) => void;
 }
 
-export default function ClosedEntry({
-  onLockChange,
-  entry,
-  onOpenEntry,
-  locked,
-}: ClosedEntryProps) {
+export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, locked }: ClosedEntryProps) {
+  const { trezor } = useContext(DependenciesContext);
+  const { decryptFullEntry } = trezor();
   const [status, setStatus] = useState(STATUS.DEFAULT);
   const [user] = useUser();
   const tagEntries = useTagEntries();
   const [copiedUsername, setCopiedUsername] = useState(false);
-  const requiresTrezorAck =  user.status === UserStatus.TREZOR_REQ_CONFIRMATION;
+  const requiresTrezorAck = user.status === UserStatus.TREZOR_REQ_CONFIRMATION;
 
   const handleCopyUsername = (text: string) => {
     navigator.clipboard
@@ -50,35 +48,32 @@ export default function ClosedEntry({
   const handleCopyPassword = () => {
     setStatus(STATUS.DECRYPTING_PASSWORD);
     onLockChange(true);
-    decryptFullEntry(entry, false)
-      .then((clearEntry) => {
-        if (clearEntry != null) {
-          navigator.clipboard.writeText(clearEntry.password).then(() => {
-            setTimeout(() => {
-              navigator.clipboard.writeText('').catch(() => {
-                console.error('Failed to clear clipboard');
-              });
-            }, 10000);
-          });
-        }
-        setStatus(STATUS.DEFAULT);
-        onLockChange(false);
-      })
+    decryptFullEntry(safeEntry, safeEntry.legacyMode).then((clearEntry) => {
+      if (clearEntry != null) {
+        navigator.clipboard.writeText(clearEntry.password).then(() => {
+          setTimeout(() => {
+            navigator.clipboard.writeText('').catch(() => {
+              console.error('Failed to clear clipboard');
+            });
+          }, 10000);
+        });
+      }
+      setStatus(STATUS.DEFAULT);
+      onLockChange(false);
+    });
   };
 
   const handleEditEntry = () => {
     setStatus(STATUS.DECRYPTING_ENTRY);
     onLockChange(true);
-    const safeEntry = entry;
-    decryptFullEntry(safeEntry, safeEntry?.legacyMode || false)
-      .then((clearEntry) => {
-        if (clearEntry != null) {
-          onOpenEntry(clearEntry);
-        } else {
-          setStatus(STATUS.DEFAULT);
-          onLockChange(false);
-        }
-      })
+    decryptFullEntry(safeEntry, safeEntry.legacyMode).then((clearEntry) => {
+      if (clearEntry != null) {
+        onOpenEntry(clearEntry);
+      } else {
+        setStatus(STATUS.DEFAULT);
+        onLockChange(false);
+      }
+    });
   };
 
   const renderLockedEntryIcon = (tagId: string) => {
@@ -98,7 +93,8 @@ export default function ClosedEntry({
         TagIcon: tagIconSvg,
       },
     };
-    const { avatarClassName, className, iconPath, TagIcon } = status === STATUS.DEFAULT ? stateStyles.DEFAULT : stateStyles.UNLOCKING;
+    const { avatarClassName, className, iconPath, TagIcon } =
+      status === STATUS.DEFAULT ? stateStyles.DEFAULT : stateStyles.UNLOCKING;
     return (
       <div className={avatarClassName}>
         {iconPath && <Image className={className} src={iconPath} height={50} width={50} alt="avatar" />}
@@ -106,8 +102,8 @@ export default function ClosedEntry({
       </div>
     );
   };
-  const renderAccountInfo = ()  => {
-    const title = entry.metaTitle ?? entry.title;
+  const renderAccountInfo = () => {
+    const title = safeEntry.metaTitle ?? safeEntry.title;
     if (status != STATUS.DEFAULT) {
       const msg = requiresTrezorAck ? 'Look at Trezor!' : 'Unlocking...';
       const actionMsg = status === STATUS.DECRYPTING_ENTRY ? 'Editing Entry' : 'Copying Password to clipboard';
@@ -115,28 +111,41 @@ export default function ClosedEntry({
         <div className={styles.account_info}>
           <strong className={styles.title}>{msg}</strong>
           <div className={styles.credentials}>
-            <div className={styles.label}>{actionMsg}</div>
+            <div data-cy={'closed-entry-action-msg'} className={styles.label}>
+              {actionMsg}
+            </div>
           </div>
         </div>
       );
     } else {
       return (
-        <div className={styles.account_info}>
-          <label className={styles.title}>{title}</label>
+        <div data-cy={`closed-entry-${safeEntry.key}`} className={styles.account_info}>
+          <label data-cy={'closed-entry-title-' + safeEntry.title} className={styles.title}>
+            {title}
+          </label>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
-              <div className={`${styles.label} ${styles.clickable}`} onClick={() => handleCopyUsername(entry.username)}>
-                {entry.username}
+              <div
+                className={`${styles.label} ${styles.clickable}`}
+                onClick={() => handleCopyUsername(safeEntry.username)}
+              >
+                {safeEntry.username}
               </div>
             </ToolTip>
             {!locked && (
-              <ToolTip text={'Copy password'} position={'bottom'}>
-                <input onClick={handleCopyPassword}
-                       className={styles.password_shadow}
-                       title={'Copy to clipboard'}
-                       type="password"
-                       value={'password'}
-                       readOnly
+              <ToolTip
+                text={'Copy password'}
+                position={'bottom'}
+                dataCy={'closed-entry-password-copy-wrapper-' + safeEntry.key}
+              >
+                <input
+                  data-cy={'closed-entry-password-copy-' + safeEntry.key}
+                  onClick={handleCopyPassword}
+                  className={styles.password_shadow}
+                  title={'Copy to clipboard'}
+                  type="password"
+                  value={'password'}
+                  readOnly
                 />
               </ToolTip>
             )}
@@ -147,11 +156,11 @@ export default function ClosedEntry({
   };
   return (
     <>
-      {renderLockedEntryIcon(entry.tags[0] ?? '')}
+      {renderLockedEntryIcon(safeEntry.tags[0] ?? '')}
       {renderAccountInfo()}
       {!locked && (
         <div className={styles.account_info_controls}>
-          <button className={styles.edit_btn} onClick={handleEditEntry}>
+          <button data-cy={`closed-entry-edit-button-${safeEntry.title}`} className={styles.edit_btn} onClick={handleEditEntry}>
             Edit
           </button>
         </div>
