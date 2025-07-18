@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Layout from './Home/Layout';
 import PinDialog from 'components/ui/PinDialog';
 import DeviceIcon from 'components/svg/ui/DeviceIcon';
+import BridgeDownModal from 'components/ui/BridgeDownModal';
 import Image from 'next/image';
 import { IMAGE_FILE } from 'lib/images';
 import styles from './Home.module.scss';
@@ -13,6 +14,7 @@ import TrezorConnect, { UI } from '@trezor/connect-web';
 import { Routes, useLocation } from 'contexts/location.context';
 import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-session';
 import { DROPBOX_CLIENT_ID } from 'lib/constants';
+
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
@@ -133,6 +135,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
       return <span data-cy={'home-page-spinner'} className={styles.spinner}></span>;
     } else {
       switch (user.status) {
+        case UserStatus.TREZOR_BRIDGE_UNAVAILABLE:
         case UserStatus.OFFLINE:
           return renderStorageSelection();
         case UserStatus.ONLINE_NO_TREZOR:
@@ -183,6 +186,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
 
   return (
     <Layout>
+      <BridgeDownModal show={user.status == UserStatus.TREZOR_BRIDGE_UNAVAILABLE}/>
       <Image unoptimized={true} src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
       <div className={styles.grid}>{renderContent()}</div>
     </Layout>

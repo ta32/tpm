@@ -1,7 +1,7 @@
 import TrezorConnect, {
   DEVICE_EVENT,
   DeviceEventMessage,
-  DeviceUniquePath,
+  DeviceUniquePath, TRANSPORT_EVENT, TransportEventMessage,
   UI_EVENT,
   UiEventMessage,
 } from '@trezor/connect-web';
@@ -95,6 +95,7 @@ export async function initTrezor(appUrl: string, trustedHost: boolean) {
     lazyLoad: false,
     coreMode: "iframe",
     manifest: {
+      appName: 'Tmp Password Manager',
       email: 'test@gmail.com',
       appUrl: appUrl,
     },
@@ -115,6 +116,10 @@ export function setTrezorDeviceEventHandler(deviceEventCallback: (event: DeviceE
 }
 export function setTrezorUiEventHandler(uiEventCallback: (event: UiEventMessage) => void) {
   TrezorConnect.on(UI_EVENT, uiEventCallback);
+}
+
+export function setTrezorTransportEventHandler(transportEventCallback: (event: TransportEventMessage) => void) {
+  TrezorConnect.on(TRANSPORT_EVENT, transportEventCallback);
 }
 
 export function trezorDispose() {

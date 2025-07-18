@@ -11,7 +11,7 @@
     "test": "jest --watch"
   },
   "dependencies": {
-    "@trezor/connect-web": "^9.4.7",
+    "@trezor/connect-web": "9.6.1",
     "dropbox": "^10.34.0",
     "next": "^15.1.4",
     "react": "^19.0.0",

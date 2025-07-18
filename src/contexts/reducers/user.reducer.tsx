@@ -11,6 +11,7 @@ export enum UserStatus {
   TREZOR_ENTERED_CONFIRMATION,
   TREZOR_UNACQUIRED_DEVICE,
   TREZOR_ACTIVATED,
+  TREZOR_BRIDGE_UNAVAILABLE,
   OFFLINE,
 }
 export interface User {
@@ -53,6 +54,16 @@ export interface ActivatedTmpOnDevice {
   keyPair: AppDataKeys;
 }
 
+export interface TrezorBridgeUnavailable {
+  type: 'TREZOR_BRIDGE_UNAVAILABLE';
+  errorMsg: string;
+}
+
+export interface TrezorBridgeAvailable {
+  type: 'TREZOR_BRIDGE_AVAILABLE';
+  msg: string;
+}
+
 export type UserAction =
   | DropboxUserLoggedIn
   | LogoutUser
@@ -62,6 +73,8 @@ export type UserAction =
   | AskForConfirmation
   | ConfirmationEntered
   | ActivatedTmpOnDevice
+  | TrezorBridgeUnavailable
+  | TrezorBridgeAvailable
   | DevicePinEntered;
 
 export function userReducer(state: User, action: UserAction): User {
@@ -134,6 +147,18 @@ export function userReducer(state: User, action: UserAction): User {
       } else {
         return { ...state, status: UserStatus.ONLINE_NO_TREZOR, device: null };
       }
+    }
+    case 'TREZOR_BRIDGE_UNAVAILABLE': {
+      return {
+        ...state,
+        status: UserStatus.TREZOR_BRIDGE_UNAVAILABLE
+      }
+    }
+    case 'TREZOR_BRIDGE_AVAILABLE': {
+      return {
+        ...state,
+        status: UserStatus.ONLINE_NO_TREZOR,
+      };
     }
     case 'LOGOUT': {
       return {

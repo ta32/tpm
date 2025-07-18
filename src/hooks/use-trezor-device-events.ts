@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { DEVICE, DeviceEventMessage, KnownDevice, UnknownDevice } from '@trezor/connect-web';
 import { getDevice, setTrezorDeviceEventHandler } from '../lib/trezor';
-import { useUserDispatch } from '../contexts/user.context';
+import { useUserDispatch } from 'contexts/user.context';
 
 export function useTrezorDeviceEvents() {
   const isInitialized = useRef(false);
