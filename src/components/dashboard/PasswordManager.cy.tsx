@@ -42,7 +42,6 @@ function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry 
     legacyMode: legacy,
   };
 }
-
 function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePasswordEntry {
   return {
     key: clearEntry.key,
@@ -58,7 +57,6 @@ function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePassword
     legacyMode: false, // default to false for new entries
   }
 }
-
 function withInitialTagEntries(): TagEntries {
   return {
     status: TagsStatus.UNINITIALIZED,
@@ -95,7 +93,6 @@ function withClearPasswordEntry(entry: SafePasswordEntry): ClearPasswordEntry {
     lastModifiedDate: entry.lastModifiedDate,
   };
 }
-
 function withTagEntry(num: number): TagEntry {
   return {
     id: `id${num}`,
@@ -103,24 +100,6 @@ function withTagEntry(num: number): TagEntry {
     icon: `bitcoin`,
   };
 }
-
-function DashboardPageWrapper({ deps, initialUser, initialTags, children }: DashboardPageProps) {
-  return (
-    <div className={inter.className} style={{ margin: 0 }}>
-      <DependenciesContext.Provider value={deps}>
-        <LocationProvider>
-          <UserProvider initialUser={initialUser}>
-            <TagEntriesProvider initialTagEntries={initialTags}>
-              <PasswordEntriesProvider>{children}</PasswordEntriesProvider>
-            </TagEntriesProvider>
-          </UserProvider>
-        </LocationProvider>
-      </DependenciesContext.Provider>
-    </div>
-  );
-}
-// endregion
-
 function withTrezorServiceFakedEncryptionAndDecryption(entries: SafePasswordEntry[]): Partial<TrezorService> {
   const appData: AppData = {
     entries: entries,
@@ -143,6 +122,22 @@ function withTrezorServiceFakedEncryptionAndDecryption(entries: SafePasswordEntr
     }),
   };
 }
+function DashboardPageWrapper({ deps, initialUser, initialTags, children }: DashboardPageProps) {
+  return (
+    <div className={inter.className} style={{ margin: 0 }}>
+      <DependenciesContext.Provider value={deps}>
+        <LocationProvider>
+          <UserProvider initialUser={initialUser}>
+            <TagEntriesProvider initialTagEntries={initialTags}>
+              <PasswordEntriesProvider>{children}</PasswordEntriesProvider>
+            </TagEntriesProvider>
+          </UserProvider>
+        </LocationProvider>
+      </DependenciesContext.Provider>
+    </div>
+  );
+}
+// endregion
 
 describe('Password Manager Page Tests', () => {
   beforeEach(() => {
@@ -419,7 +414,6 @@ describe('Password Manager Page Tests', () => {
       .click();
 
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}-changed]`).should('exist');
-
   })
 
   it('able to delete an existing password in the password manager', () => {

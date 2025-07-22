@@ -6,6 +6,8 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:debug": "tauri build --debug",
     "cypress:open": "cypress open",
     "prettier": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore",
     "test": "jest --watch"

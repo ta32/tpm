@@ -8,21 +8,17 @@ import { Routes, useLocation } from 'contexts/location.context';
 import { APP_URL, DROPBOX_CLIENT_ID } from 'lib/constants';
 import { useTrezorUiEvents } from 'hooks/use-trezor-ui-events';
 import { useTrezorDeviceEvents } from 'hooks/use-trezor-device-events';
-import { useDropboxSession } from 'hooks/use-dropbox-session';
 import { useDropboxWindowOauthParams } from 'hooks/use-dropbox-window-oauth-params';
-import { useTrezorTransportEvents } from '../hooks/use-trezor-transport-events';
+
 export default function App() {
   const router = useRouter();
   const [location, _] = useLocation();
   const [userDispatch] = useUserDispatch();
   const { search, codeVerifier } = useDropboxWindowOauthParams();
-  const dropboxStatus = useDropboxSession(search, DROPBOX_CLIENT_ID, codeVerifier, );
   // Link Trezor events to user context
   useTrezorUiEvents();
   // Link Trezor device events to user context
   useTrezorDeviceEvents();
-  // Link Trezor transport events to user context
-  useTrezorTransportEvents();
   // Navigation
   useEffect(() => {
     if (location === Routes.DASHBOARD) {

@@ -155,9 +155,20 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'TREZOR_BRIDGE_AVAILABLE': {
+      const online = state.dbc != null;
+      const onlineWithTrezor = state.device !== null;
+      const onlineWithoutTrezor = online && !onlineWithTrezor;
+      let newStatus = UserStatus.OFFLINE;
+      if (online) {
+        if (onlineWithTrezor) {
+          newStatus = UserStatus.ONLINE_WITH_TREZOR;
+        } else if (onlineWithoutTrezor) {
+          newStatus = UserStatus.ONLINE_NO_TREZOR;
+        }
+      }
       return {
         ...state,
-        status: UserStatus.ONLINE_NO_TREZOR,
+        status: newStatus,
       };
     }
     case 'LOGOUT': {

@@ -70,6 +70,7 @@ export interface TrezorService {
   initTrezor: typeof initTrezor;
   setTrezorDeviceEventHandler: typeof setTrezorDeviceEventHandler;
   setTrezorUiEventHandler: typeof setTrezorUiEventHandler;
+  setTrezorTransportEventHandler: typeof setTrezorTransportEventHandler;
 }
 
 export const trezorServiceFactory = (): TrezorService => {
@@ -84,6 +85,7 @@ export const trezorServiceFactory = (): TrezorService => {
     initTrezor,
     setTrezorDeviceEventHandler,
     setTrezorUiEventHandler,
+    setTrezorTransportEventHandler,
   };
 };
 

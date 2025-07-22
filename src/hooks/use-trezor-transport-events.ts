@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { useUser, useUserDispatch } from '../contexts/user.context';
+import { useContext, useEffect, useRef } from 'react';
+import { useUserDispatch } from 'contexts/user.context';
 import { TransportEventMessage } from '@trezor/connect-web';
-import { setTrezorTransportEventHandler } from '../lib/trezor';
+import { DependenciesContext } from 'contexts/deps.context';
 
 export function useTrezorTransportEvents() {
+  const { trezor } = useContext(DependenciesContext);
   const isInitialized = useRef(false);
   const [userDispatch] = useUserDispatch();
   const userDispatchRef = useRef(userDispatch);
@@ -14,6 +15,7 @@ export function useTrezorTransportEvents() {
 
   useEffect(() => {
     if (!isInitialized.current) {
+      const { setTrezorTransportEventHandler } = trezor();
       const transportEventCb = (event: TransportEventMessage) => {
         let userDispatch = userDispatchRef.current;
         switch (event.type) {
@@ -30,6 +32,6 @@ export function useTrezorTransportEvents() {
       setTrezorTransportEventHandler(transportEventCb);
       isInitialized.current = true;
     }
-  }, []);
+  }, [trezor]);
   return isInitialized.current;
 }
