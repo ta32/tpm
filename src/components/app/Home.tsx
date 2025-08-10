@@ -140,7 +140,6 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
       return <span data-cy={'home-page-spinner'} className={styles.spinner}></span>;
     } else {
       switch (user.status) {
-        case UserStatus.TREZOR_BRIDGE_UNAVAILABLE:
         case UserStatus.OFFLINE:
           return renderStorageSelection();
         case UserStatus.ONLINE_NO_TREZOR:

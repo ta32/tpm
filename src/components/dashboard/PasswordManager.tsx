@@ -26,7 +26,7 @@ export default function PasswordManager() {
 
   return (
     <div>
-      <BridgeDownModal show={user.status == UserStatus.ONLINE_NO_TREZOR}/>
+      <BridgeDownModal show={user.status == UserStatus.TREZOR_BRIDGE_UNAVAILABLE}/>
       <SidePanel onSelectedTag={handleTageSelect} />
       <PinModal show={user.status === UserStatus.TREZOR_REQ_PIN_AUTH} submitCallback={enterPin} />
       <section className={styles.content}>
