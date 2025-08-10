@@ -29,7 +29,7 @@ const INITIAL_APP_DATA: AppData = {
       icon: 'bitcoin',
     },
   ],
-  modelVersion: 0,
+  modelVersion: '0',
 };
 const INITIAL_APP_DATA_TAG_INDEX = INITIAL_APP_DATA.tags.length - 1;
 

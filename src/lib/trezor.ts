@@ -20,6 +20,9 @@ const IV_SIZE = 12;
 const KEY_SIZE_BITS = 256;
 const AUTH_SIZE = 128 / 8;
 
+// Version of the model used for serialization
+const MODEL_VERSION_ENTRY = '1.0.0';
+
 export interface TrezorDevice {
   label: string;
   model: string;
@@ -46,6 +49,7 @@ export interface SafePasswordEntry {
   createdDate: number;
   lastModifiedDate: number;
   legacyMode: boolean;
+  modelVersion: string;
 }
 export interface ClearPasswordEntry {
   key: string;
@@ -214,6 +218,7 @@ export async function encryptFullEntry(entry: ClearPasswordEntry): Promise<SafeP
       createdDate: entry.createdDate,
       lastModifiedDate: entry.lastModifiedDate,
       legacyMode: false,
+      modelVersion: MODEL_VERSION_ENTRY,
     };
   }
   return undefined;

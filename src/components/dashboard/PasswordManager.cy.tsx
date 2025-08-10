@@ -40,6 +40,7 @@ function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry 
     createdDate: 0,
     lastModifiedDate: 0,
     legacyMode: legacy,
+    modelVersion: '1',
   };
 }
 function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePasswordEntry {
@@ -55,6 +56,7 @@ function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePassword
     createdDate: clearEntry.createdDate,
     lastModifiedDate: clearEntry.lastModifiedDate,
     legacyMode: false, // default to false for new entries
+    modelVersion: '1',
   }
 }
 function withInitialTagEntries(): TagEntries {
@@ -105,7 +107,7 @@ function withTrezorServiceFakedEncryptionAndDecryption(entries: SafePasswordEntr
     entries: entries,
     version: 1,
     tags: Object.values(withInitialTagEntries().entries),
-    modelVersion: 1,
+    modelVersion: '1',
   };
   return {
     decryptAppData: cy.stub().resolves(appData),
@@ -160,7 +162,7 @@ describe('Password Manager Page Tests', () => {
       entries: [withSafePasswordEntry(1, false), withSafePasswordEntry(2, false), withSafePasswordEntry(3, false)],
       version: 1,
       tags: [withTagEntry(1)],
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
@@ -186,7 +188,7 @@ describe('Password Manager Page Tests', () => {
       entries: [],
       version: 1,
       tags: [],
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
@@ -224,7 +226,7 @@ describe('Password Manager Page Tests', () => {
       entries: [newEntry, legacyEntry],
       version: 1,
       tags: [],
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const neverResolvingPromise = new Promise(() => {});
 
@@ -282,7 +284,7 @@ describe('Password Manager Page Tests', () => {
       entries: [],
       version: 1,
       tags: Object.values(withInitialTagEntries().entries),
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const importedAppData: TrezorAppData = {
       version: '0',
