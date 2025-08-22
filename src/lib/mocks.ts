@@ -1,8 +1,8 @@
 import { Dependencies } from 'contexts/deps.context';
-import { SafePasswordEntry, TrezorService } from 'lib/trezor';
+import { TrezorService } from 'lib/trezor';
 import { DropboxService } from 'lib/dropbox';
 import { User, UserStatus } from 'contexts/reducers/user.reducer';
-import { Dropbox, DropboxAuth } from 'dropbox';
+import { Dropbox } from 'dropbox';
 
 // region Object Builders
 export function withLoggedInUser(): User {
@@ -33,6 +33,7 @@ function withDefaultDeps(): Dependencies {
       getEncryptionKey: cy.stub().resolves(new Uint8Array(32)),
       setTrezorUiEventHandler: cy.stub().resolves(),
       setTrezorDeviceEventHandler: cy.stub().resolves(),
+      setTrezorTransportEventHandler: cy.stub().resolves(),
     }),
     dropbox: () => ({
       hasRedirectedFromAuth: cy.stub().returns(true),

@@ -121,6 +121,7 @@ export default function ImportPasswordsModal({ show, onCanceled, appDataEncrypti
   };
 
   const renderDropzone = (dropped: boolean) => {
+    // Note: HTML5 drag and drop will only work if "dragDropEnabled": false in Tauri config
     return (
       <div>
         <p>You can only import trezor data if it was encrypted with the current device.</p>

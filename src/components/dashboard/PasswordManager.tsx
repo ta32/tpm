@@ -4,10 +4,12 @@ import SidePanel from './PasswordManager/SidePanel';
 import PasswordTable from './PasswordManager/PasswordTable';
 import StatusModal from './PasswordManager/StatusModal';
 import PinModal from 'components/ui/PinModal';
+import BridgeDownModal from 'components/ui/BridgeDownModal';
 import styles from './PasswordManager.module.scss';
 import { UserStatus } from 'contexts/reducers/user.reducer';
 import { useUser, useUserDispatch } from 'contexts/user.context';
 import TrezorConnect, { UI } from '@trezor/connect-web';
+
 
 export default function PasswordManager() {
   const [user] = useUser();
@@ -24,6 +26,7 @@ export default function PasswordManager() {
 
   return (
     <div>
+      <BridgeDownModal show={user.status == UserStatus.TREZOR_BRIDGE_UNAVAILABLE}/>
       <SidePanel onSelectedTag={handleTageSelect} />
       <PinModal show={user.status === UserStatus.TREZOR_REQ_PIN_AUTH} submitCallback={enterPin} />
       <section className={styles.content}>

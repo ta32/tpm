@@ -101,12 +101,13 @@ it('can generate valid key derived from trezor that can encrypt and decrypt the 
     createdDate: 0,
     lastModifiedDate: 0,
     legacyMode: false,
+    modelVersion: '1',
   };
   const appData: AppData = {
     tags: [],
     entries: [safeEntry],
     version: 1,
-    modelVersion: 1,
+    modelVersion: '1',
   };
 
   const result = await encryptAppData(appData, appDataKey.userAppDataEncryptionKey);

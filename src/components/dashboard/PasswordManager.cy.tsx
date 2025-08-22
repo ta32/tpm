@@ -40,9 +40,9 @@ function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry 
     createdDate: 0,
     lastModifiedDate: 0,
     legacyMode: legacy,
+    modelVersion: '1',
   };
 }
-
 function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePasswordEntry {
   return {
     key: clearEntry.key,
@@ -56,9 +56,9 @@ function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePassword
     createdDate: clearEntry.createdDate,
     lastModifiedDate: clearEntry.lastModifiedDate,
     legacyMode: false, // default to false for new entries
+    modelVersion: '1',
   }
 }
-
 function withInitialTagEntries(): TagEntries {
   return {
     status: TagsStatus.UNINITIALIZED,
@@ -95,7 +95,6 @@ function withClearPasswordEntry(entry: SafePasswordEntry): ClearPasswordEntry {
     lastModifiedDate: entry.lastModifiedDate,
   };
 }
-
 function withTagEntry(num: number): TagEntry {
   return {
     id: `id${num}`,
@@ -103,30 +102,12 @@ function withTagEntry(num: number): TagEntry {
     icon: `bitcoin`,
   };
 }
-
-function DashboardPageWrapper({ deps, initialUser, initialTags, children }: DashboardPageProps) {
-  return (
-    <div className={inter.className} style={{ margin: 0 }}>
-      <DependenciesContext.Provider value={deps}>
-        <LocationProvider>
-          <UserProvider initialUser={initialUser}>
-            <TagEntriesProvider initialTagEntries={initialTags}>
-              <PasswordEntriesProvider>{children}</PasswordEntriesProvider>
-            </TagEntriesProvider>
-          </UserProvider>
-        </LocationProvider>
-      </DependenciesContext.Provider>
-    </div>
-  );
-}
-// endregion
-
 function withTrezorServiceFakedEncryptionAndDecryption(entries: SafePasswordEntry[]): Partial<TrezorService> {
   const appData: AppData = {
     entries: entries,
     version: 1,
     tags: Object.values(withInitialTagEntries().entries),
-    modelVersion: 1,
+    modelVersion: '1',
   };
   return {
     decryptAppData: cy.stub().resolves(appData),
@@ -143,6 +124,22 @@ function withTrezorServiceFakedEncryptionAndDecryption(entries: SafePasswordEntr
     }),
   };
 }
+function DashboardPageWrapper({ deps, initialUser, initialTags, children }: DashboardPageProps) {
+  return (
+    <div className={inter.className} style={{ margin: 0 }}>
+      <DependenciesContext.Provider value={deps}>
+        <LocationProvider>
+          <UserProvider initialUser={initialUser}>
+            <TagEntriesProvider initialTagEntries={initialTags}>
+              <PasswordEntriesProvider>{children}</PasswordEntriesProvider>
+            </TagEntriesProvider>
+          </UserProvider>
+        </LocationProvider>
+      </DependenciesContext.Provider>
+    </div>
+  );
+}
+// endregion
 
 describe('Password Manager Page Tests', () => {
   beforeEach(() => {
@@ -165,7 +162,7 @@ describe('Password Manager Page Tests', () => {
       entries: [withSafePasswordEntry(1, false), withSafePasswordEntry(2, false), withSafePasswordEntry(3, false)],
       version: 1,
       tags: [withTagEntry(1)],
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
@@ -191,7 +188,7 @@ describe('Password Manager Page Tests', () => {
       entries: [],
       version: 1,
       tags: [],
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
@@ -229,7 +226,7 @@ describe('Password Manager Page Tests', () => {
       entries: [newEntry, legacyEntry],
       version: 1,
       tags: [],
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const neverResolvingPromise = new Promise(() => {});
 
@@ -287,7 +284,7 @@ describe('Password Manager Page Tests', () => {
       entries: [],
       version: 1,
       tags: Object.values(withInitialTagEntries().entries),
-      modelVersion: 1,
+      modelVersion: '1',
     };
     const importedAppData: TrezorAppData = {
       version: '0',
@@ -419,7 +416,6 @@ describe('Password Manager Page Tests', () => {
       .click();
 
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}-changed]`).should('exist');
-
   })
 
   it('able to delete an existing password in the password manager', () => {

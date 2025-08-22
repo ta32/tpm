@@ -38,6 +38,7 @@ function entry(num: number): SafePasswordEntry {
     createdDate: 0,
     lastModifiedDate: 0,
     legacyMode: false,
+    modelVersion: '1',
   };
 }
 

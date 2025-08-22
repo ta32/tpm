@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import Layout from './Home/Layout';
 import PinDialog from 'components/ui/PinDialog';
 import DeviceIcon from 'components/svg/ui/DeviceIcon';
+import BridgeDownModal from 'components/ui/BridgeDownModal';
 import Image from 'next/image';
 import { IMAGE_FILE } from 'lib/images';
 import styles from './Home.module.scss';
@@ -13,6 +14,8 @@ import TrezorConnect, { UI } from '@trezor/connect-web';
 import { Routes, useLocation } from 'contexts/location.context';
 import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-session';
 import { DROPBOX_CLIENT_ID } from 'lib/constants';
+import { useTrezorTransportEvents } from 'hooks/use-trezor-transport-events';
+
 
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
@@ -36,6 +39,9 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
   const { urlSearch, codeVerifier } = dropboxArgs;
   const dropboxStatus = useDropboxSession(urlSearch, DROPBOX_CLIENT_ID, codeVerifier);
 
+  // Link Trezor transport events to user context
+  useTrezorTransportEvents();
+
   const { getEncryptionKey } = trezor();
   const handleShowLogoutUrl = () => {
     setShowLogoutUrl(!showLogoutUrl);
@@ -43,6 +49,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
 
   const enterPin = (pin: string) => {
     userDispatch({ type: 'DEVICE_PIN_ENTERED' });
+    // TODO use dependency injection for TrezorConnect
     TrezorConnect.uiResponse({ type: UI.RECEIVE_PIN, payload: pin });
   };
 
@@ -183,6 +190,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
 
   return (
     <Layout>
+      <BridgeDownModal show={user.status == UserStatus.TREZOR_BRIDGE_UNAVAILABLE}/>
       <Image unoptimized={true} src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
       <div className={styles.grid}>{renderContent()}</div>
     </Layout>

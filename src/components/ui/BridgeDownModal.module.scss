@@ -1,0 +1,26 @@
+@use "styles/colors.module";
+@use "styles/mixins";
+
+$line_height: 100px;
+$margin-left-value: 10px;
+
+.modal_body {
+  h1 {
+    text-align: center;
+  }
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: colors.$white;
+}
+
+.heading {
+  color: colors.$black_font;
+  @include mixins.text_headline;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+.content {
+  margin-left: $margin-left-value;
+  color: colors.$black_font;
+}

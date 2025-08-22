@@ -31,13 +31,17 @@ export default function RootLayout({
   useEffect(() => {
     if (!TREZOR_CONNECT_CONFIG.init) {
       const trustedHost = TRUSTED_HOSTS.includes(window.location.hostname);
-      initTrezor(APP_URL, trustedHost).catch((error) => {
+      initTrezor(APP_URL, trustedHost)
+        .then(() => {
+          TREZOR_CONNECT_CONFIG.init = true;
+        })
+        .catch((error) => {
         // FATAL ERROR
         console.error(error);
         return;
       });
     }
-    TREZOR_CONNECT_CONFIG.init = true;
+
     // cleanup
     return () => {
       TREZOR_CONNECT_CONFIG.init = false;

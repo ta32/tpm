@@ -4,13 +4,15 @@ import { SafePasswordEntry } from './trezor';
 import { uniqueId } from './utils';
 import { FROM_TREZOR_ICON_KEY_TO_TAG_NAME, TAG_SOCIAL } from './images';
 
-const MODEL_VERSION = 1;
+// Version of the model used for serialization
+const MODEL_VERSION_APP_DATA = '1.0.0';
 
 export interface AppData {
   entries: SafePasswordEntry[];
   version: number;
   tags: TagEntry[];
-  modelVersion: number;
+  modelVersion: string;
+  metaData?: string;
 }
 export interface TrezorAppData {
   version: string;
@@ -99,6 +101,7 @@ export function mergeAppData(
       legacyMode: true,
       createdDate: Date.now(),
       lastModifiedDate: Date.now(),
+      modelVersion: MODEL_VERSION_APP_DATA,
     };
     if (!existingEntry) {
       passwordEntries.push(newEntry);
@@ -121,7 +124,7 @@ export function fromState(passwordState: PasswordEntries, tagState: TagEntries, 
     entries: entries,
     version: newVersion,
     tags: tags,
-    modelVersion: MODEL_VERSION,
+    modelVersion: MODEL_VERSION_APP_DATA,
   };
 }
 

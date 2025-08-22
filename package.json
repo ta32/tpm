@@ -6,12 +6,14 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:debug": "tauri build --debug",
     "cypress:open": "cypress open",
     "prettier": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore",
     "test": "jest --watch"
   },
   "dependencies": {
-    "@trezor/connect-web": "^9.4.7",
+    "@trezor/connect-web": "9.6.1",
     "dropbox": "^10.34.0",
     "next": "^15.1.4",
     "react": "^19.0.0",
