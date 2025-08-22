@@ -63,7 +63,7 @@ export default function EntryInput({
         autoComplete="off"
         autoCorrect="off"
         name={name}
-        className={`${styles.input} ${invalid ? styles.invalid : ''}`}
+        className={`${name.toLowerCase()}-input ${styles.input} ${invalid ? styles.invalid : ''}`}
         type={type == 'text' ? 'text' : passwordInputType}
         placeholder={placeholder}
         value={inputValue != null ? inputValue : ''}

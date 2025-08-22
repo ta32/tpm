@@ -14,3 +14,8 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.password-input,
+.username-input {
+  font-family: consolas, 'DejaVu Sans Mono', 'SF Mono', monospace;
+}
