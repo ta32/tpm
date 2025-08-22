@@ -50,6 +50,7 @@ export interface SafePasswordEntry {
   lastModifiedDate: number;
   legacyMode: boolean;
   modelVersion: string;
+  metaData?: string;
 }
 export interface ClearPasswordEntry {
   key: string;

@@ -12,6 +12,7 @@ export interface AppData {
   version: number;
   tags: TagEntry[];
   modelVersion: string;
+  metaData?: string;
 }
 export interface TrezorAppData {
   version: string;
