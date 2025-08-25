@@ -10,6 +10,7 @@ import { usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { useTagEntries } from 'contexts/tag-entries.context';
 import Colors from 'styles/colors.module.scss';
+import TextInput from './ExpandedEntry/TextInput';
 
 interface ExpandedEntryProps {
   entry: ClearPasswordEntry | null;
@@ -27,7 +28,6 @@ export default function ExpandedEntry({
 }: ExpandedEntryProps) {
   const [changed, setChanged] = useState(false);
   const tagEntries = useTagEntries();
-  const [itemMissing, setItemMissing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const passwordEntriesDispatch = usePasswordEntriesDispatch();
 
@@ -46,10 +46,7 @@ export default function ExpandedEntry({
       lastModifiedDate: parseInt(formData.get('lastModifiedDate') as string),
       createdDate: parseInt(formData.get('createdDate') as string),
     };
-    if (newEntry.item == '') {
-      setItemMissing(true);
-    } else {
-      setItemMissing(false);
+    if (e.currentTarget.checkValidity()) {
       if (newEntry.title == '') {
         newEntry.title = newEntry.item;
       }
@@ -59,7 +56,6 @@ export default function ExpandedEntry({
 
   const handleChange = () => {
     setChanged(true);
-    setItemMissing(false);
   };
 
   const handleRemoveEntryConfirm = () => {
@@ -103,26 +99,12 @@ export default function ExpandedEntry({
           cancelCallback={handleCancelRemoveEntry}
         />
       )}
-      <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={true} onChange={handleChange}>
+      <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={false} onChange={handleChange}>
         {renderIcon(entry?.tags[0] ?? '')}
         <div className={styles.account_info}>
-          <EntryInput
-            name="item"
-            label={'Item/URL *'}
-            placeholder={''}
-            type={'text'}
-            defaultValue={entry?.item ?? ''}
-            mandatory={true}
-            invalid={itemMissing}
-          />
-          <EntryInput data-cy={"password-entry-title-input"} name="title" label={'Title'} placeholder={''} type={'text'} defaultValue={entry?.title ?? ''} />
-          <EntryInput
-            name="username"
-            label={'Username'}
-            placeholder={''}
-            type={'text'}
-            defaultValue={entry?.username ?? ''}
-          />
+          <TextInput name='item' label='Item/URL *' defaultValue={entry?.item} mandatory={true} errMsg='Item is mandatory' />
+          <TextInput name='title' label='Title' defaultValue={entry?.title}/>
+          <TextInput name='username' label='Username' defaultValue={entry?.username} />
           <EntryInput
             name="password"
             label={'Password'}
