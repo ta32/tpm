@@ -97,12 +97,6 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'ADD_DEVICE': {
-      if (action.device === null && state.status === UserStatus.ONLINE_NO_TREZOR) {
-        return {
-          ...state,
-          status: UserStatus.TREZOR_UNACQUIRED_DEVICE,
-        };
-      }
       if (state.status === UserStatus.ONLINE_NO_TREZOR) {
         return {
           ...state,
