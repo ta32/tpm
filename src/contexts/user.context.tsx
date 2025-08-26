@@ -1,9 +1,4 @@
-import React, {
-  createContext,
-  Dispatch,
-  useContext,
-  useReducer,
-} from 'react';
+import React, { createContext, Dispatch, useContext, useReducer } from 'react';
 import { User, UserAction, userReducer, UserStatus } from './reducers/user.reducer';
 
 export { type User } from './reducers/user.reducer';

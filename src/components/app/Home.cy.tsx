@@ -11,7 +11,6 @@ import { DropboxService } from 'lib/dropbox';
 import { TrezorService } from 'lib/trezor';
 import { TransportEventMessage } from '@trezor/connect-web';
 
-
 const inter = Inter({ subsets: ['latin'] });
 
 /// region Types
@@ -35,24 +34,24 @@ interface TransportEventTrigger {
 
 /// region Helper
 function withMockedTransportEvents(): TrezorServiceWithTransportEventsTrigger {
-  const trigger : TransportEventTrigger = {
+  const trigger: TransportEventTrigger = {
     callback: () => {},
     isReady: false,
     async waitForReady() {
-      while(!trigger.isReady) {
-        await new Promise<void>(resolve => setTimeout(resolve, 100))
+      while (!trigger.isReady) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
       }
-    }
+    },
   };
   const trezorService: Partial<TrezorService> = {
     setTrezorTransportEventHandler: cy.stub().callsFake((userProvidedCallback: TransportEventHandler) => {
       trigger.isReady = true;
       trigger.callback = userProvidedCallback;
     }),
-  }
+  };
   return {
     trezorService,
-    trigger
+    trigger,
   };
 }
 /// endregion
@@ -170,9 +169,9 @@ describe('<Home />', () => {
       payload: {
         error: 'Bridge is down',
         code: 'BRIDGE_DOWN',
-        apiType: 'usb'
-      }
-    }
+        apiType: 'usb',
+      },
+    };
     const bridgeAvailableMessage: TransportEventMessage = {
       event: 'TRANSPORT_EVENT',
       type: 'transport-start',
@@ -181,8 +180,8 @@ describe('<Home />', () => {
         apiType: 'usb',
         version: '2.0.0',
         outdated: false,
-      }
-    }
+      },
+    };
 
     const dbc = new Dropbox({ auth: new DropboxAuth({ clientId: '123' }) });
     const dropboxService: Partial<DropboxService> = {
@@ -210,19 +209,21 @@ describe('<Home />', () => {
     // should appear after the OAUTH redirect
     cy.get('[data-cy=storage-login]').should('exist');
     // assert
-    cy.get('[data-cy=dropbox-account-name]').should('have.text', 'ta32mock')
+    cy.get('[data-cy=dropbox-account-name]')
+      .should('have.text', 'ta32mock')
       .then(() => {
         // simulate Trezor bridge being down
         trigger.callback(bridgeDownMessage);
       });
-    cy.get('[data-cy=bridge-modal]').should('be.visible')
+    cy.get('[data-cy=bridge-modal]')
+      .should('be.visible')
       .then(() => {
         // simulate Trezor bridge being available
         trigger.callback(bridgeAvailableMessage);
       });
     cy.get('[data-cy=bridge-modal]').should('not.be.visible');
     cy.get('[data-cy=dropbox-account-name]').should('have.text', 'ta32mock');
-  })
+  });
 
   it('after trezor bridge loses connection, before connecting to dropbox, user should see connect to dropbox button', () => {
     cy.viewport(1920, 1080);
@@ -233,9 +234,9 @@ describe('<Home />', () => {
       payload: {
         error: 'Bridge is down',
         code: 'BRIDGE_DOWN',
-        apiType: 'usb'
-      }
-    }
+        apiType: 'usb',
+      },
+    };
     const bridgeAvailableMessage: TransportEventMessage = {
       event: 'TRANSPORT_EVENT',
       type: 'transport-start',
@@ -244,8 +245,8 @@ describe('<Home />', () => {
         apiType: 'usb',
         version: '2.0.0',
         outdated: false,
-      }
-    }
+      },
+    };
 
     const { trezorService, trigger }: TrezorServiceWithTransportEventsTrigger = withMockedTransportEvents();
     const customDeps = withTrezorService(trezorService);
@@ -266,14 +267,16 @@ describe('<Home />', () => {
     });
 
     // should appear after the OAUTH redirect
-    cy.get('[data-cy=storage-login]').should('be.visible')
+    cy.get('[data-cy=storage-login]')
+      .should('be.visible')
       .then(() => trigger.waitForReady())
       .then(() => trigger.callback(bridgeDownMessage));
 
-    cy.get('[data-cy=bridge-modal]').should('be.visible')
+    cy.get('[data-cy=bridge-modal]')
+      .should('be.visible')
       .then(() => trigger.callback(bridgeAvailableMessage));
 
     cy.get('[data-cy=bridge-modal]').should('not.be.visible');
     cy.get('[data-cy=storage-login]').should('be.visible');
-  })
+  });
 });

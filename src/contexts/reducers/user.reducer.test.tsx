@@ -32,11 +32,11 @@ export function withDevice(label: string): TrezorDevice {
     pathId: 'path',
     appDataSeed: 'seed',
     appDataEncryptionKey: new Uint8Array(),
-  }
+  };
   return {
     ...defaultDevice,
     label,
-  }
+  };
 }
 
 describe('useReducer', () => {
@@ -110,7 +110,7 @@ describe('useReducer', () => {
       const actual = actions.reduce(userReducer, initialState);
 
       expect(actual.status).toEqual(UserStatus.ONLINE_WITH_TREZOR);
-    })
+    });
   });
   describe('when user is connected to storage account', () => {
     const mockDropbox = new Dropbox();
@@ -122,11 +122,6 @@ describe('useReducer', () => {
       const actual = userReducer(initialState, addDevice);
 
       expect(actual.status).toEqual(UserStatus.ONLINE_WITH_TREZOR);
-    })
+    });
   });
 });
-
-
-
-
-

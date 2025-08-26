@@ -57,7 +57,7 @@ function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePassword
     lastModifiedDate: clearEntry.lastModifiedDate,
     legacyMode: false, // default to false for new entries
     modelVersion: '1',
-  }
+  };
 }
 function withInitialTagEntries(): TagEntries {
   return {
@@ -233,7 +233,8 @@ describe('Password Manager Page Tests', () => {
     // using a never resolving promise otherwise test will exit early
     const trezorService = {
       decryptAppData: cy.stub().resolves(appData),
-      decryptFullEntry: cy.stub()
+      decryptFullEntry: cy
+        .stub()
         .withArgs(newEntry, false)
         .returns(neverResolvingPromise)
         .withArgs(legacyEntry, true)
@@ -389,7 +390,7 @@ describe('Password Manager Page Tests', () => {
     const user = withLoggedInUser();
     const tagEntries = withInitialTagEntries();
     // empty app data
-    const entryOne = withSafePasswordEntry(1, false)
+    const entryOne = withSafePasswordEntry(1, false);
     const entryOneTitle = entryOne.title;
 
     const trezorService = withTrezorServiceFakedEncryptionAndDecryption([entryOne]);
@@ -407,22 +408,20 @@ describe('Password Manager Page Tests', () => {
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}]`).should('exist');
 
     // cypress doesn't support hover so we need to click a hidden button
-    cy.get(`[data-cy=closed-entry-edit-button-${entryOneTitle}]`).click({force: true});
+    cy.get(`[data-cy=closed-entry-edit-button-${entryOneTitle}]`).click({ force: true });
 
     cy.get('[data-cy=input-title]').type('-changed');
 
-    cy.get('[data-cy=submit-password-entry')
-      .should('contain.text', 'Save')
-      .click();
+    cy.get('[data-cy=submit-password-entry').should('contain.text', 'Save').click();
 
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}-changed]`).should('exist');
-  })
+  });
 
   it('able to delete an existing password in the password manager', () => {
     const user = withLoggedInUser();
     const tagEntries = withInitialTagEntries();
     // empty app data
-    const entryOne = withSafePasswordEntry(1, false)
+    const entryOne = withSafePasswordEntry(1, false);
     const entryTwo = withSafePasswordEntry(2, false);
     const entryOneTitle = entryOne.title;
     const entryTwoTitle = entryTwo.title;
@@ -441,7 +440,7 @@ describe('Password Manager Page Tests', () => {
     cy.get(`[data-cy=closed-entry-title-${entryTwoTitle}]`).should('exist');
 
     // cypress doesn't support hover so we need to click a hidden button
-    cy.get(`[data-cy=closed-entry-edit-button-${entryTwoTitle}]`).click({force: true});
+    cy.get(`[data-cy=closed-entry-edit-button-${entryTwoTitle}]`).click({ force: true });
 
     cy.get('[data-cy=expanded-entry-remove-password]').should('exist');
     cy.get('[data-cy=expanded-entry-remove-password]').click();
@@ -451,5 +450,5 @@ describe('Password Manager Page Tests', () => {
 
     cy.get(`[data-cy=closed-entry-title-${entryTwoTitle}]`).should('not.exist');
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}]`).should('exist');
-  })
+  });
 });

@@ -145,8 +145,8 @@ export function userReducer(state: User, action: UserAction): User {
     case 'TREZOR_BRIDGE_UNAVAILABLE': {
       return {
         ...state,
-        status: UserStatus.TREZOR_BRIDGE_UNAVAILABLE
-      }
+        status: UserStatus.TREZOR_BRIDGE_UNAVAILABLE,
+      };
     }
     case 'TREZOR_BRIDGE_AVAILABLE': {
       const online = state.dbc != null;
