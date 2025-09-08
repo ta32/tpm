@@ -16,7 +16,6 @@ import { DropboxSessionStatus, useDropboxSession } from 'hooks/use-dropbox-sessi
 import { DROPBOX_CLIENT_ID } from 'lib/constants';
 import { useTrezorTransportEvents } from 'hooks/use-trezor-transport-events';
 
-
 const LOGOUT_URL = 'https://www.dropbox.com/logout';
 
 interface DropBoxArgs {
@@ -63,7 +62,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
       console.error('wallet is not initialized');
       return;
     }
-    getEncryptionKey(user.device.path).then((keyPair) => {
+    getEncryptionKey(user.device).then((keyPair) => {
       if (keyPair !== null) {
         userDispatch({ type: 'ACTIVATED_TMP_ON_DEVICE', keyPair });
         setLoading(true);
@@ -190,7 +189,7 @@ export default function Home({ handleDropBoxSignIn, handleLogout, dropboxArgs }:
 
   return (
     <Layout>
-      <BridgeDownModal show={user.status == UserStatus.TREZOR_BRIDGE_UNAVAILABLE}/>
+      <BridgeDownModal show={user.status == UserStatus.TREZOR_BRIDGE_UNAVAILABLE} />
       <Image unoptimized={true} src={IMAGE_FILE.TPM_LOGO.path()} width={500} height={120} alt="" />
       <div className={styles.grid}>{renderContent()}</div>
     </Layout>

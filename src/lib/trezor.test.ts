@@ -1,11 +1,13 @@
-import { it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import TrezorConnect, { Success } from '@trezor/connect-web';
 import {
+  AppDataKeys,
   ClearPasswordEntry,
   decryptAppData,
   decryptFullEntry,
   encryptAppData,
   encryptFullEntry,
+  getDevice,
   getEncryptionKey,
   SafePasswordEntry,
 } from './trezor';
@@ -43,21 +45,21 @@ function mTrezorConnectCipherKeyValueOfDefaultNonceReturnsCipherText(mTrezorConn
 }
 
 function mTrezorConnectCipherKeyValueReturnsCipherText(mTrezorConnectCipherKeyValue: any) {
-  let encryptionPassKeyResponse: Success<CipheredValue> = {
+  let cipherText: Success<CipheredValue> = {
     success: true,
     payload: {
-      value: 'safe_key',
+      value: 'cipher text, of the encrypted key that was used to encrypt the password client side',
     },
   };
   //@ts-ignore
-  mTrezorConnectCipherKeyValue.mockResolvedValue(encryptionPassKeyResponse);
+  mTrezorConnectCipherKeyValue.mockResolvedValue(cipherText);
 }
 
 function mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue: any) {
   const args = mTrezorConnectCipherKeyValue.mock.calls[0][0];
   //@ts-ignore
   const value = args.value;
-  // return the same value that was encrypted by the trezor
+  // return the same value that was encrypted by the trezor connect cipherKeyValue method
   const decryptedPassKeyResponse: Success<CipheredValue> = {
     success: true,
     payload: {
@@ -71,100 +73,121 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-it('can generate valid key derived from trezor that can encrypt and decrypt the app data', async () => {
-  // The old trezor extension used the trezor to encrypt (AES-256-CBC) a constant value ( DEFAULT_NONCE )
-  // The returned CipherText is deterministic to the account used on the trezor.
-  // This is used to generate a key which will encrypt and decrypt the app data using AES-256-GCM
-
-  // TrezorConnect.cipherKeyValue implementation defined by slip-0011 (AES-256-CBC)
-  mTrezorConnectCipherKeyValueOfDefaultNonceReturnsCipherText(mTrezorConnectCipherKeyValue);
-  // the key is used to encrypt and decrypt the app data
-  const appDataKey = await getEncryptionKey('path');
-  expect(appDataKey).toBeDefined();
-  expect(appDataKey?.userAppDataEncryptionKey).toBeDefined();
-  // array with 170 32 elements
-  const expectedKey = new Uint8Array(32);
-  expectedKey.fill(170); // hex value aa is 170
-  expect(appDataKey?.userAppDataEncryptionKey).toEqual(new Uint8Array(expectedKey));
-  if (appDataKey === undefined || appDataKey?.userAppDataEncryptionKey === undefined) {
-    return;
+describe('decryptAppData', () => {
+  function withDevice() {
+    const payload: any = {
+      label: 'Slurp1',
+      name: '',
+      path: '1234',
+      type: 'acquired',
+    };
+    return getDevice(payload);
   }
-  const safeEntry: SafePasswordEntry = {
-    key: 'test',
-    title: 'test',
-    item: 'test',
-    username: 'username',
-    passwordEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-    secretNoteEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-    tags: ['tags'],
-    safeKey: 'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted',
-    createdDate: 0,
-    lastModifiedDate: 0,
-    legacyMode: false,
-    modelVersion: '1',
-  };
-  const appData: AppData = {
-    tags: [],
-    entries: [safeEntry],
-    version: 1,
-    modelVersion: '1',
-  };
-
-  const result = await encryptAppData(appData, appDataKey.userAppDataEncryptionKey);
-  expect(result).toBeDefined();
-  if (result === undefined) {
-    return;
+  function withAppData() {
+    const safeEntry: SafePasswordEntry = {
+      key: 'test',
+      title: 'test',
+      item: 'test',
+      username: 'username',
+      passwordEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+      secretNoteEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+      tags: ['tags'],
+      safeKey: 'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted',
+      createdDate: 0,
+      lastModifiedDate: 0,
+      legacyMode: false,
+      modelVersion: '1',
+    };
+    const appData: AppData = {
+      tags: [],
+      entries: [safeEntry],
+      version: 1,
+      modelVersion: '1',
+    };
+    return appData;
   }
 
-  // must be called after encryptAppData
-  mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
-
-  const decryptedAppData = await decryptAppData(result, appDataKey.userAppDataEncryptionKey);
-  expect(decryptedAppData).toBeDefined();
-  if (decryptedAppData === undefined) {
-    return;
+  async function encryptAppDataAndSetupEchoOfEncryptionKey(appData: AppData, appDataKey: AppDataKeys) {
+    const result = await encryptAppData(appData, appDataKey.userAppDataEncryptionKey);
+    expect(result).toBeDefined();
+    // must be called after encryptAppData
+    mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
+    return result;
   }
-  expect(decryptedAppData.entries).toEqual(appData.entries);
-  expect(decryptedAppData.version).toEqual(appData.version);
-});
+  async function setupMockToAllowGetEncryptionKeyToReturnDeterministicKey() {
+    // The old trezor extension used the trezor to encrypt (AES-256-CBC) a constant value ( DEFAULT_NONCE )
+    // The returned CipherText is deterministic to the account used on the trezor.
+    // This is used to generate a key which will encrypt and decrypt the app data using AES-256-GCM
 
-it('encrypt then decrypt result in the same value', async () => {
-  // Passwords are encrypted by a random key generated each time the password is changed.
-  // This passKey is encrypted by the trezor and stored online. The original key is discarded.
-  // Therefore, to unlock the password the saved key must be decrypted by the trezor before its used.
-
-  // This test will encrypt and decrypt a password - only the trezor encryption is mocked
-  // which is used to encrypt the passKey (AES key) that is used to encrypt the password
-  const clearPasswordEntry: ClearPasswordEntry = {
-    key: 'test',
-    title: 'test',
-    item: 'test',
-    username: 'username',
-    password: 'password',
-    safeNote: 'safeNote',
-    tags: ['tags'],
-    createdDate: 0,
-    lastModifiedDate: 0,
-  };
-  // This method of TrezorConnect is responsible for symmetric encryption and decryption
-  // It is used to encrypt the "passKey", AES key that is used to encrypt the clear password entry
-  // The "SafeKey" is stored online, and it must be decrypted by the trezor in order to unlock safe entries
-  // this is the mechanism that was used in the original implementation of TrezorPasswordManager
-  mTrezorConnectCipherKeyValueReturnsCipherText(mTrezorConnectCipherKeyValue);
-  const result = await encryptFullEntry(clearPasswordEntry);
-  expect(result).toBeDefined();
-  if (result === undefined) {
-    return;
+    // TrezorConnect.cipherKeyValue implementation defined by slip-0011 (AES-256-CBC)
+    mTrezorConnectCipherKeyValueOfDefaultNonceReturnsCipherText(mTrezorConnectCipherKeyValue);
+    // this is a payload we get from the trezor connect event callbacks
+    const device = withDevice();
+    // device path must not be empty
+    expect(device).toBeDefined();
+    // the pathId is required to identify the device when connecting to an unacquired device, but optional for acquired devices
+    expect(device.pathId).toBe('1234');
+    // the key is used to encrypt and decrypt the app data
+    const appDataKey = await getEncryptionKey(device);
+    expect(appDataKey).toBeDefined();
+    expect(appDataKey?.userAppDataEncryptionKey).toBeDefined();
+    // array with 170 32 elements
+    const expectedKey = new Uint8Array(32);
+    expectedKey.fill(170); // hex value aa is 170
+    expect(appDataKey?.userAppDataEncryptionKey).toEqual(new Uint8Array(expectedKey));
+    return appDataKey;
   }
-  // must be called after encryptAppData
-  mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
 
-  const decrypted = await decryptFullEntry(result, false);
-  expect(decrypted).toBeDefined();
-  expect(decrypted?.key).toBe(clearPasswordEntry.key);
-  expect(decrypted?.title).toBe(clearPasswordEntry.title);
-  expect(decrypted?.item).toBe(clearPasswordEntry.item);
-  expect(decrypted?.username).toBe(clearPasswordEntry.username);
-  expect(decrypted?.password).toBe(clearPasswordEntry.password);
-  expect(decrypted?.safeNote).toBe(clearPasswordEntry.safeNote);
+  it('should be able to get appdata after encryptAppData using deterministic key', async () => {
+
+    const appData = withAppData();
+    const appDataKey = await setupMockToAllowGetEncryptionKeyToReturnDeterministicKey();
+    const result = await encryptAppDataAndSetupEchoOfEncryptionKey(appData, appDataKey!);
+
+    const decryptedAppData = await decryptAppData(result, appDataKey!.userAppDataEncryptionKey);
+
+    expect(decryptedAppData).toBeDefined();
+    expect(decryptedAppData!.entries).toEqual(appData.entries);
+    expect(decryptedAppData!.version).toEqual(appData.version);
+  });
+})
+
+describe("decryptFullEntry", () => {
+  async function encryptFullEntryAndSetupEchoOfEncryptionKey(clearPasswordEntry: ClearPasswordEntry) {
+    mTrezorConnectCipherKeyValueReturnsCipherText(mTrezorConnectCipherKeyValue);
+    // encryptFullEntry will generate a random passKey (AES key) to encrypt the password entry
+    // this key is encrypted by the TrezorConnect.cipherKeyValue method
+    const result = await encryptFullEntry(clearPasswordEntry);
+    expect(result).toBeDefined();
+    // set the mock to echo the actual value of the AES key that was used to encrypt the password entry
+    // so it can be decrypted by the client again
+    mTrezorConnectCipherKeyValueReturnsDecryptedText(mTrezorConnectCipherKeyValue);
+    return result;
+  }
+
+  it("should be able to decrypt clear password using client side generated key", async () => {
+    // This test will encrypt and decrypt a password - only the trezor encryption is mocked.
+    const clearPasswordEntry: ClearPasswordEntry = {
+      key: 'test',
+      title: 'test',
+      item: 'test',
+      username: 'username',
+      password: 'password',
+      safeNote: 'safeNote',
+      tags: ['tags'],
+      createdDate: 0,
+      lastModifiedDate: 0,
+    };
+    const safeEntry = await encryptFullEntryAndSetupEchoOfEncryptionKey(clearPasswordEntry);
+
+    const decrypted = await decryptFullEntry(safeEntry!, false);
+
+    expect(decrypted).toBeDefined();
+    expect(decrypted?.key).toBe(clearPasswordEntry.key);
+    expect(decrypted?.title).toBe(clearPasswordEntry.title);
+    expect(decrypted?.item).toBe(clearPasswordEntry.item);
+    expect(decrypted?.username).toBe(clearPasswordEntry.username);
+    expect(decrypted?.password).toBe(clearPasswordEntry.password);
+    expect(decrypted?.safeNote).toBe(clearPasswordEntry.safeNote);
+  });
 });

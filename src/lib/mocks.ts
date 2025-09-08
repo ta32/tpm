@@ -15,11 +15,36 @@ export function withLoggedInUser(): User {
       appDataEncryptionKey: new Uint8Array(32),
       deviceId: 'deviceId',
       model: 't1',
-      path: 'path',
+      pathId: 'path',
     },
     dropboxAccountName: 'test',
   };
 }
+
+export function withTrezorPasswordEntry(title: string, tags: string[]): any {
+  return {
+    title: title,
+    username: 'username',
+    password: {
+      type: 'Buffer',
+      data: [1, 2, 3],
+    },
+    nonce: 'abc',
+    tags: tags,
+    safe_note: {
+      type: 'Buffer',
+      data: [1, 2, 3],
+    },
+    note: '',
+    success: false,
+    export: false,
+  };
+}
+
+// endregion
+
+// region Dependency Builders
+
 function withDefaultDeps(): Dependencies {
   return {
     trezor: () => ({
@@ -44,9 +69,7 @@ function withDefaultDeps(): Dependencies {
     }),
   };
 }
-// endregion
 
-// region Dependency Builders
 export function withStubDeps(): Dependencies {
   return {
     ...withDefaultDeps(),
@@ -87,28 +110,6 @@ export function withServices(
       ...withDefaultDeps().dropbox(),
       ...dropboxService,
     }),
-  };
-}
-// endregion
-
-// region Builders Trezor
-export function withTrezorPasswordEntry(title: string, tags: string[]): any {
-  return {
-    title: title,
-    username: 'username',
-    password: {
-      type: 'Buffer',
-      data: [1, 2, 3],
-    },
-    nonce: 'abc',
-    tags: tags,
-    safe_note: {
-      type: 'Buffer',
-      data: [1, 2, 3],
-    },
-    note: '',
-    success: false,
-    export: false,
   };
 }
 // endregion

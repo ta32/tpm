@@ -1,13 +1,18 @@
 import TrezorConnect, {
   DEVICE_EVENT,
   DeviceEventMessage,
-  DeviceUniquePath, TRANSPORT_EVENT, TransportEventMessage,
+  DeviceUniquePath,
+  KnownDevice,
+  TRANSPORT_EVENT,
+  TransportEventMessage,
   UI_EVENT,
   UiEventMessage,
+  UnknownDevice,
 } from '@trezor/connect-web';
 import { hexFromUint8Array, uint8ArrayFromHex } from './buffer';
 
 import { AppData, deserializeObject, serializeObject, TrezorAppData } from './storage';
+import { Device } from '@trezor/connect/lib/types/device';
 
 const BIP_44_COIN_TYPE_BTC = 0x80000000;
 const SLIP_16_PATH = 10016;
@@ -27,7 +32,7 @@ export interface TrezorDevice {
   label: string;
   model: string;
   deviceId: string;
-  path: string;
+  pathId: string;
   appDataSeed: string;
   appDataEncryptionKey: Uint8Array;
 }
@@ -100,7 +105,7 @@ export async function initTrezor(appUrl: string, trustedHost: boolean) {
     debug: false,
     popup: !trustedHost,
     lazyLoad: false,
-    coreMode: "iframe",
+    coreMode: 'iframe',
     manifest: {
       appName: 'Tmp Password Manager',
       email: 'test@gmail.com',
@@ -133,21 +138,23 @@ export function trezorDispose() {
   TrezorConnect.dispose();
 }
 
-export function getDevice(deviceInfo: { label: string; model: string; deviceId: string }): TrezorDevice {
+export function getDevice(payload: KnownDevice | UnknownDevice | Device): TrezorDevice {
   return {
     appDataEncryptionKey: new Uint8Array(0),
     appDataSeed: '',
-    path: '',
-    label: deviceInfo.label,
-    model: deviceInfo.model,
-    deviceId: deviceInfo.deviceId,
+    pathId: payload.path,
+    label: payload.label,
+    model: payload.features?.model || '',
+    deviceId: payload.features?.device_id || '',
   };
 }
 
-export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys | null> {
+export async function getEncryptionKey(device: TrezorDevice): Promise<AppDataKeys | null> {
   const result = await TrezorConnect.cipherKeyValue({
     device: {
-      path: DeviceUniquePath(devicePath),
+      // https://connect.trezor.io/9/details/commonParams/
+      // The device path is required if connecting to an unacquired device
+      path: DeviceUniquePath(device.pathId),
     },
     override: true,
     useEmptyPassphrase: true,
@@ -164,8 +171,10 @@ export async function getEncryptionKey(devicePath: string): Promise<AppDataKeys 
       userAppDataSeed512Bit: result.payload.value,
       userAppDataEncryptionKey: uint8ArrayFromHex(tmp.substring(tmp.length / 2, tmp.length)),
     };
+  } else {
+    console.error('Error connecting to Trezor');
+    return null;
   }
-  return null;
 }
 
 export async function encryptAppData(appData: AppData, key: Uint8Array): Promise<Uint8Array> {
