@@ -1,0 +1,27 @@
+@use "styles/colors.module";
+
+.label {
+  color: colors.$grey_content_font;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  margin-bottom: 0.25rem;
+  margin-right: 1rem;
+}
+
+.input {
+  overflow: visible;
+  border-radius: 0.1rem;
+  border: none;
+  font-size: 1.1em;
+  background-color: colors.$grey_bg;
+  color: colors.$black_font;
+  width: 15rem;
+  outline: none;
+  padding: 5px 7px;
+}
+
+.invalid {
+  border: 1px solid colors.$red;
+  background-color: colors.$highlight_red;
+}

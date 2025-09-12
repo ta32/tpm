@@ -160,7 +160,11 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
       {renderAccountInfo()}
       {!locked && (
         <div className={styles.account_info_controls}>
-          <button data-cy={`closed-entry-edit-button-${safeEntry.title}`} className={styles.edit_btn} onClick={handleEditEntry}>
+          <button
+            data-cy={`closed-entry-edit-button-${safeEntry.title}`}
+            className={styles.edit_btn}
+            onClick={handleEditEntry}
+          >
             Edit
           </button>
         </div>

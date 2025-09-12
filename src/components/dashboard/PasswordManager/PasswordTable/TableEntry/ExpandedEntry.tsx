@@ -11,6 +11,9 @@ import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { useTagEntries } from 'contexts/tag-entries.context';
 import Colors from 'styles/colors.module.scss';
 import TextInput from './ExpandedEntry/TextInput';
+import SecretInput from './ExpandedEntry/SecretInput';
+import PasswordInput from './ExpandedEntry/PasswordInput';
+import TagInput from './ExpandedEntry/TagInput';
 
 interface ExpandedEntryProps {
   entry: ClearPasswordEntry | null;
@@ -92,7 +95,7 @@ export default function ExpandedEntry({
     <>
       {entry?.title && (
         <DeleteModal
-          data-cy={"delete-modal"}
+          data-cy={'delete-modal'}
           entryName={entry.title}
           show={showDeleteModal}
           submitCallback={handleRemoveEntryConfirm}
@@ -102,30 +105,22 @@ export default function ExpandedEntry({
       <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={false} onChange={handleChange}>
         {renderIcon(entry?.tags[0] ?? '')}
         <div className={styles.account_info}>
-          <TextInput name='item' label='Item/URL *' defaultValue={entry?.item} mandatory={true} errMsg='Item is mandatory' />
-          <TextInput name='title' label='Title' defaultValue={entry?.title}/>
-          <TextInput name='username' label='Username' defaultValue={entry?.username} />
-          <EntryInput
-            name="password"
-            label={'Password'}
-            placeholder={''}
-            type={'password'}
-            onChanged={handleChange}
-            defaultValue={entry?.password ?? ''}
-          />
-          <EntryInput name="tags" label={'Tags'} placeholder={''} type={'tags'} defaultValue={entry?.tags ?? ''} />
-          <EntryInput
-            name="safeNote"
-            label={'Secret Note'}
-            placeholder={''}
-            type={'secret'}
-            defaultValue={entry?.safeNote ?? ''}
-          />
+          <TextInput name="item" label="Item/URL *" defaultValue={entry?.item} mandatory={true} errMsg="Item is mandatory" />
+          <TextInput name="title" label="Title" defaultValue={entry?.title} />
+          <TextInput name="username" label="Username" defaultValue={entry?.username} />
+          <PasswordInput name={'password'} entry={entry} />
+          <TagInput name={'tags'} label={'Tags'} initialTags={entry?.tags} />
+          <SecretInput name={'safeNote'} entry={entry} />
           {entry?.title && (
             <div className={styles.layout}>
               <div className={styles.container}>
                 <label className={styles.label}>Actions</label>
-                <button data-cy={"expanded-entry-remove-password"} className={styles.remove_button} onClick={handleRemoveEntry} type="button">
+                <button
+                  data-cy={'expanded-entry-remove-password'}
+                  className={styles.remove_button}
+                  onClick={handleRemoveEntry}
+                  type="button"
+                >
                   <DeleteIcon className={styles.delete_icon} width={15}></DeleteIcon>
                   <span>REMOVE ENTRY</span>
                 </button>
@@ -135,7 +130,7 @@ export default function ExpandedEntry({
         </div>
         {changed && (
           <div className={styles.account_info_controls}>
-            <button data-cy={"submit-password-entry"} type="submit" disabled={saving} className={styles.save_btn}>
+            <button data-cy={'submit-password-entry'} type="submit" disabled={saving} className={styles.save_btn}>
               {saving ? 'Saving' : 'Save'}
             </button>
             <button type="reset" className={styles.discard_btn} onClick={handleDiscardEntry}>

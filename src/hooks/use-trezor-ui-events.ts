@@ -4,7 +4,6 @@ import { UserStatus } from 'contexts/reducers/user.reducer';
 import { setTrezorUiEventHandler } from 'lib/trezor';
 import { useEffect, useRef } from 'react';
 
-
 export function useTrezorUiEvents() {
   const isInitialized = useRef(false);
   const [user] = useUser();
@@ -25,14 +24,20 @@ export function useTrezorUiEvents() {
       const uiEventCb = (event: UiEventMessage) => {
         const user = userRef.current;
         const userDispatch = userDispatchRef.current;
-        if (event.type === UI.REQUEST_PIN) {
-          userDispatch({ type: 'SHOW_PIN_DIALOG' });
-        } else if (event.type === UI.REQUEST_BUTTON) {
-          userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
-        } else if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION && event.type === UI.CLOSE_UI_WINDOW) {
-          userDispatch({ type: 'CONFIRMATION_ENTERED' });
-        } else {
-          console.warn('un-handled UI event', event);
+        switch (event.type) {
+          case UI.REQUEST_PIN:
+            userDispatch({ type: 'SHOW_PIN_DIALOG' });
+            break;
+          case UI.REQUEST_BUTTON:
+            userDispatch({ type: 'ASK_FOR_CONFIRMATION' });
+            break;
+          case UI.CLOSE_UI_WINDOW:
+            if (user.status === UserStatus.TREZOR_REQ_CONFIRMATION) {
+              userDispatch({ type: 'CONFIRMATION_ENTERED' });
+            }
+            break;
+          default:
+            break;
         }
       };
       setTrezorUiEventHandler(uiEventCb);
