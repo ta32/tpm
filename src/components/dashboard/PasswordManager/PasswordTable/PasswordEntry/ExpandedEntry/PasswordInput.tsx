@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import styles from './EntryInput.module.scss';
-import LabeledInput from 'components/ui/LabeledInput';
+import PasswordEntryInput from 'components/ui/PasswordEntryInput';
 import { ClearPasswordEntry } from 'lib/trezor';
 import VisibilityIcon from 'components/svg/ui/VisibilityIcon';
-import Colors from 'styles/colors.module.scss';
 import ToolTip from 'components/ui/ToolTip';
 import RefreshIcon from 'components/svg/ui/RefreshIcon';
 import generatePassword from 'lib/password';
+import Colors from 'styles/colors.module.scss';
+import styles from 'components/dashboard/PasswordManager/PasswordTable/PasswordEntry/ExpandedEntry.module.scss';
 
 type DefaultTypes = string | string[] | null;
 
@@ -32,7 +32,7 @@ export default function PasswordInput({name, entry, onChanged }: PasswordInputPr
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
-        <LabeledInput type={"password"} label={'Password'} name={name} placeholder={''} defaultValue={defaultValue}></LabeledInput>
+        <PasswordEntryInput type={"password"} label={'Password'} name={name} placeholder={''} defaultValue={defaultValue}></PasswordEntryInput>
       </div>
       <div className={styles.container_row_no_wrap}>
         <ToolTip text={'Show password'} position={'top'} width={'150px'}>

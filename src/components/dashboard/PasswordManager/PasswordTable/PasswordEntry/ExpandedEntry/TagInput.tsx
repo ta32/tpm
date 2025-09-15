@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MultiSelect from 'components/ui/MultiSelect';
-import styles from './EntryInput.module.scss';
+import styles from 'components/dashboard/PasswordManager/PasswordTable/PasswordEntry/ExpandedEntry.module.scss';
 import { getTags } from 'contexts/reducers/tag-entries.reducer';
 import { useTagEntries } from 'contexts/tag-entries.context';
 

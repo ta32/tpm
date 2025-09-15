@@ -1,8 +1,7 @@
 import React, { FormEvent, useState } from 'react';
-import styles from '../TableEntry.module.scss';
+import styles from './ExpandedEntry.module.scss';
 import Image from 'next/image';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
-import EntryInput from './ExpandedEntry/EntryInput';
 import DeleteIcon from 'components/svg/ui/DeleteIcon';
 import { ClearPasswordEntry } from 'lib/trezor';
 import DeleteModal from './ExpandedEntry/DeleteModal';
