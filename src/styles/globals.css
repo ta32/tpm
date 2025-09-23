@@ -15,6 +15,7 @@ a {
   box-sizing: border-box;
 }
 
+.safenote-input,
 .password-input,
 .username-input {
   font-family: consolas, 'DejaVu Sans Mono', 'SF Mono', monospace;
