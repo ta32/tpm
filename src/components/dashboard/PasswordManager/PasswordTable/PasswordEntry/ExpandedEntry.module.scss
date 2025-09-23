@@ -121,8 +121,8 @@
     background-color: rgba(colors.$grey_content_font, .4);
     border-radius: 4px;
 
-    height: calc(variables.$avatar_size * 2);
-    width: calc(variables.$avatar_size * 2);
+    height: calc(#{variables.$avatar_size} * 2);
+    width: calc(#{variables.$avatar_size} * 2);
 
     img {
       position: absolute;
