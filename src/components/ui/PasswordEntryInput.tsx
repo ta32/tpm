@@ -12,7 +12,15 @@ interface TextInputProps {
   errMsg?: string;
 }
 
-export default function PasswordEntryInput({ label, name, placeholder, defaultValue, mandatory, type, errMsg }: TextInputProps) {
+export default function PasswordEntryInput({
+  label,
+  name,
+  placeholder,
+  defaultValue,
+  mandatory,
+  type,
+  errMsg,
+}: TextInputProps) {
   const [inputValue, setInputValue] = useState<string>(defaultValue ?? '');
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
 

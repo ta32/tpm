@@ -104,7 +104,13 @@ export default function ExpandedEntry({
       <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={false} onChange={handleChange}>
         {renderIcon(entry?.tags[0] ?? '')}
         <div className={styles.account_info}>
-          <TextInput name="item" label="Item/URL *" defaultValue={entry?.item} mandatory={true} errMsg="Item is mandatory" />
+          <TextInput
+            name="item"
+            label="Item/URL *"
+            defaultValue={entry?.item}
+            mandatory={true}
+            errMsg="Item is mandatory"
+          />
           <TextInput name="title" label="Title" defaultValue={entry?.title} />
           <TextInput name="username" label="Username" defaultValue={entry?.username} />
           <PasswordInput name={'password'} entry={entry} />

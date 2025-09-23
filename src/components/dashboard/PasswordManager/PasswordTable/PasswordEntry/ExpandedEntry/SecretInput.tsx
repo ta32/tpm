@@ -7,10 +7,10 @@ import styles from 'components/dashboard/PasswordManager/PasswordTable/PasswordE
 
 interface SecretInputProps {
   name: string;
-  entry?: ClearPasswordEntry | null
+  entry?: ClearPasswordEntry | null;
 }
 
-export default function SecretInput({name, entry }: SecretInputProps) {
+export default function SecretInput({ name, entry }: SecretInputProps) {
   const [showSecret, setShowSecret] = useState(false);
   const handleToggleShowSecret = () => {
     setShowSecret(!showSecret);
@@ -19,11 +19,17 @@ export default function SecretInput({name, entry }: SecretInputProps) {
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
-        <PasswordEntryInput type={"secret"} label={'Secret Note'} name={name} placeholder={''} defaultValue={defaultValue}></PasswordEntryInput>
+        <PasswordEntryInput
+          type={'secret'}
+          label={'Secret Note'}
+          name={name}
+          placeholder={''}
+          defaultValue={defaultValue}
+        ></PasswordEntryInput>
       </div>
       <button type={'button'} className={styles.control_btn} onClick={handleToggleShowSecret}>
         <VisibilityIcon fill={Colors.black} />
       </button>
     </div>
-  )
+  );
 }

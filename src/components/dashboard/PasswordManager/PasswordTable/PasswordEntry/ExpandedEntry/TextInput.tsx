@@ -15,7 +15,14 @@ export default function TextInput({ label, name, placeholder, defaultValue, mand
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
-        <PasswordEntryInput name={name} label={label} placeholder={placeholder} defaultValue={defaultValue} mandatory={mandatory} errMsg={errMsg}></PasswordEntryInput>
+        <PasswordEntryInput
+          name={name}
+          label={label}
+          placeholder={placeholder}
+          defaultValue={defaultValue}
+          mandatory={mandatory}
+          errMsg={errMsg}
+        ></PasswordEntryInput>
       </div>
     </div>
   );

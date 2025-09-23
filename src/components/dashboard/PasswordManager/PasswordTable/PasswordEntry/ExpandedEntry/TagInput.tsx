@@ -21,13 +21,8 @@ export default function TagInput({ name, label, initialTags }: TagInputProps) {
     <div className={styles.layout}>
       <div className={styles.container}>
         <label className={styles.label}>{label}</label>
-        <MultiSelect
-          name={name}
-          className={styles.input}
-          selectedValues={initialTags}
-          items={tags}
-        />
+        <MultiSelect name={name} className={styles.input} selectedValues={initialTags} items={tags} />
       </div>
     </div>
-  )
+  );
 }

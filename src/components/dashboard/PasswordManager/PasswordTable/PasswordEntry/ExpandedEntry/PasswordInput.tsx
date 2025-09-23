@@ -15,7 +15,7 @@ interface PasswordInputProps {
   onChanged?: () => void;
   entry?: ClearPasswordEntry | null;
 }
-export default function PasswordInput({name, entry, onChanged }: PasswordInputProps) {
+export default function PasswordInput({ name, entry, onChanged }: PasswordInputProps) {
   const defaultValue = entry?.password ?? '';
   const [inputValue, setInputValue] = useState<DefaultTypes>(defaultValue);
   const [showSecret, setShowSecret] = useState(false);
@@ -32,7 +32,13 @@ export default function PasswordInput({name, entry, onChanged }: PasswordInputPr
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
-        <PasswordEntryInput type={"password"} label={'Password'} name={name} placeholder={''} defaultValue={defaultValue}></PasswordEntryInput>
+        <PasswordEntryInput
+          type={'password'}
+          label={'Password'}
+          name={name}
+          placeholder={''}
+          defaultValue={defaultValue}
+        ></PasswordEntryInput>
       </div>
       <div className={styles.container_row_no_wrap}>
         <ToolTip text={'Show password'} position={'top'} width={'150px'}>
@@ -47,5 +53,5 @@ export default function PasswordInput({name, entry, onChanged }: PasswordInputPr
         </ToolTip>
       </div>
     </div>
-  )
+  );
 }

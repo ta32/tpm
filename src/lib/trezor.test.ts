@@ -92,7 +92,8 @@ describe('decryptAppData', () => {
       passwordEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
       secretNoteEnc: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
       tags: ['tags'],
-      safeKey: 'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted',
+      safeKey:
+        'Base64 encoded AES-256-CBC key - it needs to be unlocked by the trezor for the password to be decrypted',
       createdDate: 0,
       lastModifiedDate: 0,
       legacyMode: false,
@@ -139,7 +140,6 @@ describe('decryptAppData', () => {
   }
 
   it('should be able to get appdata after encryptAppData using deterministic key', async () => {
-
     const appData = withAppData();
     const appDataKey = await setupMockToAllowGetEncryptionKeyToReturnDeterministicKey();
     const result = await encryptAppDataAndSetupEchoOfEncryptionKey(appData, appDataKey!);
@@ -150,9 +150,9 @@ describe('decryptAppData', () => {
     expect(decryptedAppData!.entries).toEqual(appData.entries);
     expect(decryptedAppData!.version).toEqual(appData.version);
   });
-})
+});
 
-describe("decryptFullEntry", () => {
+describe('decryptFullEntry', () => {
   async function encryptFullEntryAndSetupEchoOfEncryptionKey(clearPasswordEntry: ClearPasswordEntry) {
     mTrezorConnectCipherKeyValueReturnsCipherText(mTrezorConnectCipherKeyValue);
     // encryptFullEntry will generate a random passKey (AES key) to encrypt the password entry
@@ -165,7 +165,7 @@ describe("decryptFullEntry", () => {
     return result;
   }
 
-  it("should be able to decrypt clear password using client side generated key", async () => {
+  it('should be able to decrypt clear password using client side generated key', async () => {
     // This test will encrypt and decrypt a password - only the trezor encryption is mocked.
     const clearPasswordEntry: ClearPasswordEntry = {
       key: 'test',
