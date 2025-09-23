@@ -2,7 +2,7 @@ import styles from './PasswordEntryInput.module.scss';
 import React, { useState } from 'react';
 import ToolTip from 'components/ui/ToolTip';
 
-interface TextInputProps {
+interface PasswordEntryInputProps {
   name: string;
   label: string;
   type?: string;
@@ -20,17 +20,13 @@ export default function PasswordEntryInput({
   mandatory,
   type,
   errMsg,
-}: TextInputProps) {
+}: PasswordEntryInputProps) {
   const [inputValue, setInputValue] = useState<string>(defaultValue ?? '');
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
 
   const handleInvalid = (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (e.currentTarget.checkValidity()) {
-      setShowToolTip(false);
-    } else {
-      setShowToolTip(true);
-    }
+    setShowToolTip(!e.currentTarget.checkValidity());
   };
 
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
