@@ -36,10 +36,10 @@ export default function RootLayout({
           TREZOR_CONNECT_CONFIG.init = true;
         })
         .catch((error) => {
-        // FATAL ERROR
-        console.error(error);
-        return;
-      });
+          // FATAL ERROR
+          console.error(error);
+          return;
+        });
     }
 
     // cleanup

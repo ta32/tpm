@@ -10,7 +10,11 @@ export enum DropboxSessionStatus {
   CONNECTED = 'CONNECTED',
 }
 
-export function useDropboxSession(locationSearch: string, clientId: string|undefined, codeVerifier: string | null): DropboxSessionStatus {
+export function useDropboxSession(
+  locationSearch: string,
+  clientId: string | undefined,
+  codeVerifier: string | null
+): DropboxSessionStatus {
   const { dropbox } = useContext(DependenciesContext);
   const { connectDropbox, hasRedirectedFromAuth } = dropbox();
   const [user] = useUser();

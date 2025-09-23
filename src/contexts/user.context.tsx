@@ -1,15 +1,6 @@
-import React, {
-  createContext,
-  Dispatch,
-  MutableRefObject,
-  RefObject,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-} from 'react';
+import React, { createContext, Dispatch, useContext, useReducer } from 'react';
 import { User, UserAction, userReducer, UserStatus } from './reducers/user.reducer';
-import { Dropbox } from 'dropbox';
+
 export { type User } from './reducers/user.reducer';
 
 const defaultInitialUser = {

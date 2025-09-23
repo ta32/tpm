@@ -15,7 +15,7 @@ interface DeleteModalProps {
 export default function DeleteModal({ entryName, show, submitCallback, cancelCallback }: DeleteModalProps) {
   return (
     <Modal
-      dataCy={"delete-modal"}
+      dataCy={'delete-modal'}
       show={show}
       xOffset={50}
       yOffset={10}
@@ -38,7 +38,7 @@ export default function DeleteModal({ entryName, show, submitCallback, cancelCal
           </button>
         </div>
         <div className={`${Styles.tag_controls}`}>
-          <button data-cy={"delete-confirmation"} type="button" className={Styles.red} onClick={submitCallback}>
+          <button data-cy={'delete-confirmation'} type="button" className={Styles.red} onClick={submitCallback}>
             Yes, Remove
           </button>
           <button type="button" className={Styles.blank} onClick={cancelCallback}>

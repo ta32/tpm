@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
-import styles from '../TableEntry.module.scss';
+import styles from './ClosedEntry.module.scss';
 import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/tag-entries.context';
@@ -9,7 +9,7 @@ import { ClearPasswordEntry, SafePasswordEntry } from 'lib/trezor';
 import ToolTip from 'components/ui/ToolTip';
 import { useUser } from 'contexts/user.context';
 import { UserStatus } from 'contexts/reducers/user.reducer';
-import { DependenciesContext } from '../../../../../contexts/deps.context';
+import { DependenciesContext } from 'contexts/deps.context';
 
 enum STATUS {
   DECRYPTING_ENTRY,
@@ -155,16 +155,20 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
     }
   };
   return (
-    <>
+    <div className={styles.container}>
       {renderLockedEntryIcon(safeEntry.tags[0] ?? '')}
       {renderAccountInfo()}
       {!locked && (
         <div className={styles.account_info_controls}>
-          <button data-cy={`closed-entry-edit-button-${safeEntry.title}`} className={styles.edit_btn} onClick={handleEditEntry}>
+          <button
+            data-cy={`closed-entry-edit-button-${safeEntry.title}`}
+            className={styles.edit_btn}
+            onClick={handleEditEntry}
+          >
             Edit
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }

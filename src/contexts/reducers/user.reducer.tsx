@@ -97,12 +97,6 @@ export function userReducer(state: User, action: UserAction): User {
       }
     }
     case 'ADD_DEVICE': {
-      if (action.device === null && state.status === UserStatus.ONLINE_NO_TREZOR) {
-        return {
-          ...state,
-          status: UserStatus.TREZOR_UNACQUIRED_DEVICE,
-        };
-      }
       if (state.status === UserStatus.ONLINE_NO_TREZOR) {
         return {
           ...state,
@@ -151,8 +145,8 @@ export function userReducer(state: User, action: UserAction): User {
     case 'TREZOR_BRIDGE_UNAVAILABLE': {
       return {
         ...state,
-        status: UserStatus.TREZOR_BRIDGE_UNAVAILABLE
-      }
+        status: UserStatus.TREZOR_BRIDGE_UNAVAILABLE,
+      };
     }
     case 'TREZOR_BRIDGE_AVAILABLE': {
       const online = state.dbc != null;

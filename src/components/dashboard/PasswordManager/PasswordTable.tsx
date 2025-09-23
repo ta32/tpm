@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import styles from './PasswordTable.module.scss';
 import Colors from 'styles/colors.module.scss';
 import FilterInput from './PasswordTable/FilterInput';
-import TableEntry from './PasswordTable/TableEntry';
+import PasswordEntry from './PasswordTable/PasswordEntry';
 import ImportPasswordsModal from './PasswordTable/ImportPasswordsModal';
 import { usePasswordEntries, usePasswordEntriesDispatch } from 'contexts/password-entries.context';
 import { fromState } from 'lib/storage';
@@ -274,7 +274,7 @@ export default function PasswordTable({
       </div>
       <div className={styles.dashboard}>
         {
-          <TableEntry
+          <PasswordEntry
             locked={false}
             row={{ type: 'NEW_ENTRY' }}
             hidden={!newEntry}
@@ -286,7 +286,7 @@ export default function PasswordTable({
         }
         {entries.map((entry) => {
           return (
-            <TableEntry
+            <PasswordEntry
               locked={lockEntries}
               row={{ type: 'VIEW_ENTRY', entry: entry }}
               key={entry.key}
