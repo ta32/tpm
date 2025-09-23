@@ -1,7 +1,6 @@
 import styles from './PasswordEntryInput.module.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ToolTip from 'components/ui/ToolTip';
-import { value } from '@trezor/utxo-lib/lib/payments/lazy';
 
 interface PasswordEntryInputProps {
   name: string;
