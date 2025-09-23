@@ -101,7 +101,7 @@ export default function ExpandedEntry({
           cancelCallback={handleCancelRemoveEntry}
         />
       )}
-      <form className={styles.entry} onSubmit={handleSubmitEntry} noValidate={false} onChange={handleChange}>
+      <form className={styles.entry} onSubmit={handleSubmitEntry} onChange={handleChange}>
         {renderIcon(entry?.tags[0] ?? '')}
         <div className={styles.account_info}>
           <TextInput
