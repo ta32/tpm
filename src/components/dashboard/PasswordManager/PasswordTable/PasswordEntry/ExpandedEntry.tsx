@@ -119,7 +119,7 @@ export default function ExpandedEntry({
           {entry?.title && (
             <div className={styles.layout}>
               <div className={styles.container}>
-                <span className={styles.label}>Actions</span>
+                <label className={styles.label}>Actions</label>
                 <button
                   data-cy={'expanded-entry-remove-password'}
                   className={styles.remove_button}
