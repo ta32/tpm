@@ -172,3 +172,56 @@
     }
   }
 }
+
+
+.remove_button {
+  display: flex;
+  align-items: center;
+  width: 15rem;
+  border-radius: 3px;
+  background-color: colors.$red;
+  color: colors.$white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border: none;
+}
+
+.delete_icon {
+  margin-right: 0.5rem;
+  fill: colors.$white;
+}
+
+.save_btn {
+  margin-top: variables.$account_info_controls_margin;
+  margin-right: 1rem;
+  border: none;
+  background-color: rgb(colors.$green,1);
+  color: colors.$white;
+  border-radius: 3px;
+  width: 6rem;
+  height: 2.5rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    background-color: rgb(colors.$green,0.8);
+    cursor: pointer;
+  }
+}
+
+.discard_btn {
+  margin-top: variables.$account_info_controls_margin;
+  margin-right: 1rem;
+  background-color: rgb(colors.$white,1);
+  border: 1px solid colors.$black;
+  color: colors.$black;
+  border-radius: 3px;
+  width: 6rem;
+  height: 2.5rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    color: colors.$black;
+    border-color: colors.$black;
+    cursor: pointer;
+  }
+}

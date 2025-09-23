@@ -15,12 +15,15 @@ export default function SecretInput({ name, entry }: SecretInputProps) {
   const handleToggleShowSecret = () => {
     setShowSecret(!showSecret);
   };
+
+  const inputType = showSecret ? 'text' : 'password';
+
   const defaultValue = entry?.safeNote ?? '';
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
         <PasswordEntryInput
-          type={'secret'}
+          type={inputType}
           label={'Secret Note'}
           name={name}
           placeholder={''}

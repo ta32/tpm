@@ -113,13 +113,13 @@ export default function ExpandedEntry({
           />
           <TextInput name="title" label="Title" defaultValue={entry?.title} />
           <TextInput name="username" label="Username" defaultValue={entry?.username} />
-          <PasswordInput name={'password'} entry={entry} />
+          <PasswordInput name={'password'} entry={entry} onPasswordGenerated={handleChange} />
           <TagInput name={'tags'} label={'Tags'} initialTags={entry?.tags} />
           <SecretInput name={'safeNote'} entry={entry} />
           {entry?.title && (
             <div className={styles.layout}>
               <div className={styles.container}>
-                <label className={styles.label}>Actions</label>
+                <span className={styles.label}>Actions</span>
                 <button
                   data-cy={'expanded-entry-remove-password'}
                   className={styles.remove_button}

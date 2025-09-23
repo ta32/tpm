@@ -8,36 +8,43 @@ import generatePassword from 'lib/password';
 import Colors from 'styles/colors.module.scss';
 import styles from 'components/dashboard/PasswordManager/PasswordTable/PasswordEntry/ExpandedEntry.module.scss';
 
-type DefaultTypes = string | string[] | null;
 
 interface PasswordInputProps {
   name: string;
-  onChanged?: () => void;
+  onPasswordGenerated?: () => void;
   entry?: ClearPasswordEntry | null;
 }
-export default function PasswordInput({ name, entry, onChanged }: PasswordInputProps) {
+export default function PasswordInput({ name, entry, onPasswordGenerated }: PasswordInputProps) {
   const defaultValue = entry?.password ?? '';
-  const [inputValue, setInputValue] = useState<DefaultTypes>(defaultValue);
+  const [inputValue, setInputValue] = useState<string>(defaultValue);
   const [showSecret, setShowSecret] = useState(false);
   const handleToggleShowPassword = () => {
     setShowSecret(!showSecret);
   };
   const handleGeneratePassword = () => {
-    if (onChanged) {
-      onChanged();
+    if (onPasswordGenerated) {
+      onPasswordGenerated();
     }
     const password = generatePassword(16);
     setInputValue(password);
   };
+
+  const onInputValueChange = (value: string) => {
+    setInputValue(value);
+  }
+
+  const passwordInputType = showSecret ? 'text' : 'password';
+
   return (
     <div className={styles.layout}>
       <div className={styles.container}>
         <PasswordEntryInput
-          type={'password'}
+          type={passwordInputType}
           label={'Password'}
           name={name}
           placeholder={''}
-          defaultValue={defaultValue}
+          value={inputValue}
+          onInputValueChange={onInputValueChange}
         ></PasswordEntryInput>
       </div>
       <div className={styles.container_row_no_wrap}>

@@ -1,0 +1,182 @@
+@use "styles/colors.module";
+@use "styles/animations";
+@use "styles/mixins";
+@use "styles/variables";
+
+.account_info {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.account_info_controls {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.avatar_mini {
+  display: flex;
+  position: relative;
+  margin: 15px 15px 10px 20px;
+  border-radius: 4px;
+  height: variables.$avatar_size;
+  width: variables.$avatar_size;
+  img {
+    position: absolute;
+  }
+  &.shaded {
+    background-color: rgba(colors.$grey_content_font, .4);
+  }
+}
+
+.title {
+  padding-left: 1rem;
+  display: inline;
+  font-size: 1rem;
+  color: colors.$grey_content_font;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+}
+strong.title {
+  font-size: 1.3rem;
+}
+
+.credentials {
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: row;
+  @include mixins.text_sm;
+  color: colors.$grey_font;
+  text-overflow: ellipsis;
+
+  input {
+    width: 75px;
+    border: none;
+    background-color: transparent;
+    letter-spacing: 0.1rem;
+  }
+
+  .label {
+    margin-bottom: 0.25rem;
+  }
+
+  .password_shadow {
+    visibility: hidden;
+    margin-left: 0.5rem;
+    transition: all 30ms ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.trezor_btn {
+  background: linear-gradient(colors.$blue_dark_very_much, colors.$blue);
+  padding: 0 5px 10px 5px;
+  animation: shake 1.2s cubic-bezier(0.36, 0.07, 0, 0.1) infinite;
+}
+
+.save_btn {
+  margin-top: variables.$account_info_controls_margin;
+  margin-right: 1rem;
+  border: none;
+  background-color: rgb(colors.$green,1);
+  color: colors.$white;
+  border-radius: 3px;
+  width: 6rem;
+  height: 2.5rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    background-color: rgb(colors.$green,0.8);
+    cursor: pointer;
+  }
+}
+
+.discard_btn {
+  margin-top: variables.$account_info_controls_margin;
+  margin-right: 1rem;
+  background-color: rgb(colors.$white,1);
+  border: 1px solid colors.$black;
+  color: colors.$black;
+  border-radius: 3px;
+  width: 6rem;
+  height: 2.5rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    color: colors.$black;
+    border-color: colors.$black;
+    cursor: pointer;
+  }
+}
+
+.edit_btn {
+  margin-left: auto;
+  align-self: center;
+  margin-right: 1rem;
+  border: none;
+  visibility: hidden;
+  background-color: rgb(colors.$white,0);
+  color: colors.$grey_font;
+  border-radius: 3px;
+  width: 6rem;
+  padding: 0.5rem 0;
+
+  &:hover {
+    background-color: colors.$white;
+  }
+}
+
+.remove_button {
+  display: flex;
+  align-items: center;
+  width: 15rem;
+  border-radius: 3px;
+  background-color: colors.$red;
+  color: colors.$white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border: none;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  &:hover {
+    .password_shadow {
+      color: colors.$black;
+      visibility: visible !important;
+    }
+    .edit_btn {
+      visibility: visible !important;
+    }
+  }
+}
+
+.remove_button {
+  display: flex;
+  align-items: center;
+  width: 15rem;
+  border-radius: 3px;
+  background-color: colors.$red;
+  color: colors.$white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  border: none;
+}
+
+.delete_icon {
+  margin-right: 0.5rem;
+  fill: colors.$white;
+}

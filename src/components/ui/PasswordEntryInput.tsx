@@ -1,6 +1,7 @@
 import styles from './PasswordEntryInput.module.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ToolTip from 'components/ui/ToolTip';
+import { value } from '@trezor/utxo-lib/lib/payments/lazy';
 
 interface PasswordEntryInputProps {
   name: string;
@@ -8,18 +9,22 @@ interface PasswordEntryInputProps {
   type?: string;
   placeholder?: string;
   mandatory?: boolean;
+  value?: string;
   defaultValue?: string | undefined;
   errMsg?: string;
+  onInputValueChange?: (value: string) => void;
 }
 
 export default function PasswordEntryInput({
   label,
   name,
   placeholder,
+  value,
   defaultValue,
   mandatory,
   type,
   errMsg,
+  onInputValueChange
 }: PasswordEntryInputProps) {
   const [inputValue, setInputValue] = useState<string>(defaultValue ?? '');
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
@@ -34,7 +39,11 @@ export default function PasswordEntryInput({
     if (e.currentTarget.checkValidity()) {
       setShowToolTip(false);
     }
-    setInputValue(e.currentTarget.value);
+    if (onInputValueChange) {
+      onInputValueChange(e.currentTarget.value);
+    } else {
+      setInputValue(e.currentTarget.value);
+    }
   };
 
   const renderInput = () => {
@@ -48,7 +57,7 @@ export default function PasswordEntryInput({
         className={`${name.toLowerCase()}-input ${styles.input} ${showToolTip ? styles.invalid : ''}`}
         type={type ?? 'text'}
         placeholder={placeholder ?? ''}
-        value={inputValue != null ? inputValue : ''}
+        value={value? value : inputValue}
         required={mandatory}
         onInvalid={handleInvalid}
         onChange={onChange}

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { getTag } from 'contexts/reducers/tag-entries.reducer';
 import { IMAGE_FILE, SELECTABLE_TAG_ICONS } from 'lib/images';
-import styles from '../PasswordEntry.module.scss';
+import styles from './ClosedEntry.module.scss';
 import Image from 'next/image';
 import Colors from 'styles/colors.module.scss';
 import { useTagEntries } from 'contexts/tag-entries.context';
@@ -155,7 +155,7 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
     }
   };
   return (
-    <>
+    <div className={styles.container}>
       {renderLockedEntryIcon(safeEntry.tags[0] ?? '')}
       {renderAccountInfo()}
       {!locked && (
@@ -169,6 +169,6 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }
