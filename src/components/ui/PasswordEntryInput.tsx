@@ -24,7 +24,7 @@ export default function PasswordEntryInput({
   mandatory,
   type,
   errMsg,
-  onInputValueChange
+  onInputValueChange,
 }: PasswordEntryInputProps) {
   const [inputValue, setInputValue] = useState<string>(defaultValue ?? '');
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
@@ -57,7 +57,7 @@ export default function PasswordEntryInput({
         className={`${name.toLowerCase()}-input ${styles.input} ${showToolTip ? styles.invalid : ''}`}
         type={type ?? 'text'}
         placeholder={placeholder ?? ''}
-        value={value? value : inputValue}
+        value={value ? value : inputValue}
         required={mandatory}
         onInvalid={handleInvalid}
         onChange={onChange}

@@ -8,7 +8,6 @@ import generatePassword from 'lib/password';
 import Colors from 'styles/colors.module.scss';
 import styles from 'components/dashboard/PasswordManager/PasswordTable/PasswordEntry/ExpandedEntry.module.scss';
 
-
 interface PasswordInputProps {
   name: string;
   onPasswordGenerated?: () => void;
@@ -31,7 +30,7 @@ export default function PasswordInput({ name, entry, onPasswordGenerated }: Pass
 
   const onInputValueChange = (value: string) => {
     setInputValue(value);
-  }
+  };
 
   const passwordInputType = showSecret ? 'text' : 'password';
 
