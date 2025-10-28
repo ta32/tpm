@@ -6,7 +6,7 @@ import { User, UserProvider } from 'contexts/user.context';
 import { IMAGE_FILE } from 'lib/images';
 import { Dropbox, DropboxAuth } from 'dropbox';
 import { Dependencies, DependenciesContext } from 'contexts/deps.context';
-import { withDropboxService, withServices, withStubDeps, withTrezorService } from 'lib/mocks';
+import { withDropboxService, withServices, withStubDeps, withTrezorService } from 'test-utils/mocks';
 import { DropboxService } from 'lib/dropbox';
 import { TrezorService } from 'lib/trezor';
 import { TransportEventMessage } from '@trezor/connect-web';

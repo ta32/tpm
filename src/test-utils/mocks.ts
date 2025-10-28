@@ -1,5 +1,5 @@
 import { Dependencies } from 'contexts/deps.context';
-import { TrezorService } from 'lib/trezor';
+import { SafePasswordEntry, TrezorService } from 'lib/trezor';
 import { DropboxService } from 'lib/dropbox';
 import { User, UserStatus } from 'contexts/reducers/user.reducer';
 import { Dropbox } from 'dropbox';
@@ -41,7 +41,24 @@ export function withTrezorPasswordEntry(title: string, tags: string[]): any {
   };
 }
 
-// endregion
+export function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry {
+  return {
+    key: `key${num}`,
+    item: `item${num}`,
+    title: `Title${num}`,
+    username: `username${num}`,
+    passwordEnc: new Uint8Array([num]),
+    secretNoteEnc: new Uint8Array([num]),
+    safeKey: `safeKey${num}`,
+    tags: [`tag${num}`],
+    createdDate: 0,
+    lastModifiedDate: 0,
+    legacyMode: legacy,
+    modelVersion: '1',
+  };
+}
+
+// endregion Object Builders
 
 // region Dependency Builders
 
@@ -112,4 +129,4 @@ export function withServices(
     }),
   };
 }
-// endregion
+// endregion Dependency Builders

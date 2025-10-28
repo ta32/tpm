@@ -1,7 +1,7 @@
 import { it, expect } from '@jest/globals';
 import { TextDecoder, TextEncoder } from 'util';
 import { AppData, deserializeObject, mergeAppData, serializeObject, TrezorAppData } from './storage';
-import { withTrezorPasswordEntry } from './mocks';
+import { withTrezorPasswordEntry } from '../test-utils/mocks';
 
 // Node.Js polyfills for WebAPIs
 Object.assign(global, { TextDecoder, TextEncoder });
