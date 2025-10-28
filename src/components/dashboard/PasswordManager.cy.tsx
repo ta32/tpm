@@ -131,7 +131,7 @@ function DashboardPageWrapper({ deps, initialUser, initialTags, children }: Dash
 }
 // endregion
 
-describe('Password Manager Page Tests', () => {
+describe('PasswordManager - Interactions ', () => {
   beforeEach(() => {
     IMAGE_FILE.getPaths().forEach((image) => {
       cy.readFile(`Public${image}`, null).then((img) => {
@@ -321,7 +321,7 @@ describe('Password Manager Page Tests', () => {
         <PasswordManager />
       </DashboardPageWrapper>
     ).then(() => {
-      debugger;
+      // debugger;
     });
     cy.get('[data-cy=password-table-account-name]').should('exist').click();
     cy.get('[data-cy=password-table-import-passwords]').click();
@@ -443,7 +443,7 @@ describe('Password Manager Page Tests', () => {
   });
 });
 
-describe('Password Table snapshot tests', () => {
+describe('PasswordManager - Layout', () => {
   beforeEach(() => {
     IMAGE_FILE.getPaths().forEach((image) => {
       cy.readFile(`Public${image}`, null).then((img) => {
@@ -457,7 +457,7 @@ describe('Password Table snapshot tests', () => {
     });
   });
 
-  it('password multiple closed entries', () => {
+  it('password multiple closed entries left aligned', () => {
     const user = withLoggedInUser();
     const appData: AppData = {
       entries: [
@@ -476,15 +476,14 @@ describe('Password Table snapshot tests', () => {
     };
     const customDeps = withTrezorService(trezorService);
     cy.viewport(1920, 1080);
-    // cy.mount(
-    //   <DashboardPageWrapper initialUser={user} deps={customDeps}>
-    //     <PasswordManager />
-    //   </DashboardPageWrapper>
-    // ).then(() => {
-    //   cy.get('[data-cy=password-table]').toMatchImageSnapshot({
-    //     failureThreshold: 0.01,
-    //     failureThresholdType: 'percentage',
-    //   });
-    // });
+    cy.mount(
+      <DashboardPageWrapper initialUser={user} deps={customDeps}>
+        <PasswordManager />
+      </DashboardPageWrapper>
+    ).then(() => {
+      // debugger;
+    });
+    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title2]');
+    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title5]');
   });
 });

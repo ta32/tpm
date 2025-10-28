@@ -35,6 +35,11 @@
 //     }
 //   }
 // }
+
+// indicates file is a module
+// https://stackoverflow.com/questions/57132428/augmentations-for-the-global-scope-can-only-be-directly-nested-in-external-modul
+export {};
+
 const within = (a: number, b: number, tol = 2) => Math.abs(a - b) <= tol;
 
 Cypress.Commands.add('shouldAlignLeft', (aSel: string, bSel: string, tol = 2) => {
@@ -61,8 +66,10 @@ Cypress.Commands.add('shouldAlignMiddleY', (aSel: string, bSel: string, tol = 2)
 declare global {
   namespace Cypress {
     interface Chainable {
-      shouldAlignLeft(aSel: string, bSel: string, tol?: number): Chainable<JQuery<HTMLElement>>;
-      shouldAlignMiddleY(aSel: string, bSel: string, tol?: number): Chainable<JQuery<HTMLElement>>;
+      /** Assert that the left edges of the two elements are aligned within `tol` pixels. */
+      shouldAlignLeft(aSel: string, bSel: string, tol?: number): Chainable;
+      /** Assert that the vertical middles of the two elements are aligned within `tol` pixels. */
+      shouldAlignMiddleY(aSel: string, bSel: string, tol?: number): Chainable;
     }
   }
 }
