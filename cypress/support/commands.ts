@@ -35,3 +35,34 @@
 //     }
 //   }
 // }
+const within = (a: number, b: number, tol = 2) => Math.abs(a - b) <= tol;
+
+Cypress.Commands.add('shouldAlignLeft', (aSel: string, bSel: string, tol = 2) => {
+  cy.get(aSel).then(($a) => {
+    const a = $a[0].getBoundingClientRect();
+    cy.get(bSel).then(($b) => {
+      const b = $b[0].getBoundingClientRect();
+      expect(within(a.left, b.left, tol), `left edges: ${a.left} vs ${b.left}`).to.be.true;
+    });
+  });
+});
+
+Cypress.Commands.add('shouldAlignMiddleY', (aSel: string, bSel: string, tol = 2) => {
+  const mid = (r: DOMRect) => r.top + r.height / 2;
+  cy.get(aSel).then(($a) => {
+    const a = $a[0].getBoundingClientRect();
+    cy.get(bSel).then(($b) => {
+      const b = $b[0].getBoundingClientRect();
+      expect(within(mid(a), mid(b), tol), `vertical middles: ${mid(a)} vs ${mid(b)}`).to.be.true;
+    });
+  });
+});
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      shouldAlignLeft(aSel: string, bSel: string, tol?: number): Chainable<JQuery<HTMLElement>>;
+      shouldAlignMiddleY(aSel: string, bSel: string, tol?: number): Chainable<JQuery<HTMLElement>>;
+    }
+  }
+}
