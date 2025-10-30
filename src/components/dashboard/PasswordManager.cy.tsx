@@ -483,7 +483,7 @@ describe('PasswordManager - Layout', () => {
     ).then(() => {
       // debugger;
     });
-    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title2]');
-    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title5]');
+    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title2]', 2, true);
+    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title5]', 2, true);
   });
 });
