@@ -13,7 +13,13 @@ import { Dependencies, DependenciesContext } from 'contexts/deps.context';
 import { AppData, TrezorAppData } from 'lib/storage';
 import { ClearPasswordEntry, SafePasswordEntry, TrezorService } from 'lib/trezor';
 import { TagEntries, TagEntry, TagsStatus } from 'contexts/reducers/tag-entries.reducer';
-import { withLoggedInUser, withServices, withTrezorPasswordEntry, withTrezorService } from 'lib/mocks';
+import {
+  withLoggedInUser,
+  withSafePasswordEntry,
+  withServices,
+  withTrezorPasswordEntry,
+  withTrezorService,
+} from 'test-utils/mocks';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,22 +33,6 @@ interface DashboardPageProps {
 // endregion
 
 // region Helpers
-function withSafePasswordEntry(num: number, legacy: boolean): SafePasswordEntry {
-  return {
-    key: `key${num}`,
-    item: `item${num}`,
-    title: `Title${num}`,
-    username: `username${num}`,
-    passwordEnc: new Uint8Array([num]),
-    secretNoteEnc: new Uint8Array([num]),
-    safeKey: `safeKey${num}`,
-    tags: [`tag${num}`],
-    createdDate: 0,
-    lastModifiedDate: 0,
-    legacyMode: legacy,
-    modelVersion: '1',
-  };
-}
 function withSafePasswordEntryFrom(clearEntry: ClearPasswordEntry): SafePasswordEntry {
   return {
     key: clearEntry.key,
@@ -141,7 +131,7 @@ function DashboardPageWrapper({ deps, initialUser, initialTags, children }: Dash
 }
 // endregion
 
-describe('Password Manager Page Tests', () => {
+describe('PasswordManager - Interactions ', () => {
   beforeEach(() => {
     IMAGE_FILE.getPaths().forEach((image) => {
       cy.readFile(`Public${image}`, null).then((img) => {
@@ -331,7 +321,7 @@ describe('Password Manager Page Tests', () => {
         <PasswordManager />
       </DashboardPageWrapper>
     ).then(() => {
-      debugger;
+      // debugger;
     });
     cy.get('[data-cy=password-table-account-name]').should('exist').click();
     cy.get('[data-cy=password-table-import-passwords]').click();
@@ -450,5 +440,50 @@ describe('Password Manager Page Tests', () => {
 
     cy.get(`[data-cy=closed-entry-title-${entryTwoTitle}]`).should('not.exist');
     cy.get(`[data-cy=closed-entry-title-${entryOneTitle}]`).should('exist');
+  });
+});
+
+describe('PasswordManager - Layout', () => {
+  beforeEach(() => {
+    IMAGE_FILE.getPaths().forEach((image) => {
+      cy.readFile(`Public${image}`, null).then((img) => {
+        // Intercept requests to Next.js backend image endpoint
+        cy.intercept('_next/image*', {
+          statusCode: 200,
+          headers: { 'Content-Type': 'image/png' },
+          body: img.buffer,
+        });
+      });
+    });
+  });
+
+  it('password multiple closed entries left aligned', () => {
+    const user = withLoggedInUser();
+    const appData: AppData = {
+      entries: [
+        withSafePasswordEntry(1, false),
+        withSafePasswordEntry(2, false),
+        withSafePasswordEntry(3, false),
+        withSafePasswordEntry(4, false),
+        withSafePasswordEntry(5, false),
+      ],
+      version: 1,
+      tags: [],
+      modelVersion: '1',
+    };
+    const trezorService = {
+      decryptAppData: cy.stub().resolves(appData),
+    };
+    const customDeps = withTrezorService(trezorService);
+    cy.viewport(1920, 1080);
+    cy.mount(
+      <DashboardPageWrapper initialUser={user} deps={customDeps}>
+        <PasswordManager />
+      </DashboardPageWrapper>
+    ).then(() => {
+      // debugger;
+    });
+    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title2]', 2, true);
+    cy.shouldAlignLeft('[data-cy=closed-entry-title-Title1]', '[data-cy=closed-entry-title-Title5]', 2, true);
   });
 });

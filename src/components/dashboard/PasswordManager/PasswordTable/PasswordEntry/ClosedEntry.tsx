@@ -126,6 +126,7 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
               <div
+                data-cy={`closed-entry-username-${safeEntry.key}`}
                 className={`${styles.label} ${styles.clickable}`}
                 onClick={() => handleCopyUsername(safeEntry.username)}
               >
