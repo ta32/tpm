@@ -25,7 +25,6 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-
 // indicates file is a module
 // https://stackoverflow.com/questions/57132428/augmentations-for-the-global-scope-can-only-be-directly-nested-in-external-modul
 export {};
@@ -37,19 +36,15 @@ function injectVLine(doc: Document, x: number, color = 'red', id = ''): HTMLElem
   const win = doc.defaultView || window;
   // convert viewport X (boundingClientRect.left) to document/page X
   const pageX = Math.round(x + (win.pageXOffset ?? win.scrollX ?? 0));
-  const pageHeight = Math.max(
-    doc.documentElement?.scrollHeight || 0,
-    doc.body?.scrollHeight || 0,
-    win.innerHeight
-  );
+  const pageHeight = Math.max(doc.documentElement?.scrollHeight || 0, doc.body?.scrollHeight || 0, win.innerHeight);
 
   const el = doc.createElement('div');
   el.setAttribute('data-cy-alignment', id || 'alignment-line');
   Object.assign(el.style, {
-    position: 'absolute',         // moves with the page content
+    position: 'absolute', // moves with the page content
     left: `${pageX}px`,
     top: '0px',
-    height: `${pageHeight}px`,    // cover full page height so it stays aligned when scrolling
+    height: `${pageHeight}px`, // cover full page height so it stays aligned when scrolling
     width: '1px',
     background: color,
     zIndex: '999999',
@@ -97,16 +92,18 @@ Cypress.Commands.add('shouldAlignLeft', (aSel: string, bSel: string, tol = 2, re
     cy.get(bSel).then(($b) => {
       const b = $b[0].getBoundingClientRect();
       if (render) {
-        cy.window().then((win) => {
-          // inject two vertical lines for visual debugging
-          injectVLine(win.document, a.left, 'rgba(255,3,3,0.9)', 'alignment-a-left');
-          injectVLine(win.document, b.left, 'rgba(255,0,0,0.9)', 'alignment-b-left');
-          // inject bounding boxes for the elements: left=green, right=blue
-          injectBoxHighlight(win.document, a, 'rgba(0,59,255,0.9)', 'alignment-box-a');
-          injectBoxHighlight(win.document, b, 'rgba(0,177,253,0.9)', 'alignment-box-b');
-        }).then(() => {
-          expect(within(a.left, b.left, tol), `left edges: ${a.left} vs ${b.left}`).to.be.true;
-        })
+        cy.window()
+          .then((win) => {
+            // inject two vertical lines for visual debugging
+            injectVLine(win.document, a.left, 'rgba(255,3,3,0.9)', 'alignment-a-left');
+            injectVLine(win.document, b.left, 'rgba(255,0,0,0.9)', 'alignment-b-left');
+            // inject bounding boxes for the elements: left=green, right=blue
+            injectBoxHighlight(win.document, a, 'rgba(0,59,255,0.9)', 'alignment-box-a');
+            injectBoxHighlight(win.document, b, 'rgba(0,177,253,0.9)', 'alignment-box-b');
+          })
+          .then(() => {
+            expect(within(a.left, b.left, tol), `left edges: ${a.left} vs ${b.left}`).to.be.true;
+          });
       } else {
         expect(within(a.left, b.left, tol), `left edges: ${a.left} vs ${b.left}`).to.be.true;
       }
@@ -123,25 +120,25 @@ Cypress.Commands.add('shouldAlignMiddleY', (aSel: string, bSel: string, tol = 2,
       if (render) {
         cy.window().then((win) => {
           // inject horizontal lines by creating thin full-width divs positioned at mid Y
-           const doc = win.document;
-           const yA = Math.round(mid(a));
-           const yB = Math.round(mid(b));
-           const makeHLine = (y: number, color: string, id: string) => {
-             const el = doc.createElement('div');
-             el.setAttribute('data-cy-alignment', id);
-             Object.assign(el.style, {
-               position: 'fixed',
-               left: '0',
-               top: `${y}px`,
-               width: '100vw',
-               height: '2px',
-               background: color,
-               zIndex: '999999',
-               pointerEvents: 'none',
-               opacity: '0.8',
-             } as CSSStyleDeclaration);
-             doc.body.appendChild(el);
-           };
+          const doc = win.document;
+          const yA = Math.round(mid(a));
+          const yB = Math.round(mid(b));
+          const makeHLine = (y: number, color: string, id: string) => {
+            const el = doc.createElement('div');
+            el.setAttribute('data-cy-alignment', id);
+            Object.assign(el.style, {
+              position: 'fixed',
+              left: '0',
+              top: `${y}px`,
+              width: '100vw',
+              height: '2px',
+              background: color,
+              zIndex: '999999',
+              pointerEvents: 'none',
+              opacity: '0.8',
+            } as CSSStyleDeclaration);
+            doc.body.appendChild(el);
+          };
           makeHLine(yA, 'rgba(255,165,0,0.9)', 'alignment-a-mid');
           makeHLine(yB, 'rgba(255,165,0,0.9)', 'alignment-b-mid');
           // inject bounding boxes for the elements: left=green, right=blue
