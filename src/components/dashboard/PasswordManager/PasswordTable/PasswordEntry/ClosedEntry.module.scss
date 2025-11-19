@@ -80,6 +80,10 @@ strong.title {
   cursor: pointer;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .trezor_btn {
   background: linear-gradient(colors.$blue_dark_very_much, colors.$blue);
   padding: 0 5px 10px 5px;
@@ -132,9 +136,11 @@ strong.title {
   border-radius: 3px;
   width: 6rem;
   padding: 0.5rem 0;
+  cursor: pointer;
 
   &:hover {
     background-color: colors.$white;
+    cursor: pointer;
   }
 }
 
