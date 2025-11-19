@@ -17,17 +17,15 @@ interface PasswordTableProps {
   children: React.ReactNode;
 }
 
-function PasswordTableWrapper({children}: PasswordTableProps) {
+function PasswordTableWrapper({ children }: PasswordTableProps) {
   const user = withLoggedInUser();
   return (
     <div className={inter.className} style={{ margin: 0 }}>
       <UserProvider initialUser={user}>
-        <TagEntriesProvider>
-          {children}
-        </TagEntriesProvider>
+        <TagEntriesProvider>{children}</TagEntriesProvider>
       </UserProvider>
     </div>
-  )
+  );
 }
 describe('Password entry component test for closed entry', () => {
   beforeEach(() => {
@@ -69,10 +67,12 @@ describe('Password entry username cursor', () => {
         <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} />
       </PasswordTableWrapper>
     );
-    cy.get(`[data-cy=closed-entry-username-${safeEnty.key}]`).trigger('mouseover').should(($el) => {
-      const cursor = getComputedStyle($el[0]).cursor;
-      expect(cursor).to.equal('pointer');
-    });
+    cy.get(`[data-cy=closed-entry-username-${safeEnty.key}]`)
+      .trigger('mouseover')
+      .should(($el) => {
+        const cursor = getComputedStyle($el[0]).cursor;
+        expect(cursor).to.equal('pointer');
+      });
   });
 });
 
@@ -87,9 +87,12 @@ describe('Password entry edit button cursor', () => {
     );
     // Hover container to reveal edit button
     cy.get(`[data-cy=closed-entry-${safeEnty.key}]`).trigger('mouseover');
-    cy.get(`[data-cy=closed-entry-edit-button-${safeEnty.title}]`).should('be.visible').trigger('mouseover').should(($el) => {
-      const cursor = getComputedStyle($el[0]).cursor;
-      expect(cursor).to.equal('pointer');
-    });
+    cy.get(`[data-cy=closed-entry-edit-button-${safeEnty.title}]`)
+      .should('be.visible')
+      .trigger('mouseover')
+      .should(($el) => {
+        const cursor = getComputedStyle($el[0]).cursor;
+        expect(cursor).to.equal('pointer');
+      });
   });
 });
