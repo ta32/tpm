@@ -20,15 +20,29 @@ interface PasswordTableProps {
 function PasswordTableWrapper({ children }: PasswordTableProps) {
   const user = withLoggedInUser();
   return (
-    <div className={inter.className} style={{ margin: 0 }}>
+    <div className={inter.className}
+         style={{
+           margin: 0,
+           display: 'block',
+           minHeight: '100vh',
+           minWidth: '100vw',
+           backgroundColor: 'lightgray',
+         }}
+    >
       <UserProvider initialUser={user}>
         <TagEntriesProvider>{children}</TagEntriesProvider>
       </UserProvider>
     </div>
   );
 }
-describe('Password entry component test for closed entry', () => {
+
+const width = 1500;
+const height = 500;
+
+
+describe('Closed entry in locked state', () => {
   beforeEach(() => {
+    cy.viewport(width, height);
     IMAGE_FILE.getPaths().forEach((image) => {
       cy.readFile(`Public${image}`, null).then((img) => {
         // Intercept requests to Next.js backend image endpoint
@@ -41,25 +55,7 @@ describe('Password entry component test for closed entry', () => {
     });
   });
 
-  it('renders correctly', () => {
-    const safeEnty = withSafePasswordEntry(1, false);
-    const voidFn = () => {};
-
-    cy.viewport(2000, 100);
-    cy.mount(
-      <PasswordTableWrapper>
-        <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={true} onLockChange={voidFn} />
-      </PasswordTableWrapper>
-    ).then(() => {
-      // debugger;
-    });
-
-    cy.get('div').contains(safeEnty.title);
-  });
-});
-
-describe('Password entry username cursor', () => {
-  it('shows pointer cursor when hovering username', () => {
+  it('shows pointer on username', () => {
     const safeEnty = withSafePasswordEntry(2, false);
     const voidFn = () => {};
     cy.mount(
@@ -68,31 +64,98 @@ describe('Password entry username cursor', () => {
       </PasswordTableWrapper>
     );
     cy.get(`[data-cy=closed-entry-username-${safeEnty.key}]`)
-      .trigger('mouseover')
       .should(($el) => {
         const cursor = getComputedStyle($el[0]).cursor;
         expect(cursor).to.equal('pointer');
       });
   });
-});
 
-describe('Password entry edit button cursor', () => {
-  it('shows pointer cursor when hovering edit button', () => {
+  it('edit button is shown and clickable when the closed entry is hovered', () => {
     const safeEnty = withSafePasswordEntry(3, false);
+
+    // Cypress cannot test hover so need to set defaultIsHovered to true
     const voidFn = () => {};
     cy.mount(
       <PasswordTableWrapper>
-        <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} />
+        <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} defaultIsHovered={true} />
       </PasswordTableWrapper>
     );
-    // Hover container to reveal edit button
-    cy.get(`[data-cy=closed-entry-${safeEnty.key}]`).trigger('mouseover');
+
     cy.get(`[data-cy=closed-entry-edit-button-${safeEnty.title}]`)
       .should('be.visible')
-      .trigger('mouseover')
       .should(($el) => {
         const cursor = getComputedStyle($el[0]).cursor;
         expect(cursor).to.equal('pointer');
+      })
+      .click(); // Verify it's clickable
+  });
+
+  it('username, password shadow, and edit button are horizontally aligned when hovered', () => {
+    const safeEnty = withSafePasswordEntry(5, false);
+
+    // Cypress cannot test hover so need to set defaultIsHovered to true
+    const voidFn = () => {};
+    cy.mount(
+      <PasswordTableWrapper>
+        <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} defaultIsHovered={true} />
+      </PasswordTableWrapper>
+    );
+
+    // Check that username and password shadow are vertically aligned
+    cy.shouldAlignMiddleY(
+      `[data-cy=closed-entry-username-${safeEnty.key}]`,
+      `[data-cy=closed-entry-password-copy-${safeEnty.key}]`,
+      2,
+      true
+    );
+
+    // Check that username and edit button are vertically aligned
+    cy.shouldAlignMiddleY(
+      `[data-cy=closed-entry-username-${safeEnty.key}]`,
+      `[data-cy=closed-entry-edit-button-${safeEnty.title}]`,
+      2,
+      true
+    );
+
+    // Check that password shadow and edit button are vertically aligned
+    cy.shouldAlignMiddleY(
+      `[data-cy=closed-entry-password-copy-${safeEnty.key}]`,
+      `[data-cy=closed-entry-edit-button-${safeEnty.title}]`,
+      2,
+      true
+    );
+  });
+});
+
+
+describe('Closed entry being unlocked', () => {
+  beforeEach(() => {
+    cy.viewport(width, height);
+    IMAGE_FILE.getPaths().forEach((image) => {
+      cy.readFile(`Public${image}`, null).then((img) => {
+        // Intercept requests to Next.js backend image endpoint
+        cy.intercept('_next/image*', {
+          statusCode: 200,
+          headers: { 'Content-Type': 'image/png' },
+          body: img.buffer,
+        });
       });
+    });
+  });
+  it('copy password is pressed', () => {
+    const safeEnty = withSafePasswordEntry(4, false);
+    // Cypress cannot test hover so need to set defaultIsHovered to true
+    const voidFn = () => {};
+    cy.mount(
+      <PasswordTableWrapper>
+        <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} defaultIsHovered={true} />
+      </PasswordTableWrapper>
+    ).then(() => {
+      //debugger;
+    });
+    // Now the password copy button should be visible
+    cy.get(`[data-cy=closed-entry-password-copy-${safeEnty.key}]`)
+      .should('be.visible')
+      .click();
   });
 });

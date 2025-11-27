@@ -22,15 +22,17 @@ interface ClosedEntryProps {
   locked: boolean;
   safeEntry: SafePasswordEntry;
   onOpenEntry: (entry: ClearPasswordEntry) => void;
+  defaultIsHovered?: boolean;
 }
 
-export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, locked }: ClosedEntryProps) {
+export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, locked, defaultIsHovered }: ClosedEntryProps) {
   const { trezor } = useContext(DependenciesContext);
   const { decryptFullEntry } = trezor();
   const [status, setStatus] = useState(STATUS.DEFAULT);
   const [user] = useUser();
   const tagEntries = useTagEntries();
   const [copiedUsername, setCopiedUsername] = useState(false);
+  const [isHovered, setIsHovered] = useState(defaultIsHovered);
   const requiresTrezorAck = user.status === UserStatus.TREZOR_REQ_CONFIRMATION;
 
   const handleCopyUsername = (text: string) => {
@@ -120,14 +122,14 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
     } else {
       return (
         <div data-cy={`closed-entry-${safeEntry.key}`} className={styles.account_info}>
-          <label data-cy={'closed-entry-title-' + safeEntry.title} className={styles.title}>
+          <div data-cy={'closed-entry-title-' + safeEntry.title} className={styles.title}>
             {title}
-          </label>
+          </div>
           <div className={styles.credentials}>
             <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
               <div
                 data-cy={`closed-entry-username-${safeEntry.key}`}
-                className={`${styles.label} ${styles.clickable}`}
+                className={styles.username_label}
                 onClick={() => handleCopyUsername(safeEntry.username)}
               >
                 {safeEntry.username}
@@ -156,7 +158,12 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
     }
   };
   return (
-    <div className={styles.container}>
+    <div
+      className={`${styles.container} ${isHovered ? styles.hovered : ''}`}
+      data-cy={`closed-entry-container-${safeEntry.key}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {renderLockedEntryIcon(safeEntry.tags[0] ?? '')}
       {renderAccountInfo()}
       {!locked && (
