@@ -4,9 +4,10 @@ import { Inter } from 'next/font/google';
 import { IMAGE_FILE } from 'lib/images';
 import React from 'react';
 import ClosedEntry from './PasswordEntry/ClosedEntry';
-import { withLoggedInUser, withSafePasswordEntry } from 'test-utils/mocks';
+import { withLoggedInUser, withSafePasswordEntry, withStubDeps, withTrezorService } from 'test-utils/mocks';
 import { UserProvider } from 'contexts/user.context';
 import { TagEntriesProvider } from 'contexts/tag-entries.context';
+import { Dependencies, DependenciesContext } from 'contexts/deps.context';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,10 +15,11 @@ const inter = Inter({
 });
 
 interface PasswordTableProps {
+  deps: Dependencies;
   children: React.ReactNode;
 }
 
-function PasswordTableWrapper({ children }: PasswordTableProps) {
+function PasswordTableWrapper({ deps, children }: PasswordTableProps) {
   const user = withLoggedInUser();
   return (
     <div className={inter.className}
@@ -29,16 +31,17 @@ function PasswordTableWrapper({ children }: PasswordTableProps) {
            backgroundColor: 'lightgray',
          }}
     >
-      <UserProvider initialUser={user}>
-        <TagEntriesProvider>{children}</TagEntriesProvider>
-      </UserProvider>
+      <DependenciesContext.Provider value={deps}>
+        <UserProvider initialUser={user}>
+          <TagEntriesProvider>{children}</TagEntriesProvider>
+        </UserProvider>
+      </DependenciesContext.Provider>
     </div>
   );
 }
 
 const width = 1500;
 const height = 500;
-
 
 describe('Closed entry in locked state', () => {
   beforeEach(() => {
@@ -58,8 +61,9 @@ describe('Closed entry in locked state', () => {
   it('shows pointer on username', () => {
     const safeEnty = withSafePasswordEntry(2, false);
     const voidFn = () => {};
+    const deps = withStubDeps();
     cy.mount(
-      <PasswordTableWrapper>
+      <PasswordTableWrapper deps={deps}>
         <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} />
       </PasswordTableWrapper>
     );
@@ -75,8 +79,9 @@ describe('Closed entry in locked state', () => {
 
     // Cypress cannot test hover so need to set defaultIsHovered to true
     const voidFn = () => {};
+    const deps = withStubDeps();
     cy.mount(
-      <PasswordTableWrapper>
+      <PasswordTableWrapper deps={deps}>
         <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} defaultIsHovered={true} />
       </PasswordTableWrapper>
     );
@@ -95,8 +100,9 @@ describe('Closed entry in locked state', () => {
 
     // Cypress cannot test hover so need to set defaultIsHovered to true
     const voidFn = () => {};
+    const deps = withStubDeps();
     cy.mount(
-      <PasswordTableWrapper>
+      <PasswordTableWrapper deps={deps}>
         <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} defaultIsHovered={true} />
       </PasswordTableWrapper>
     );
@@ -107,7 +113,7 @@ describe('Closed entry in locked state', () => {
       `[data-cy=closed-entry-password-copy-${safeEnty.key}]`,
       2,
       true
-    );
+    )
 
     // Check that username and edit button are vertically aligned
     cy.shouldAlignMiddleY(
@@ -115,7 +121,7 @@ describe('Closed entry in locked state', () => {
       `[data-cy=closed-entry-edit-button-${safeEnty.title}]`,
       2,
       true
-    );
+    )
 
     // Check that password shadow and edit button are vertically aligned
     cy.shouldAlignMiddleY(
@@ -123,7 +129,7 @@ describe('Closed entry in locked state', () => {
       `[data-cy=closed-entry-edit-button-${safeEnty.title}]`,
       2,
       true
-    );
+    )
   });
 });
 
@@ -144,10 +150,15 @@ describe('Closed entry being unlocked', () => {
   });
   it('copy password is pressed', () => {
     const safeEnty = withSafePasswordEntry(4, false);
+    const neverResolvingPromise = new Promise(() => {});
+    const trezorService = {
+      decryptFullEntry: cy.stub().returns(neverResolvingPromise),
+    };
+    const deps = withTrezorService(trezorService)
     // Cypress cannot test hover so need to set defaultIsHovered to true
     const voidFn = () => {};
     cy.mount(
-      <PasswordTableWrapper>
+      <PasswordTableWrapper deps={deps}>
         <ClosedEntry safeEntry={safeEnty} onOpenEntry={voidFn} locked={false} onLockChange={voidFn} defaultIsHovered={true} />
       </PasswordTableWrapper>
     ).then(() => {
@@ -157,5 +168,14 @@ describe('Closed entry being unlocked', () => {
     cy.get(`[data-cy=closed-entry-password-copy-${safeEnty.key}]`)
       .should('be.visible')
       .click();
+
+    cy.get('[data-cy=closed-entry-details]').should('have.text', 'Copying password to clipboard');
+
+    cy.shouldAlignLeft(
+      `[data-cy=closed-entry-title-${safeEnty.title}]`,
+      `[data-cy=closed-entry-details]`,
+      2,
+      true
+    );
   });
 });

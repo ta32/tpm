@@ -78,7 +78,7 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
     });
   };
 
-  const renderLockedEntryIcon = (tagId: string) => {
+  const renderAvatarIcon = (tagId: string) => {
     const tag = getTag(tagEntries, tagId);
     const tagIconSvg = SELECTABLE_TAG_ICONS.get(tag?.icon ?? '');
     const stateStyles = {
@@ -104,69 +104,35 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
       </div>
     );
   };
-  const renderAccountInfo = () => {
-    const title = safeEntry.metaTitle ?? safeEntry.title;
-    if (status != STATUS.DEFAULT) {
-      const msg = requiresTrezorAck ? 'Look at Trezor!' : 'Unlocking...';
-      const actionMsg = status === STATUS.DECRYPTING_ENTRY ? 'Editing Entry' : 'Copying Password to clipboard';
-      return (
-        <div className={styles.account_info}>
-          <strong className={styles.title}>{msg}</strong>
-          <div className={styles.credentials}>
-            <div data-cy={'closed-entry-action-msg'} className={styles.label}>
-              {actionMsg}
-            </div>
+  const renderClosedEntryDetails = () => {
+    return (
+      <>
+        <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
+          <div
+            data-cy={`closed-entry-username-${safeEntry.key}`}
+            className={styles.username_label}
+            onClick={() => handleCopyUsername(safeEntry.username)}
+          >
+            {safeEntry.username}
           </div>
-        </div>
-      );
-    } else {
-      return (
-        <div data-cy={`closed-entry-${safeEntry.key}`} className={styles.account_info}>
-          <div data-cy={'closed-entry-title-' + safeEntry.title} className={styles.title}>
-            {title}
-          </div>
-          <div className={styles.credentials}>
-            <ToolTip text={copiedUsername ? 'Copied!' : 'Copy username'} position={'bottom'}>
-              <div
-                data-cy={`closed-entry-username-${safeEntry.key}`}
-                className={styles.username_label}
-                onClick={() => handleCopyUsername(safeEntry.username)}
-              >
-                {safeEntry.username}
-              </div>
-            </ToolTip>
-            {!locked && (
-              <ToolTip
-                text={'Copy password'}
-                position={'bottom'}
-                dataCy={'closed-entry-password-copy-wrapper-' + safeEntry.key}
-              >
-                <input
-                  data-cy={'closed-entry-password-copy-' + safeEntry.key}
-                  onClick={handleCopyPassword}
-                  className={styles.password_shadow}
-                  title={'Copy to clipboard'}
-                  type="password"
-                  value={'password'}
-                  readOnly
-                />
-              </ToolTip>
-            )}
-          </div>
-        </div>
-      );
-    }
-  };
-  return (
-    <div
-      className={`${styles.container} ${isHovered ? styles.hovered : ''}`}
-      data-cy={`closed-entry-container-${safeEntry.key}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {renderLockedEntryIcon(safeEntry.tags[0] ?? '')}
-      {renderAccountInfo()}
-      {!locked && (
+        </ToolTip>
+        {!locked && (
+          <ToolTip
+            text={'Copy password'}
+            position={'bottom'}
+            dataCy={'closed-entry-password-copy-wrapper-' + safeEntry.key}
+          >
+            <input
+              data-cy={'closed-entry-password-copy-' + safeEntry.key}
+              onClick={handleCopyPassword}
+              className={styles.password_shadow}
+              title={'Copy to clipboard'}
+              type="password"
+              value={'password'}
+              readOnly
+            />
+          </ToolTip>
+        )}
         <div className={styles.account_info_controls}>
           <button
             data-cy={`closed-entry-edit-button-${safeEntry.title}`}
@@ -176,7 +142,49 @@ export default function ClosedEntry({ onLockChange, safeEntry, onOpenEntry, lock
             Edit
           </button>
         </div>
-      )}
+      </>
+    );
+  }
+  const renderUnlockMessage = () => {
+    const actionMsg = status === STATUS.DECRYPTING_ENTRY ? 'Editing Entry' : 'Copying password to clipboard';
+    return (
+      <div className={styles.label}>
+        {actionMsg}
+      </div>
+    );
+  }
+  const renderTitle = (text: string, emphasis: boolean) => {
+    return (
+      <div
+        className={emphasis ? styles.title_emphasis : styles.title}
+        data-cy={'closed-entry-title-' + safeEntry.title}
+      >
+        {text}
+      </div>
+    );
+  };
+
+  const isClosed = status === STATUS.DEFAULT;
+  // meta-title takes precedence over title for instance imported entries are prefixed
+  // with conflict if there was a duplicate title
+  const title = safeEntry.metaTitle ?? safeEntry.title;
+  const titleText = isClosed ? title : (requiresTrezorAck ? 'Look at Trezor!' : 'Unlocking...');
+  const emphasis = !isClosed;
+  return (
+    <div
+      className={`${styles.container} ${isHovered ? styles.hovered : ''}`}
+      data-cy={`closed-entry-container-${safeEntry.key}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {renderAvatarIcon(safeEntry.tags[0] ?? '')}
+      <div className={styles.account_info} data-cy={`closed-entry-${safeEntry.key}`}>
+        {renderTitle(titleText, emphasis)}
+        <div className={styles.entry_details} data-cy="closed-entry-details">
+          {isClosed && renderClosedEntryDetails()}
+          {!isClosed && renderUnlockMessage()}
+        </div>
+      </div>
     </div>
   );
 }

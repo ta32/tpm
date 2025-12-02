@@ -8,14 +8,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 100%;
 }
 
 .account_info_controls {
   margin-left: auto;
   margin-right: auto;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
 }
 
 .avatar_mini {
@@ -42,11 +40,13 @@
   white-space: nowrap;
 
 }
-strong.title {
-  font-size: 1.3rem;
+.title_emphasis {
+  @extend .title;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-.credentials {
+.entry_details {
   padding-left: 1rem;
   display: flex;
   flex-direction: row;
@@ -72,9 +72,6 @@ strong.title {
 }
 
 .edit_btn {
-  margin-left: auto;
-  align-self: center;
-  margin-right: 1rem;
   border: none;
   outline: none;
   visibility: hidden;
@@ -82,7 +79,6 @@ strong.title {
   color: colors.$grey_font;
   border-radius: 3px;
   width: 6rem;
-  padding: 0.5rem 0;
   cursor: pointer;
 
   &:hover {

@@ -248,7 +248,7 @@ describe('PasswordManager - Interactions ', () => {
 
     // cypress doesn't support hover so we need to click a hidden button
     cy.get('[data-cy=closed-entry-password-copy-key1]').click({ force: true }); // https://docs.cypress.io/api/commands/hover
-    cy.get('[data-cy=closed-entry-action-msg]').should('contain', 'Copying Password to clipboard');
+    cy.get('[data-cy=closed-entry-action-msg]').should('contain', 'Copying password to clipboard');
     cy.wrap(trezorService.decryptFullEntry).should('be.calledWith', newEntry, false);
 
     // need to remount because the promise is not resolving
@@ -263,7 +263,7 @@ describe('PasswordManager - Interactions ', () => {
 
     // copy legacy password
     cy.get('[data-cy=closed-entry-password-copy-key2]').click({ force: true }); // https://docs.cypress.io/api/commands/hover
-    cy.get('[data-cy=closed-entry-action-msg]').should('contain', 'Copying Password to clipboard');
+    cy.get('[data-cy=closed-entry-action-msg]').should('contain', 'Copying password to clipboard');
     cy.wrap(trezorService.decryptFullEntry).should('be.calledWith', legacyEntry, true);
   });
 
